@@ -30,11 +30,14 @@ const GLfloat light_specular1[] = {0, 0.3, 0.6, 1};   // Specular of light 1
 const GLfloat one[] = {1, 1, 1, 1};                 // Specular on teapot
 const GLfloat medium[] = {0.5, 0.5, 0.5, 1};        // Diffuse on teapot
 const GLfloat small[] = {0.2, 0.2, 0.2, 1};         // Ambient on teapot
+const GLfloat zero[] = {0.0, 0.0, 0.0, 0};			// Self Emission
 const GLfloat high[] = {100} ;                      // Shininess of teapot
-GLfloat light0[4], light1[4], light2[4], light3[4], light4[4], light5[4], light6[4], light7[4], light8[4], light9[4];
+GLfloat light0[4], light1[4], light2[4], light3[4], light4[4],
+ 		light5[4], light6[4], light7[4], light8[4], light9[4];
 
 // Variables to set uniform params for lighting fragment shader 
 GLuint islight ; 
+GLuint numLights;
 GLuint light0posn ; 
 GLuint light0color ; 
 GLuint light1posn ; 
@@ -58,7 +61,8 @@ GLuint light9color ;
 GLuint ambient ; 
 GLuint diffuse ; 
 GLuint specular ; 
-GLuint shininess ; 
+GLuint shininess ;
+GLuint emission ;
 
 // New helper transformation function to transform vector by modelview 
 // May be better done using newer glm functionality.
@@ -183,11 +187,11 @@ void init() {
   // Set up initial position for eye, up and amount
   // As well as booleans 
 
-		eye = eyeinit ; 
+	eye = eyeinit ; 
 	up = upinit ; 
 	amount = 5;
-		sx = sy = 1.0 ; 
-		tx = ty = 0.0 ;
+	sx = sy = 1.0 ; 
+	tx = ty = 0.0 ;
 	useGlu = false;
 
 	glEnable(GL_DEPTH_TEST);
@@ -203,6 +207,7 @@ void init() {
 	fragmentshader = initshaders(GL_FRAGMENT_SHADER, "shaders/light.frag.glsl");
 	shaderprogram = initprogram(vertexshader, fragmentshader);
 	islight = glGetUniformLocation(shaderprogram,"islight");
+	numLights = glGetUniformLocation(shaderprogram,"numLights");
 	light0posn = glGetUniformLocation(shaderprogram,"light0posn");
 	light0color = glGetUniformLocation(shaderprogram,"light0color");
 	light1posn = glGetUniformLocation(shaderprogram,"light1posn");
@@ -227,6 +232,7 @@ void init() {
 	diffuse = glGetUniformLocation(shaderprogram,"diffuse");
 	specular = glGetUniformLocation(shaderprogram,"specular");
 	shininess = glGetUniformLocation(shaderprogram,"shininess");
+	emission = glGetUniformLocation(shaderprogram,"emission");
 }
 
 void display() {
@@ -259,11 +265,13 @@ void display() {
 
         //glUniform4fv(ambient,1,small) ; 
         //glUniform4fv(diffuse,1,medium) ; 
-	glUniform4fv(ambient,1,small) ; 
+		glUniform4fv(ambient,1,small) ;
+		glUniform4fv(emission,1,zero) ;  
         glUniform4fv(diffuse,1,small) ; 
         glUniform4fv(specular,1,one) ; 
         glUniform1fv(shininess,1,high) ; 
         glUniform1i(islight,true) ;
+		glUniform1i(numLights,2) ;
 
         // Transformations for Teapot, involving translation and scaling 
         mat4 sc(1.0) , tr(1.0) ; 
