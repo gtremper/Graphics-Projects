@@ -68,10 +68,8 @@ void main (void)
         vec3 mypos = _mypos.xyz / _mypos.w ; // Dehomogenize current location 
         vec3 eyedirn = normalize(eyepos - mypos) ; 
 
-        /* Compute normal, needed for shading. 
-           Simpler is vec3 normal = normalize(gl_NormalMatrix * mynormal) ; */
-        vec3 _normal = (gl_ModelViewMatrixInverseTranspose*vec4(mynormal,0.0)).xyz ; 
-        vec3 normal = normalize(_normal) ; 
+        /* Compute normal, needed for shading. */
+         vec3 normal = normalize(gl_NormalMatrix * mynormal) ; 
 
 		/* Initialize variables */
 		vec3 position, direction, halfAngle;
@@ -81,10 +79,11 @@ void main (void)
 								
 		vec4 lightColor[10] = vec4[](light0color,light1color,light2color,light3color,light4color,
 								light5color,light6color,light7color,light8color,light9color);
-
+		
+		/* Sum over all lights */
 		for(int i=0; i<numLights ;i++) {	
 			if (lightPosn[i].w==0) {
-				direction = normalize(lightPosn[i].xyz);
+				direction = -normalize(lightPosn[i].xyz);
 			} else {
 	        	position = lightPosn[i].xyz / lightPosn[0].w ; 
 				direction = normalize (position - mypos) ;
