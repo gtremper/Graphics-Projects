@@ -19,7 +19,24 @@ uniform int islight ; // are we lighting.
 uniform vec4 light0posn ; 
 uniform vec4 light0color ; 
 uniform vec4 light1posn ; 
-uniform vec4 light1color ; 
+uniform vec4 light1color ;
+uniform vec4 light2posn ; 
+uniform vec4 light2color ; 
+uniform vec4 light3posn ; 
+uniform vec4 light3color ;
+uniform vec4 light4posn ; 
+uniform vec4 light4color ; 
+uniform vec4 light5posn ; 
+uniform vec4 light5color ;
+uniform vec4 light6posn ; 
+uniform vec4 light6color ; 
+uniform vec4 light7posn ; 
+uniform vec4 light7color ;
+uniform vec4 light8posn ; 
+uniform vec4 light8color ; 
+uniform vec4 light9posn ; 
+uniform vec4 light9color ;
+
 
 // Now, set the material parameters.  These could be varying and/or bound to 
 // a buffer.  But for now, I'll just make them uniform.  

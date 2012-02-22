@@ -185,7 +185,7 @@ void init() {
 	  fragmentshader = initshaders(GL_FRAGMENT_SHADER, "shaders/light.frag.glsl") ;
 	  shaderprogram = initprogram(vertexshader, fragmentshader) ; 
 	  islight = glGetUniformLocation(shaderprogram,"islight") ;		   
-	  light0posn = glGetUniformLocation(shaderprogram,"light0posn") ;		
+	  light0posn = glGetUniformLocation(shaderprogram,"light0posn") ;	
 	  light0color = glGetUniformLocation(shaderprogram,"light0color") ;		  
 	  light1posn = glGetUniformLocation(shaderprogram,"light1posn") ;		
 	  light1color = glGetUniformLocation(shaderprogram,"light1color") ;		  
