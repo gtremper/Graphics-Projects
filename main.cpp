@@ -5,9 +5,12 @@
 
 
 #include <iostream>
+#include <sstream>
 #include <GLUT/glut.h>
 #include "shaders.h"
 #include "Transform.h"
+
+const int MAXLIGHTS = 10;
 
 int amount; // The amount of rotation for each arrow press
 
@@ -23,46 +26,31 @@ float sx, sy ; // the scale in x and y
 float tx, ty ; // the translation in x and y
 
 // Constants to set up lighting on the teapot
-const GLfloat light_position[] = {0, 5, 10, 1};    // Position of light 0
-const GLfloat light_position1[] = {0, 5, -10, 1};  // Position of light 1
-const GLfloat light_specular[] = {0.6, 0.3, 0, 1};    // Specular of light 0
-const GLfloat light_specular1[] = {0, 0.3, 0.6, 1};   // Specular of light 1
+//const GLfloat light_position[] = {0, 5, 10, 1};    // Position of light 0
+//const GLfloat light_position1[] = {0, 5, -10, 1};  // Position of light 1
+//const GLfloat light_specular[] = {0.6, 0.3, 0, 1};    // Specular of light 0
+//const GLfloat light_specular1[] = {0, 0.3, 0.6, 1};   // Specular of light 1
+
+const GLfloat light_position[2][4] = {{0, 5, 10, 1},{0, 5, -10, 1}};
+const GLfloat light_specular[2][4] = {{0.6, 0.3, 0, 1},{0, 0.3, 0.6, 1}};
 const GLfloat one[] = {1, 1, 1, 1};                 // Specular on teapot
 const GLfloat medium[] = {0.5, 0.5, 0.5, 1};        // Diffuse on teapot
 const GLfloat small[] = {0.2, 0.2, 0.2, 1};         // Ambient on teapot
 const GLfloat zero[] = {0.0, 0.0, 0.0, 0};			// Self Emission
 const GLfloat high[] = {100} ;                      // Shininess of teapot
-GLfloat light0[4], light1[4], light2[4], light3[4], light4[4],
- 		light5[4], light6[4], light7[4], light8[4], light9[4];
+
 
 // Variables to set uniform params for lighting fragment shader 
 GLuint islight ; 
 GLuint numLights;
-GLuint light0posn ; 
-GLuint light0color ; 
-GLuint light1posn ; 
-GLuint light1color ; 
-GLuint light2posn ; 
-GLuint light2color ; 
-GLuint light3posn ; 
-GLuint light3color ; 
-GLuint light4posn ; 
-GLuint light4color ; 
-GLuint light5posn ; 
-GLuint light5color ; 
-GLuint light6posn ; 
-GLuint light6color ; 
-GLuint light7posn ; 
-GLuint light7color ; 
-GLuint light8posn ; 
-GLuint light8color ; 
-GLuint light9posn ; 
-GLuint light9color ; 
 GLuint ambient ; 
 GLuint diffuse ; 
 GLuint specular ; 
 GLuint shininess ;
 GLuint emission ;
+
+GLuint lightPosn[MAXLIGHTS];
+GLuint lightColor[MAXLIGHTS];
 
 // New helper transformation function to transform vector by modelview 
 // May be better done using newer glm functionality.
@@ -196,43 +184,39 @@ void init() {
 
 	glEnable(GL_DEPTH_TEST);
 
-  // The lighting is enabled using the same framework as in mytest 3 
-  // Except that we use two point lights
-  // For now, lights and materials are set in display.  Will move to init 
-  // later, per update lights
-
-
-
 	vertexshader = initshaders(GL_VERTEX_SHADER, "shaders/light.vert.glsl");
 	fragmentshader = initshaders(GL_FRAGMENT_SHADER, "shaders/light.frag.glsl");
 	shaderprogram = initprogram(vertexshader, fragmentshader);
 	islight = glGetUniformLocation(shaderprogram,"islight");
 	numLights = glGetUniformLocation(shaderprogram,"numLights");
-	light0posn = glGetUniformLocation(shaderprogram,"light0posn");
-	light0color = glGetUniformLocation(shaderprogram,"light0color");
-	light1posn = glGetUniformLocation(shaderprogram,"light1posn");
-	light1color = glGetUniformLocation(shaderprogram,"light1color");
-	light2posn = glGetUniformLocation(shaderprogram,"light2posn");
-	light2color = glGetUniformLocation(shaderprogram,"light2color");
-	light3posn = glGetUniformLocation(shaderprogram,"light3posn");
-	light3color = glGetUniformLocation(shaderprogram,"light3color");
-	light4posn = glGetUniformLocation(shaderprogram,"light4posn");
-	light4color = glGetUniformLocation(shaderprogram,"light4color");
-	light5posn = glGetUniformLocation(shaderprogram,"light5posn");
-	light5color = glGetUniformLocation(shaderprogram,"light5color");
-	light6posn = glGetUniformLocation(shaderprogram,"light6posn");
-	light6color = glGetUniformLocation(shaderprogram,"light6color");
-	light7posn = glGetUniformLocation(shaderprogram,"light7posn");
-	light7color = glGetUniformLocation(shaderprogram,"light7color");
-	light8posn = glGetUniformLocation(shaderprogram,"light8posn");
-	light8color = glGetUniformLocation(shaderprogram,"light8color");
-	light9posn = glGetUniformLocation(shaderprogram,"light9posn");
-	light9color = glGetUniformLocation(shaderprogram,"light9color");
+	
 	ambient = glGetUniformLocation(shaderprogram,"ambient");
 	diffuse = glGetUniformLocation(shaderprogram,"diffuse");
 	specular = glGetUniformLocation(shaderprogram,"specular");
 	shininess = glGetUniformLocation(shaderprogram,"shininess");
 	emission = glGetUniformLocation(shaderprogram,"emission");
+	
+	lightPosn[0] = glGetUniformLocation(shaderprogram,"lightPosn[0]");
+	lightColor[0] = glGetUniformLocation(shaderprogram,"lightColor[0]");
+	lightPosn[1] = glGetUniformLocation(shaderprogram,"lightPosn[1]");
+	lightColor[1] = glGetUniformLocation(shaderprogram,"lightColor[1]");
+	lightPosn[2] = glGetUniformLocation(shaderprogram,"lightPosn[2]");
+	lightColor[2] = glGetUniformLocation(shaderprogram,"lightColor[2]");
+	lightPosn[3] = glGetUniformLocation(shaderprogram,"lightPosn[3]");
+	lightColor[3] = glGetUniformLocation(shaderprogram,"lightColor[3]");
+	lightPosn[4] = glGetUniformLocation(shaderprogram,"lightPosn[4]");
+	lightColor[4] = glGetUniformLocation(shaderprogram,"lightColor[4]");
+	lightPosn[5] = glGetUniformLocation(shaderprogram,"lightPosn[5]");
+	lightColor[5] = glGetUniformLocation(shaderprogram,"lightColor[5]");
+	lightPosn[6] = glGetUniformLocation(shaderprogram,"lightPosn[6]");
+	lightColor[6] = glGetUniformLocation(shaderprogram,"lightColor[6]");
+	lightPosn[7] = glGetUniformLocation(shaderprogram,"lightPosn[7]");
+	lightColor[7] = glGetUniformLocation(shaderprogram,"lightColor[7]");
+	lightPosn[8] = glGetUniformLocation(shaderprogram,"lightPosn[8]");
+	lightColor[8] = glGetUniformLocation(shaderprogram,"lightColor[8]");
+	lightPosn[9] = glGetUniformLocation(shaderprogram,"lightPosn[9]");
+	lightColor[9] = glGetUniformLocation(shaderprogram,"lightColor[9]");
+	
 }
 
 void display() {
@@ -251,17 +235,12 @@ void display() {
         }
     glLoadMatrixf(&mv[0][0]) ; 
 
-        // Set Light and Material properties for the teapot
-        // Lights are transformed by current modelview matrix. 
-        // The shader can't do this globally. 
-        // So we need to do so manually.  
-        transformvec(light_position, light0) ; 
-        transformvec(light_position1, light1) ; 
- 
-		glUniform4fv(light0posn, 1, light0) ; 
-        glUniform4fv(light0color, 1, light_specular) ; 
-        glUniform4fv(light1posn, 1, light1) ; 
-        glUniform4fv(light1color, 1, light_specular1) ; 
+	GLfloat light[4];
+	for (int i=0; i<2; i++){
+		transformvec(light_position[i], light); 
+		glUniform4fv(lightPosn[i], 1, light);
+		glUniform4fv(lightColor[i], 1, light_specular[i]);  
+	}	
 
         //glUniform4fv(ambient,1,small) ; 
         //glUniform4fv(diffuse,1,medium) ; 
@@ -289,7 +268,7 @@ void display() {
 int main(int argc, char* argv[]) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-	glutCreateWindow("HW1: Transformations");
+	glutCreateWindow("HW2: Scene Viewer");
 	init();
 	glutDisplayFunc(display);
 	glutSpecialFunc(specialKey);

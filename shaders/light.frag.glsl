@@ -13,26 +13,8 @@ uniform int islight ; // are we lighting.
 uniform int numLights;
 
 /* Color and Position for lights */
-uniform vec4 light0posn ; 
-uniform vec4 light0color ; 
-uniform vec4 light1posn ; 
-uniform vec4 light1color ;
-uniform vec4 light2posn ; 
-uniform vec4 light2color ; 
-uniform vec4 light3posn ; 
-uniform vec4 light3color ;
-uniform vec4 light4posn ; 
-uniform vec4 light4color ; 
-uniform vec4 light5posn ; 
-uniform vec4 light5color ;
-uniform vec4 light6posn ; 
-uniform vec4 light6color ; 
-uniform vec4 light7posn ; 
-uniform vec4 light7color ;
-uniform vec4 light8posn ; 
-uniform vec4 light8color ; 
-uniform vec4 light9posn ; 
-uniform vec4 light9color ;
+uniform vec4 lightPosn[10];
+uniform vec4 lightColor[10];
 
 // Now, set the material parameters.  These could be varying and/or bound to 
 // a buffer.  But for now, I'll just make them uniform.  
@@ -74,11 +56,6 @@ void main (void)
 		/* Initialize variables */
 		vec3 position, direction, halfAngle;
 		vec4 totalCol = vec4(0,0,0,0);
-		vec4 lightPosn[10] = vec4[](light0posn,light1posn,light2posn,light3posn,light4posn,
-								light5posn,light6posn,light7posn,light8posn,light9posn);
-								
-		vec4 lightColor[10] = vec4[](light0color,light1color,light2color,light3color,light4color,
-								light5color,light6color,light7color,light8color,light9color);
 		
 		/* Sum over all lights */
 		for(int i=0; i<numLights ;i++) {	
