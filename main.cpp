@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <stack>
 #include <GLUT/glut.h>
 #include "shaders.h"
 #include "Transform.h"
@@ -25,19 +26,14 @@ static enum {view, translate, scale} transop ; // which operation to transform b
 float sx, sy ; // the scale in x and y 
 float tx, ty ; // the translation in x and y
 
-// Constants to set up lighting on the teapot
-//const GLfloat light_position[] = {0, 5, 10, 1};    // Position of light 0
-//const GLfloat light_position1[] = {0, 5, -10, 1};  // Position of light 1
-//const GLfloat light_specular[] = {0.6, 0.3, 0, 1};    // Specular of light 0
-//const GLfloat light_specular1[] = {0, 0.3, 0.6, 1};   // Specular of light 1
 
-const GLfloat light_position[2][4] = {{0, 5, 10, 1},{0, 5, -10, 1}};
-const GLfloat light_specular[2][4] = {{0.6, 0.3, 0, 1},{0, 0.3, 0.6, 1}};
-const GLfloat one[] = {1, 1, 1, 1};                 // Specular on teapot
-const GLfloat medium[] = {0.5, 0.5, 0.5, 1};        // Diffuse on teapot
-const GLfloat small[] = {0.2, 0.2, 0.2, 1};         // Ambient on teapot
-const GLfloat zero[] = {0.0, 0.0, 0.0, 0};			// Self Emission
-const GLfloat high[] = {100} ;                      // Shininess of teapot
+GLfloat light_position[2][4] = {{0, 5, 10, 1},{0, 5, -10, 1}};
+GLfloat light_specular[2][4] = {{0.6, 0.3, 0, 1},{0, 0.3, 0.6, 1}};
+GLfloat one[] = {1, 1, 1, 1};                 // Specular on teapot
+GLfloat medium[] = {0.5, 0.5, 0.5, 1};        // Diffuse on teapot
+GLfloat small[] = {0.2, 0.2, 0.2, 1};         // Ambient on teapot
+GLfloat zero[] = {0.0, 0.0, 0.0, 0};			// Self Emission
+GLfloat high[] = {100} ;                      // Shininess of teapot
 
 
 // Variables to set uniform params for lighting fragment shader 
@@ -52,9 +48,12 @@ GLuint emission ;
 GLuint lightPosn[MAXLIGHTS];
 GLuint lightColor[MAXLIGHTS];
 
+
+
+
 // New helper transformation function to transform vector by modelview 
 // May be better done using newer glm functionality.
-void transformvec (const GLfloat input[4], GLfloat output[4]) {
+void transformvec (GLfloat input[4], GLfloat output[4]) {
   GLfloat modelview[16] ; // in column major order
   glGetFloatv(GL_MODELVIEW_MATRIX, modelview) ; 
   
