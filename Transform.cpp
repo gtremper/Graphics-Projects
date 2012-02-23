@@ -21,7 +21,8 @@ mat3 Transform::rotate(const float degrees, const vec3& axis) {
 }
 
 void Transform::left(float degrees, vec3& eye, vec3& up) {
-	mat3 R = rotate(degrees,up);
+	
+	mat3 R = rotate(degrees,glm::normalize(up));
 	eye = eye * R;
 }
 

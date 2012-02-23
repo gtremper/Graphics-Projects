@@ -480,35 +480,35 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 				glUniform1f(shininess,com.args[0]);
 				break;
 			case teapot:
-				transf = mv * matStack.top();
+				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
 				glutSolidTeapot(com.args[0]);
 				break;
 			case sphere:
-				transf = mv * matStack.top();
+				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
 				glutSolidSphere(com.args[0],30,30);
 				break;
 			case cube:
-				transf = mv * matStack.top();
+				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
 				glutSolidCube(com.args[0]);
 				break;
 			case trans:
 				transf = Transform::translate(com.args[0],com.args[1],com.args[2]);
 				transf = glm::transpose(transf);
-				matStack.top() = transf * matStack.top();
+				matStack.top() = matStack.top()*transf;
 				break;
 			case rot:
 				axis = vec3(com.args[0],com.args[1],com.args[2]);
 				transf = mat4(Transform::rotate(com.args[3], axis));
 				transf = glm::transpose(transf);
-				matStack.top() = transf * matStack.top();
+				matStack.top() = matStack.top()*transf;
 				break;
 			case scal:
 				transf = Transform::scale(com.args[0],com.args[1],com.args[2]);
 				transf = glm::transpose(transf);
-				matStack.top() = transf * matStack.top();
+				matStack.top() = matStack.top()*transf;
 				break;
 			case push:
 				transf = matStack.top();
@@ -546,6 +546,7 @@ void display() {
 		glUniform4fv(lightPosn[i], 1, light);
 		glUniform4fv(lightColor[i], 1, light_specular[i]);	
 	}
+	
 	
 	// Transformations for Teapot, involving translation and scaling 
 	mat4 sc, tr; 
