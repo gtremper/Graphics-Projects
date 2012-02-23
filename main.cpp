@@ -14,38 +14,36 @@
 
 const int MAXLIGHTS = 10;
 
-int amount; // The amount of rotation for each arrow press
+int amount; 	// The amount of rotation for each arrow press
 
-vec3 eye; // The (regularly updated) vector coordinates of the eye location 
-vec3 up;  // The (regularly updated) vector coordinates of the up location 
-const vec3 eyeinit(0.0,0.0,5.0) ; // Initial eye position, also for resets
-const vec3 upinit(0.0,1.0,0.0) ; // Initial up position, also for resets
-bool useGlu; // Toggle use of "official" opengl/glm transform vs user code
-int w, h; // width and height 
+vec3 eye; 		// The (regularly updated) vector coordinates of the eye location 
+vec3 up;		// The (regularly updated) vector coordinates of the up location 
+vec3 eyeinit;	// Initial eye position, also for resets
+vec3 upinit; 	// Initial up position, also for resets
+vec3 center;
+bool useGlu; 	// Toggle use of "official" opengl/glm transform vs user code
+int w, h;    	// width and height 
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
 static enum {view, translate, scale} transop ; // which operation to transform by 
 enum oper {amb,diff,spec,emis,shin,teapot,sphere,cube,trans,rot,scal,push,pop};
 float sx, sy ; // the scale in x and y 
 float tx, ty ; // the translation in x and y
+float fovy;
+GLfloat light_position[10][4];
+GLfloat light_specular[10][4];
+int numLights;
 
-
+/* Data structure for input command */
 struct command {
 	oper op;
 	GLfloat args[4];
 };
-
-GLfloat light_position[2][4] = {{0, 5, 10, 1},{0, 5, -10, 1}};
-GLfloat light_specular[2][4] = {{0.6, 0.3, 0, 1},{0, 0.3, 0.6, 1}};
-GLfloat one[] = {1, 1, 1, 1};				  // Specular on teapot
-GLfloat medium[] = {0.5, 0.5, 0.5, 1};		  // Diffuse on teapot
-GLfloat small[] = {0.2, 0.2, 0.2, 1};		  // Ambient on teapot
-GLfloat zero[] = {0.0, 0.0, 0.0, 0};			// Self Emission
-GLfloat high = 100.0 ;					  // Shininess of teapot
+std::vector<command> commands;
 
 
 // Variables to set uniform params for lighting fragment shader 
 GLuint islight ; 
-GLuint numLights;
+GLuint numLightsShader;
 
 GLuint ambient ; 
 GLuint diffuse ; 
@@ -55,8 +53,6 @@ GLuint emission ;
 
 GLuint lightPosn[MAXLIGHTS];
 GLuint lightColor[MAXLIGHTS];
-
-
 
 
 // New helper transformation function to transform vector by modelview 
@@ -77,17 +73,18 @@ void transformvec (GLfloat input[4], GLfloat output[4]) {
 void reshape(int width, int height){
 	w = width;
 	h = height;
-		mat4 mv ; // just like for lookat
+	mat4 mv ; // just like for lookat
 
 	glMatrixMode(GL_PROJECTION);
-		float fovy = 90.0, aspect = w / (float) h, zNear = 0.1, zFar = 99.0 ;
-		// I am changing the projection stuff to be consistent with lookat
-		if (useGlu) mv = glm::perspective(fovy,aspect,zNear,zFar) ; 
-		else {
-		  mv = Transform::perspective(fovy,aspect,zNear,zFar) ; 
+	float newFovy = fovy; 
+	float aspect = w / (float) h, zNear = 0.1, zFar = 99.0 ;
+	// I am changing the projection stuff to be consistent with lookat
+	if (useGlu) mv = glm::perspective(newFovy,aspect,zNear,zFar) ; 
+	else {
+		  mv = Transform::perspective(newFovy,aspect,zNear,zFar) ; 
 		  mv = glm::transpose(mv) ; // accounting for row major 
 		}
-		glLoadMatrixf(&mv[0][0]) ; 
+	glLoadMatrixf(&mv[0][0]) ; 
 
 	glViewport(0, 0, w, h);
 }
@@ -116,32 +113,31 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'g':
 		useGlu = !useGlu;
-				reshape(w,h) ; 
+		reshape(w,h) ; 
 		std::cout << "Using glm::LookAt and glm::Perspective set to: " << (useGlu ? " true " : " false ") << "\n" ; 
 		break;
 	case 'h':
 		printHelp();
 		break;
-		case 27:  // Escape to quit
-				exit(0) ;
-				break ;
-		case 'r': // reset eye and up vectors, scale and translate. 
+	case 27:  // Escape to quit
+			exit(0) ;
+			break ;
+	case 'r': // reset eye and up vectors, scale and translate. 
 		eye = eyeinit ; 
 		up = upinit ; 
-				sx = sy = 1.0 ; 
-				tx = ty = 0.0 ; 
+		sx = sy = 1.0 ; 
+		tx = ty = 0.0 ; 
 		break ;	  
-		case 'v': 
-				transop = view ;
-				std::cout << "Operation is set to View\n" ; 
-				break ; 
-		case 't':
-				transop = translate ; 
-				std::cout << "Operation is set to Translate\n" ; 
-				break ; 
-		case 's':
-				transop = scale ; 
-				std::cout << "Operation is set to Scale\n" ; 
+	case 'v': 
+		transop = view ;
+		std::cout << "Operation is set to View\n" ; 
+		break ; 
+	case 't':
+		transop = translate ; 
+		std::cout << "Operation is set to Translate\n" ; 			break ; 
+	case 's':
+		transop = scale ; 
+		std::cout << "Operation is set to Scale\n" ; 
 	}
 	glutPostRedisplay();
 }
@@ -176,11 +172,241 @@ void specialKey(int key, int x, int y) {
 }
 
 
+void parseFile() {
+	/* Hardcode until actual parser works */
+	numLights = 2;
+	w = 500;
+	h = 500;
+	eyeinit = vec3(0.0,-2,2);
+	center = vec3(0.0,0.0,0.0);
+	upinit = vec3(0.0,1.0,1.0);
+	fovy = 30;
+	//light1
+	light_position[0][0] = 0.6;
+	light_position[0][1] = 0;
+	light_position[0][2] = 0.1;
+	light_position[0][3] = 0;
+	light_specular[0][0] = 1;
+	light_specular[0][1] = 0.5;
+	light_specular[0][2] = 0.0;
+	light_specular[0][3] = 1.0;
+	//light2
+	light_position[1][0] = 0;
+	light_position[1][1] = -0.6;
+	light_position[1][2] = 0.1;
+	light_position[1][3] = 1;
+	light_specular[1][0] = 0.5;
+	light_specular[1][1] = 0.5;
+	light_specular[1][2] = 1.0;
+	light_specular[1][3] = 1.0;
+	
+	command com;
+	
+	com.op = push;
+	com.args[0] = 0.2;
+	com.args[1] = 0.2;
+	com.args[2] = 0.2;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = trans;
+	com.args[0] = 0.0;
+	com.args[1] = 0.0;
+	com.args[2] = -0.2;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = amb;
+	com.args[0] = 0.2;
+	com.args[1] = 0.2;
+	com.args[2] = 0.2;
+	com.args[3] = 1.0;
+	commands.push_back(com);
+	
+	com.op = diff;
+	com.args[0] = 0.5;
+	com.args[1] = 0.5;
+	com.args[2] = 0.5;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	
+	com.op = spec;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	
+	com.op = shin;
+	com.args[0] = 100;
+	com.args[1] = 0.2;
+	com.args[2] = 0.2;
+	com.args[3] = 0.2;
+	commands.push_back(com);
+	
+	
+	com.op = push;
+	com.args[0] = 2;
+	com.args[1] = 0.2;
+	com.args[2] = 0.2;
+	com.args[3] = 0.2;
+	commands.push_back(com);
+	
+	
+	com.op = trans;
+	com.args[0] = 0;
+	com.args[1] = 0;
+	com.args[2] = 0.1;
+	com.args[3] = 0.2;
+	commands.push_back(com);
+	
+	
+	com.op = rot;
+	com.args[0] = 1;
+	com.args[1] = 0;
+	com.args[2] = 0;
+	com.args[3] = 90;
+	commands.push_back(com);
+	
+	
+	com.op = teapot;
+	com.args[0] = 0.15;
+	com.args[1] = 0.2;
+	com.args[2] = 0.2;
+	com.args[3] = 0.2;
+	commands.push_back(com);
+	
+	
+	com.op = pop;
+	com.args[0] = 2;
+	com.args[1] = 0.2;
+	com.args[2] = 0.2;
+	com.args[3] = 0.2;
+	commands.push_back(com);
+	
+	
+	com.op = amb;
+	com.args[0] = 0;
+	com.args[1] = 0;
+	com.args[2] = 0;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	
+	com.op = diff;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = push;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = scal;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 0.025;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = cube;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = pop;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = diff;
+	com.args[0] = 1;
+	com.args[1] = 0.25;
+	com.args[2] = 0.25;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = push;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = trans;
+	com.args[0] = -.4;
+	com.args[1] = -.4;
+	com.args[2] = 0;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = push;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = trans;
+	com.args[0] = 0;
+	com.args[1] = 0;
+	com.args[2] = 0.6;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = sphere;
+	com.args[0] = 0.1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = pop;
+	com.args[0] = 1;
+	com.args[1] = 1;
+	com.args[2] = 1;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = scal;
+	com.args[0] = 0.2;
+	com.args[1] = 0.2;
+	com.args[2] = 0.5;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = trans;
+	com.args[0] = 0;
+	com.args[1] = 0;
+	com.args[2] = 0.5;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+	com.op = cube;
+	com.args[0] = 1.0;
+	com.args[1] = 0;
+	com.args[2] = 0.5;
+	com.args[3] = 1;
+	commands.push_back(com);
+	
+		
+}
+
 
 void init() {
   
-  // Set up initial position for eye, up and amount
-  // As well as booleans 
+	parseFile();
 
 	eye = eyeinit ; 
 	up = upinit ; 
@@ -195,7 +421,7 @@ void init() {
 	fragmentshader = initshaders(GL_FRAGMENT_SHADER, "shaders/light.frag.glsl");
 	shaderprogram = initprogram(vertexshader, fragmentshader);
 	islight = glGetUniformLocation(shaderprogram,"islight");
-	numLights = glGetUniformLocation(shaderprogram,"numLights");
+	numLightsShader = glGetUniformLocation(shaderprogram,"numLights");
 	
 	ambient = glGetUniformLocation(shaderprogram,"ambient");
 	diffuse = glGetUniformLocation(shaderprogram,"diffuse");
@@ -226,14 +452,15 @@ void init() {
 	
 }
 
-
 /* Draws objects based on list of commands */
-void drawObjects(std::vector<command> commands, mat4 mv) {
+void drawObjects(std::vector<command> comms, mat4 mv) {
 	std::stack<mat4> matStack;
 	matStack.push(mat4(1.0));
-	for(int i=0; i<commands.size(); i++){
+	
+	std::vector<command>::iterator it;
+	for(it = comms.begin(); it<comms.end(); it++){
 		
-		command com = commands[i];
+		command com = *it;
 		mat4 transf , sc , tr;
 		vec3 axis;
 		switch(com.op) {
@@ -302,7 +529,6 @@ void display() {
 
 	glMatrixMode(GL_MODELVIEW);
 	mat4 mv ; 
-	const vec3 center(0.0,0.0,0.0) ; 
 
 	if (useGlu) mv = glm::lookAt(eye,center,up) ; 
 	else {
@@ -310,74 +536,27 @@ void display() {
 		  mv = glm::transpose(mv) ; // accounting for row major
 		}
 	glLoadMatrixf(&mv[0][0]) ; 
+	
+	glUniform1i(islight, true) ;
+	glUniform1i(numLightsShader, numLights);
 
 	GLfloat light[4];
-	for (int i=0; i<2; i++){
+	for (int i=0; i<numLights; i++){
 		transformvec(light_position[i], light); 
 		glUniform4fv(lightPosn[i], 1, light);
 		glUniform4fv(lightColor[i], 1, light_specular[i]);	
 	}
 	
-	 
-		//glUniform4fv(ambient,1,small) ;
-		//glUniform4fv(emission,1,zero) ;	 
-		//glUniform4fv(diffuse,1,small) ; 
-		//glUniform4fv(specular,1,one) ; 
-		//glUniform1f(shininess,high) ; 
-		glUniform1i(islight,true) ;
-		glUniform1i(numLights,2) ;
+	// Transformations for Teapot, involving translation and scaling 
+	mat4 sc, tr; 
+	sc = Transform::scale(sx,sy,1.0) ; 
+	tr = Transform::translate(tx,ty,0.0) ; 
+	// Multiply the matrices, accounting for OpenGL and GLM.
+	sc = glm::transpose(sc) ; tr = glm::transpose(tr) ; 
+	mat4 transf	 = mv * tr * sc ; // scale, then translate, then lookat.
 		
-		command com;
-		std::vector<command> commands;
-		com.op = amb;
-		com.args[0] = 0.2;
-		com.args[1] = 0.2;
-		com.args[2] = 0.2;
-		com.args[3] = 1;
-		commands.push_back(com);
+	drawObjects(commands,transf);
 		
-		com.op = diff;
-		com.args[0] = 0.2;
-		com.args[1] = 0.2;
-		com.args[2] = 0.2;
-		com.args[3] = 1;
-		commands.push_back(com);
-		
-		com.op = spec;
-		com.args[0] = 1;
-		com.args[1] = 1;
-		com.args[2] = 1;
-		com.args[3] = 1;
-		commands.push_back(com);
-		
-		com.op = shin;
-		com.args[0] = 100;
-		com.args[1] = 0.2;
-		com.args[2] = 0.2;
-		com.args[3] = 0.2;
-		commands.push_back(com);
-		
-		
-		com.op = teapot;
-		com.args[0] = 2;
-		com.args[1] = 0.2;
-		com.args[2] = 0.2;
-		com.args[3] = 0.2;
-		commands.push_back(com);
-		
-
-		// Transformations for Teapot, involving translation and scaling 
-		mat4 sc(1.0) , tr(1.0) ; 
-		sc = Transform::scale(sx,sy,1.0) ; 
-		tr = Transform::translate(tx,ty,0.0) ; 
-		// Multiply the matrices, accounting for OpenGL and GLM.
-		sc = glm::transpose(sc) ; tr = glm::transpose(tr) ; 
-		mat4 transf	 = mv * tr * sc ; // scale, then translate, then lookat.
-		
-		drawObjects(commands,transf);
-		
-
-	//glutSolidTeapot(2);
 	glutSwapBuffers();
 }
 
@@ -390,7 +569,7 @@ int main(int argc, char* argv[]) {
 	glutSpecialFunc(specialKey);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
-	glutReshapeWindow(600, 400);
+	glutReshapeWindow(w,h);
 	printHelp();
 	glutMainLoop();
 	return 0;
