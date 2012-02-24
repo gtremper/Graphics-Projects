@@ -24,6 +24,7 @@ vec3 eyeinit;	// Initial eye position, also for resets
 vec3 upinit; 	// Initial up position, also for resets
 vec3 center;
 bool useGlu; 	// Toggle use of "official" opengl/glm transform vs user code
+bool useLights;
 int wid, high;    	// width and height 
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
 static enum {view, translate, scale, light} transop ; // which operation to transform by 
@@ -130,6 +131,8 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'r': // reset eye and up vectors, scale and translate. 
 		eye = eyeinit ; 
 		up = upinit ; 
+		useLights = true;
+		glUniform1i(islight, useLights) ;
 		sx = sy = 1.0 ; 
 		tx = ty = 0.0 ; 
 		for(int i=0; i<numLights; i++) {
@@ -151,6 +154,11 @@ void keyboard(unsigned char key, int x, int y) {
 		transop = scale ; 
 		std::cout << "Operation is set to Scale\n" ;
 		break;
+	case 'l':
+		useLights = !useLights;
+		glUniform1i(islight, useLights) ;
+		std::cout << "useLights is now set to" << (useLights ? " true " : " false ") << "\n" ;
+		break; 
 	case 48:
 	case 49:
 	case 50:
@@ -392,6 +400,7 @@ void init() {
 	sx = sy = 1.0 ; 
 	tx = ty = 0.0 ;
 	useGlu = false;
+	useLights = true;
 	
 	for(int i=0; i<numLights; i++) {
 		light_position[i][0] = light_position_init[i][0];
@@ -437,7 +446,7 @@ void init() {
 	
 	
 	/* Set variables that don't change during simulation */
-	glUniform1i(islight, true) ;
+	glUniform1i(islight, useLights) ;
 	glUniform1i(numLightsShader, numLights);
 	
 	GLfloat light[4];
