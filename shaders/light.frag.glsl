@@ -56,6 +56,7 @@ void main (void)
 		/* Initialize variables */
 		vec3 position, direction, halfAngle;
 		vec4 totalCol = vec4(0,0,0,0);
+		totalCol = ambient + emission;
 		
 		/* Sum over all lights */
 		for(int i=0; i<numLights ;i++) {	
@@ -63,13 +64,13 @@ void main (void)
 				direction = -normalize(lightPosn[i].xyz);
 			} else {
 	        	position = lightPosn[i].xyz / lightPosn[i].w ; 
-				direction = normalize (position - mypos) ;
+				direction = normalize (position-mypos) ;
 			}
 	        halfAngle = normalize (direction + eyedirn) ;  
 	        totalCol += ComputeLight(direction, lightColor[i], normal, halfAngle, diffuse, specular, shininess);
 		}
 		
-		gl_FragColor = ambient + emission + totalCol;		
+		gl_FragColor = totalCol;		
 	}
 }
 		
