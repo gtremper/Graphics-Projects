@@ -32,7 +32,7 @@ float sx, sy ; // the scale in x and y
 float tx, ty ; // the translation in x and y
 float fovy;
 GLfloat light_position[10][4];
-GLfloat light_position_init[10][4];
+vec4 light_position_init[10];
 GLfloat light_specular[10][4];
 vec3 lightUp[10];
 int currentLight;
@@ -132,7 +132,12 @@ void keyboard(unsigned char key, int x, int y) {
 		up = upinit ; 
 		sx = sy = 1.0 ; 
 		tx = ty = 0.0 ; 
-		//light_position = light_position_init;
+		for(int i=0; i<numLights; i++) {
+			light_position[i][0] = light_position_init[i][0];
+			light_position[i][1] = light_position_init[i][1];
+			light_position[i][2] = light_position_init[i][2];
+			light_position[i][3] = light_position_init[i][3];
+		}
 		break ;	  
 	case 'v': 
 		transop = view ;
@@ -157,8 +162,10 @@ void keyboard(unsigned char key, int x, int y) {
 	case 56:
 	case 57:
 		int num = key-48;
-		if (num>=numLights)
+		if (num>=numLights){
+			std::cout<<"That light does not exist\n";
 			break;
+		}
 		transop = light;
 		currentLight = num;
 		vec3 a(light_position[num][0],light_position[num][1],light_position[num][2]);
@@ -251,10 +258,7 @@ void parseLine(std::string l) {
 			return;
 		} else {
 			line >> x >> y >> z >> w >> r >> g >> b >> a;
-			light_position[numLights][0] = x;
-			light_position[numLights][1] = y;
-			light_position[numLights][2] = z;
-			light_position[numLights][3] = w;
+			light_position_init[numLights] = vec4(x,y,z,w);
 			light_specular[numLights][0] = r;
 			light_specular[numLights][1] = g;
 			light_specular[numLights][2] = b;
@@ -375,11 +379,17 @@ void init() {
 
 	eye = eyeinit ; 
 	up = upinit ;
-	//light_position = light_position_init; 
 	amount = 5;
 	sx = sy = 1.0 ; 
 	tx = ty = 0.0 ;
 	useGlu = false;
+	
+	for(int i=0; i<numLights; i++) {
+		light_position[i][0] = light_position_init[i][0];
+		light_position[i][1] = light_position_init[i][1];
+		light_position[i][2] = light_position_init[i][2];
+		light_position[i][3] = light_position_init[i][3];
+	}
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -518,7 +528,6 @@ void display() {
 		glUniform4fv(lightPosn[i], 1, light);
 	}
 	
-	
 	// Transformations for Teapot, involving translation and scaling 
 	mat4 sc, tr; 
 	sc = Transform::scale(sx,sy,1.0) ; 
@@ -534,7 +543,8 @@ void display() {
 
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
-		std::cout << "You need a text file as the arguments\n";
+		std::cerr << "You need a text file as the argument\n";
+		exit(1);
 	}
 	parse(argv[1]);
 	glutInit(&argc, argv);
