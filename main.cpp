@@ -228,26 +228,11 @@ void specialKey(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
-void parse(char* filename) {
-	numLights = 0;
-	std::ifstream myfile(filename,std::ifstream::in);
-	std::stringstream line;
-	if(myfile.is_open()) {
-		while(myfile.good()) {
-			getline(myfile, line);
-			parseLine(line);
-		}
-	}
-	else cout << "Unable to open file " + file << endl;
-}
 
-
-void parseLine(std::stringstream line) {
+void parseLine(std::string l) {
 	float lookfromx, lookfromy, lookfromz, lookatx, lookaty, lookatz, upx, upy, upz;
 	float x, y, z, w, r, g, b, a, s, size, theta;
-	eyeinit = vec3(0.0,-2,2);
-	center = vec3(0.0,0.0,0.0);
-	upinit = glm::normalize(vec3(0.0,1.0,1.0));
+	std::stringstream line(l);
 	std::string cmd;
 	line >> cmd;
 	if(cmd[0] == '#') { // comment
@@ -255,128 +240,136 @@ void parseLine(std::stringstream line) {
 	} else if(cmd == "") { // blank line
 		return;
 	} else if(cmd == "size") {
-		ss >> wid >> high;
+		line >> wid >> high;
 	} else if(cmd == "camera") {
-		ss >> lookfromx >> lookfromy >> lookfromz >> lookatx >> lookaty >> lookatz >> upx >> upy >> upz >> fovy;
-		eyeinit[0] = lookfromx;
-		eyeinit[1] = lookfromy;
-		eyeinit[2] = lookfromz;
-		center[0] = lookatx;
-		center[1] = lookaty;
-		center[2] = lookatz;
-		upinit[0] = upx;
-		upinit[1] = upy;
-		upinit[2] = upz;
+		line >> lookfromx >> lookfromy >> lookfromz >> lookatx >> lookaty >> lookatz >> upx >> upy >> upz >> fovy;
+		eyeinit = vec3(lookfromx,lookfromy,lookfromz);
+		center = vec3(lookatx,lookaty,lookatz);
+		upinit = vec3(upx,upy,upz);
 	} else if(cmd == "light") {
 		if(numLights > 9) {
 			return;
 		} else {
-			ss >> x >> y >> z >> w >> r >> g >> b >> a;
-			lightPosn[numLights][0] = x;
-			lightPosn[numLights][1] = y;
-			lightPosn[numLights][2] = z;
-			lightPosn[numLights][3] = w;
-			lightColor[numLights][0] = r;
-			lightColor[numLights][1] = g;
-			lightColor[numLights][2] = b;
-			lightColor[numLights][3] = a;
+			line >> x >> y >> z >> w >> r >> g >> b >> a;
+			light_position[numLights][0] = x;
+			light_position[numLights][1] = y;
+			light_position[numLights][2] = z;
+			light_position[numLights][3] = w;
+			light_specular[numLights][0] = r;
+			light_specular[numLights][1] = g;
+			light_specular[numLights][2] = b;
+			light_specular[numLights][3] = a;
 			numLights++;
 		}
 	} else if(cmd == "ambient") {
-		ss >> r >> g >> b >> a;
+		line >> r >> g >> b >> a;
 		command com;
 		com.op = amb;
 		com.args[0] = r;
 		com.args[1] = g;
 		com.args[2] = b;
 		com.args[3] = a;
-		commands.add(com);
+		commands.push_back(com);
 	} else if(cmd == "diffuse") {
-		ss >> r >> g >> b >> a;
+		line >> r >> g >> b >> a;
 		command com;
 		com.op = diff;
 		com.args[0] = r;
 		com.args[1] = g;
 		com.args[2] = b;
 		com.args[3] = a;
-		commands.add(com);
+		commands.push_back(com);
 	} else if(cmd == "specular") {
-		ss >> r >> g >> b >> a;
+		line >> r >> g >> b >> a;
 		command com;
 		com.op = spec;
 		com.args[0] = r;
 		com.args[1] = g;
 		com.args[2] = b;
 		com.args[3] = a;
-		commands.add(com);
-	} else if(cmd == "emission") {
-		ss >> r >> g >> b >> a;
+		commands.push_back(com);
+	} else if(cmd == "emilineion") {
+		line >> r >> g >> b >> a;
 		command com;
 		com.op = emis;
 		com.args[0] = r;
 		com.args[1] = g;
 		com.args[2] = b;
 		com.args[3] = a;
-		commands.add(com);
+		commands.push_back(com);
 	} else if(cmd == "shininess") {
-		ss >> s;
+		line >> s;
 		command com;
 		com.op = shin;
 		com.args[0] = s;
-		commands.add(com);
+		commands.push_back(com);
 	} else if(cmd == "teapot") {
-		ss >> size;
+		line >> size;
 		command com;
 		com.op = teapot;
 		com.args[0] = size;
-		command.add(com);
+		commands.push_back(com);
 	} else if(cmd == "sphere") {
-		ss >> size;
+		line >> size;
 		command com;
 		com.op = sphere;
 		com.args[0] = size;
-		command.add(com);
-	} else if(comd == "cube") {
-		ss >> size;
+		commands.push_back(com);
+	} else if(cmd == "cube") {
+		line >> size;
 		command com;
 		com.op = cube;
 		com.args[0] = size;
-		command.add(com);
+		commands.push_back(com);
 	} else if(cmd == "translate") {
-		ss >> x >> y >> z;
+		line >> x >> y >> z;
 		command com;
 		com.op = trans;
 		com.args[0] = x;
 		com.args[1] = y;
 		com.args[2] = z;
-		command.add(com);
+		commands.push_back(com);
 	} else if(cmd == "rotate") {
-		ss >> x >> y >> z >> theta;
+		line >> x >> y >> z >> theta;
 		command com;
 		com.op = rot;
 		com.args[0] = x;
 		com.args[1] = y;
 		com.args[2] = z;
 		com.args[3] = theta;
-		command.add(com);
+		commands.push_back(com);
 	} else if(cmd == "scale") {
-		ss >> x >> y >> z;
+		line >> x >> y >> z;
 		command com;
 		com.op = scal;
 		com.args[0] = x;
 		com.args[1] = y;
 		com.args[2] = z;
-		command.add(com);
+		commands.push_back(com);
 	} else if(cmd == "pushTransform") {
 		command com;
 		com.op = push;
+		commands.push_back(com);
 	} else if(cmd == "popTransform") {
 		command com;
 		com.op = pop;
+		commands.push_back(com);
 	}
 
 }
 
+void parse(char* filename) {
+	numLights = 0;
+	std::ifstream myfile(filename,std::ifstream::in);
+	std::string line;
+	if(myfile.is_open()) {
+		while(myfile.good()) {
+			getline(myfile, line);
+			parseLine(line);
+		}
+	}
+	else std::cout << "Unable to open file " << filename << std::endl;
+}
 
 void init() {
 

@@ -9,8 +9,8 @@ camera 0 -2 2 0 0 0 0 1 1 30.0
 
 # lights.  A single point and directional light
 # Note that your program must support up to 10 lights
-light 0.6 0 0.1 0 1 0.5 0 1  
 light 0 -0.6 0.1 1 0.5 0.5 1 1 
+light 0.6 0 0.1 0 1 0.5 0 1  
 
 # I do a global transform to move this down a little 
 # A good use of matrix stacks and hierarchy 
