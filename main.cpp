@@ -22,32 +22,34 @@ vec3 eye; 		// The (regularly updated) vector coordinates of the eye location
 vec3 up;		// The (regularly updated) vector coordinates of the up location 
 vec3 eyeinit;	// Initial eye position, also for resets
 vec3 upinit; 	// Initial up position, also for resets
-vec3 center;
+vec3 center;	// center of the world, usually (0,0,0)
 bool useGlu; 	// Toggle use of "official" opengl/glm transform vs user code
-bool useLights;
+bool useLights; // Toggle lights on and off
 int wid, high;    	// width and height 
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
 static enum {view, translate, scale, light} transop ; // which operation to transform by 
 enum oper {amb,diff,spec,emis,shin,teapot,sphere,cube,trans,rot,scal,push,pop};
 float sx, sy ; // the scale in x and y 
 float tx, ty ; // the translation in x and y
-float fovy;
-GLfloat light_position[10][4];
-vec4 light_position_init[10];
-GLfloat light_specular[10][4];
-vec3 lightUp[10];
-int currentLight;
-int numLights;
+float fovy;    // field of view
+GLfloat light_position[10][4]; //current position of the 10 lights
+vec4 light_position_init[10];  //initial position of lights
+GLfloat light_specular[10][4]; //color of lights
+vec3 lightUp[10];	//up vectors for all the lights
+int currentLight;	//current light being moved
+int numLights;		//number of lights in the scene
 
 /* Data structure for input command */
 struct command {
 	oper op;
 	GLfloat args[4];
 };
-std::vector<command> commands;
+
+/* List of commands ran every time drawObjects() is called */
+std::vector<command> commands; 
 
 
-// Variables to set uniform params for lighting fragment shader 
+/* Variables to set uniform params for lighting fragment shader */
 GLuint islight ; 
 GLuint numLightsShader;
 
@@ -74,8 +76,8 @@ void transformvec (GLfloat input[4], GLfloat output[4]) {
   }
 }
 
-// Uses the Projection matrices (technically deprecated) to set perspective 
-// We could also do this in a more modern fashion with glm.	 
+/* Uses the Projection matrices (technically deprecated) to set perspective 
+   We could also do this in a more modern fashion with glm.	*/ 
 void reshape(int width, int height){
 	wid = width;
 	high = height;
@@ -96,7 +98,6 @@ void reshape(int width, int height){
 }
 
 
-
 void printHelp() {
   std::cout << "\npress 'h' to print this message again.\n" 
 	   << "press '+' or '-' to change the amount of rotation that\noccurs with each arrow press.\n" 
@@ -107,6 +108,7 @@ void printHelp() {
 	
 }
 
+/* Keyboard options */
 void keyboard(unsigned char key, int x, int y) {
 	switch(key) {
 	case '+':
@@ -186,9 +188,8 @@ void keyboard(unsigned char key, int x, int y) {
 	glutPostRedisplay();
 }
 
-//	You will need to enter code for the arrow keys 
-//	When an arrow key is pressed, it will call your transform functions
-
+/*	You will need to enter code for the arrow keys 
+    When an arrow key is pressed, it will call your transform functions */
 void specialKey(int key, int x, int y) {
 	switch(key) {
 	case 100: //left
@@ -243,7 +244,7 @@ void specialKey(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
-
+/* Parses a line of input and takes appropriate action */
 void parseLine(std::string l) {
 	float lookfromx, lookfromy, lookfromz, lookatx, lookaty, lookatz, upx, upy, upz;
 	float x, y, z, w, r, g, b, a, s, size, theta;
@@ -370,6 +371,7 @@ void parseLine(std::string l) {
 
 }
 
+/* Parse the whole file */
 void parse(char* filename) {
 	std::ifstream myfile(filename,std::ifstream::in);
 	std::string line;
@@ -382,6 +384,7 @@ void parse(char* filename) {
 	else std::cout << "Unable to open file " << filename << std::endl;
 }
 
+/* Default values so the program doesn't crash with empty input */
 void def() {
 	numLights = 0;
 	fovy = 90;
@@ -526,6 +529,7 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 	}
 }
 
+/* main display */
 void display() {
 	glClearColor(0, 0, 1, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
