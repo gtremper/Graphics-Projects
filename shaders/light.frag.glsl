@@ -62,7 +62,7 @@ void main (void)
 			if (lightPosn[i].w==0) {
 				direction = -normalize(lightPosn[i].xyz);
 			} else {
-	        	position = lightPosn[i].xyz / lightPosn[0].w ; 
+	        	position = lightPosn[i].xyz / lightPosn[i].w ; 
 				direction = normalize (position - mypos) ;
 			}
 	        halfAngle = normalize (direction + eyedirn) ;  
