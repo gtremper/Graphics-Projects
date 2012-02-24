@@ -170,7 +170,7 @@ void keyboard(unsigned char key, int x, int y) {
 		currentLight = num;
 		vec3 a(light_position[num][0],light_position[num][1],light_position[num][2]);
 		vec3 side = glm::cross(a,up);
-		lightUp[num] = glm::cross(side,a);
+		lightUp[num] = glm::normalize(glm::cross(side,a));
 		std::cout << "Now controlling light "<<num<<"\n";
 		break;
 	
@@ -473,7 +473,7 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 			case sphere:
 				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
-				glutSolidSphere(com.args[0],30,30);
+				glutSolidSphere(com.args[0],20,20);
 				break;
 			case cube:
 				transf = mv*matStack.top();
@@ -525,7 +525,6 @@ void display() {
 	GLfloat light[4];
 	for (int i=0; i<numLights; i++){
 		transformvec(light_position[i], light);
-		std::cout << "Light "<<i<<": ("<<light[0]<<", "<<light[1]<<", "<<light[2]<<")\n";
 		glUniform4fv(lightPosn[i], 1, light);
 	}
 	
