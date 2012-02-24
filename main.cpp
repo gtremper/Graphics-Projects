@@ -473,7 +473,7 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 			case sphere:
 				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
-				glutSolidSphere(com.args[0],30,30);
+				glutSolidSphere(com.args[0],20,20);
 				break;
 			case cube:
 				transf = mv*matStack.top();
