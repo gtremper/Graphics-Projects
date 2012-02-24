@@ -242,6 +242,7 @@ void parse(file) {
 	else cout << "Unable to open file " + file << endl;
 }
 
+
 void parseLine(line) {
 	float lookfromx, lookfromy, lookfromz, lookatx, lookaty, lookatz, upx, upy, upz;
 	float x, y, z, w, r, g, b, a, s, size, theta;
@@ -375,6 +376,7 @@ void parseLine(line) {
 		command com;
 		com.op = pop;
 	}
+
 }
 
 
@@ -540,6 +542,10 @@ void display() {
 }
 
 int main(int argc, char* argv[]) {
+	if (argc <= 1) {
+		std::cout << "You need a text file as the arguments\n";
+	}
+	String filename = String(argv[1]);
 	parse();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
