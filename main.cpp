@@ -292,7 +292,7 @@ void parseLine(std::string l) {
 		com.args[2] = b;
 		com.args[3] = a;
 		commands.push_back(com);
-	} else if(cmd == "emilineion") {
+	} else if(cmd == "emission") {
 		line >> r >> g >> b >> a;
 		command com;
 		com.op = emis;
@@ -513,7 +513,7 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_MODELVIEW);
-	mat4 mv ; 
+	mat4 mv; 
 
 	if (useGlu) mv = glm::lookAt(eye,center,up) ; 
 	else {
@@ -521,10 +521,11 @@ void display() {
 		  mv = glm::transpose(mv) ; // accounting for row major
 		}
 	glLoadMatrixf(&mv[0][0]) ; 
-
+	
 	GLfloat light[4];
 	for (int i=0; i<numLights; i++){
 		transformvec(light_position[i], light);
+		std::cout << "Light "<<i<<": ("<<light[0]<<", "<<light[1]<<", "<<light[2]<<")\n";
 		glUniform4fv(lightPosn[i], 1, light);
 	}
 	
