@@ -76,13 +76,13 @@ void transformvec (GLfloat input[4], GLfloat output[4]) {
 // Uses the Projection matrices (technically deprecated) to set perspective 
 // We could also do this in a more modern fashion with glm.	 
 void reshape(int width, int height){
-	w = width;
-	h = height;
+	wid = width;
+	high = height;
 	mat4 mv ; // just like for lookat
 
 	glMatrixMode(GL_PROJECTION);
 	float newFovy = fovy; 
-	float aspect = w / (float) h, zNear = 0.1, zFar = 99.0 ;
+	float aspect = wid / (float) high, zNear = 0.1, zFar = 99.0 ;
 	// I am changing the projection stuff to be consistent with lookat
 	if (useGlu) mv = glm::perspective(newFovy,aspect,zNear,zFar) ; 
 	else {
@@ -91,7 +91,7 @@ void reshape(int width, int height){
 		}
 	glLoadMatrixf(&mv[0][0]) ; 
 
-	glViewport(0, 0, w, h);
+	glViewport(0, 0, wid, high);
 }
 
 
@@ -118,7 +118,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'g':
 		useGlu = !useGlu;
-		reshape(w,h) ; 
+		reshape(wid,high) ; 
 		std::cout << "Using glm::LookAt and glm::Perspective set to: " << (useGlu ? " true " : " false ") << "\n" ; 
 		break;
 	case 'h':
@@ -228,11 +228,10 @@ void specialKey(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
-void parse(file) {
+void parse(char* filename) {
 	numLights = 0;
-	string line;
-	ifstream myfile;
-	myfile.open(file);
+	std::ifstream myfile(filename,std::ifstream::in);
+	std::stringstream line;
 	if(myfile.is_open()) {
 		while(myfile.good()) {
 			getline(myfile, line);
@@ -243,16 +242,15 @@ void parse(file) {
 }
 
 
-void parseLine(line) {
+void parseLine(std::stringstream line) {
 	float lookfromx, lookfromy, lookfromz, lookatx, lookaty, lookatz, upx, upy, upz;
 	float x, y, z, w, r, g, b, a, s, size, theta;
 	eyeinit = vec3(0.0,-2,2);
 	center = vec3(0.0,0.0,0.0);
 	upinit = glm::normalize(vec3(0.0,1.0,1.0));
 	std::string cmd;
-	std::stringstream ss(line);
-	ss >> cmd;
-	if(line[0] == '#') { // comment
+	line >> cmd;
+	if(cmd[0] == '#') { // comment
 		return;
 	} else if(cmd == "") { // blank line
 		return;
@@ -545,8 +543,7 @@ int main(int argc, char* argv[]) {
 	if (argc <= 1) {
 		std::cout << "You need a text file as the arguments\n";
 	}
-	String filename = String(argv[1]);
-	parse();
+	parse(argv[1]);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("HW2: Scene Viewer");
