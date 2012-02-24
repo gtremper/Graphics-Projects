@@ -61,7 +61,7 @@ void main (void)
 		/* Sum over all lights */
 		for(int i=0; i<numLights ;i++) {	
 			if (lightPosn[i].w==0) {
-				direction = -normalize(lightPosn[i].xyz);
+				direction = normalize(lightPosn[i].xyz);
 			} else {
 	        	position = lightPosn[i].xyz / lightPosn[i].w ; 
 				direction = normalize (position-mypos) ;
