@@ -6,8 +6,10 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <stack>
 #include <vector>
+#include <string>
 #include <GLUT/glut.h>
 #include "shaders.h"
 #include "Transform.h"
@@ -22,7 +24,7 @@ vec3 eyeinit;	// Initial eye position, also for resets
 vec3 upinit; 	// Initial up position, also for resets
 vec3 center;
 bool useGlu; 	// Toggle use of "official" opengl/glm transform vs user code
-int w, h;    	// width and height 
+int wid, high;    	// width and height 
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
 static enum {view, translate, scale, light} transop ; // which operation to transform by 
 enum oper {amb,diff,spec,emis,shin,teapot,sphere,cube,trans,rot,scal,push,pop};
@@ -226,321 +228,153 @@ void specialKey(int key, int x, int y) {
 	glutPostRedisplay();
 }
 
+void parse(file) {
+	numLights = 0;
+	string line;
+	ifstream myfile;
+	myfile.open(file);
+	if(myfile.is_open()) {
+		while(myfile.good()) {
+			getline(myfile, line);
+			parseLine(line);
+		}
+	}
+	else cout << "Unable to open file " + file << endl;
+}
 
-void parseFile() {
-	/* Hardcode until actual parser works */
-	numLights = 2;
-	w = 500;
-	h = 500;
+void parseLine(line) {
+	float lookfromx, lookfromy, lookfromz, lookatx, lookaty, lookatz, upx, upy, upz;
+	float x, y, z, w, r, g, b, a, s, size, theta;
 	eyeinit = vec3(0.0,-2,2);
 	center = vec3(0.0,0.0,0.0);
 	upinit = glm::normalize(vec3(0.0,1.0,1.0));
-	fovy = 30;
-	
-	
-	light_position[0][0] = 0.6;
-	light_position[0][1] = 0;
-	light_position[0][2] = 0.1;
-	light_position[0][3] = 0;
-	light_specular[0][0] = 1;
-	light_specular[0][1] = 0.5;
-	light_specular[0][2] = 0.0;
-	light_specular[0][3] = 1.0;
-	//light2
-	light_position[1][0] = 0;
-	light_position[1][1] = -0.6;
-	light_position[1][2] = 0.1;
-	light_position[1][3] = 1;
-	light_specular[1][0] = 0.5;
-	light_specular[1][1] = 0.5;
-	light_specular[1][2] = 1.0;
-	light_specular[1][3] = 1.0;
-	
-	command com;
-	
-	com.op = push;
-	com.args[0] = 0.2;
-	com.args[1] = 0.2;
-	com.args[2] = 0.2;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = trans;
-	com.args[0] = 0.0;
-	com.args[1] = 0.0;
-	com.args[2] = -0.2;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = amb;
-	com.args[0] = 0.2;
-	com.args[1] = 0.2;
-	com.args[2] = 0.2;
-	com.args[3] = 1.0;
-	commands.push_back(com);
-	
-	com.op = diff;
-	com.args[0] = 0.5;
-	com.args[1] = 0.5;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	
-	com.op = spec;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	
-	com.op = shin;
-	com.args[0] = 100;
-	com.args[1] = 0.2;
-	com.args[2] = 0.2;
-	com.args[3] = 0.2;
-	commands.push_back(com);
-	
-	
-	com.op = push;
-	com.args[0] = 2;
-	com.args[1] = 0.2;
-	com.args[2] = 0.2;
-	com.args[3] = 0.2;
-	commands.push_back(com);
-	
-	
-	com.op = trans;
-	com.args[0] = 0;
-	com.args[1] = 0;
-	com.args[2] = 0.1;
-	com.args[3] = 0.2;
-	commands.push_back(com);
-	
-	
-	com.op = rot;
-	com.args[0] = 1;
-	com.args[1] = 0;
-	com.args[2] = 0;
-	com.args[3] = 90;
-	commands.push_back(com);
-	
-	
-	com.op = teapot;
-	com.args[0] = 0.15;
-	com.args[1] = 0.2;
-	com.args[2] = 0.2;
-	com.args[3] = 0.2;
-	commands.push_back(com);
-	
-	
-	com.op = pop;
-	com.args[0] = 2;
-	com.args[1] = 0.2;
-	com.args[2] = 0.2;
-	com.args[3] = 0.2;
-	commands.push_back(com);
-	
-	
-	com.op = amb;
-	com.args[0] = 0;
-	com.args[1] = 0;
-	com.args[2] = 0;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	
-	com.op = diff;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = push;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = scal;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 0.025;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = cube;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = pop;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = diff;
-	com.args[0] = 1;
-	com.args[1] = 0.25;
-	com.args[2] = 0.25;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = push;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = trans;
-	com.args[0] = -.4;
-	com.args[1] = -.4;
-	com.args[2] = 0;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = push;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = trans;
-	com.args[0] = 0;
-	com.args[1] = 0;
-	com.args[2] = 0.6;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = sphere;
-	com.args[0] = 0.1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = pop;
-	com.args[0] = 1;
-	com.args[1] = 1;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = scal;
-	com.args[0] = 0.2;
-	com.args[1] = 0.2;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = trans;
-	com.args[0] = 0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = cube;
-	com.args[0] = 1.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = pop;
-	com.args[0] = 1.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = diff;
-	com.args[0] = .25;
-	com.args[1] = .25;
-	com.args[2] = 1;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = push;
-	com.args[0] = 1.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = trans;
-	com.args[0] = 0.4;
-	com.args[1] = 0.4;
-	com.args[2] = 0.0;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = push;
-	com.args[0] = 1.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = trans;
-	com.args[0] = 0.0;
-	com.args[1] = 0;
-	com.args[2] = 0.6;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = sphere;
-	com.args[0] = 0.1;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = pop;
-	com.args[0] = 1.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = scal;
-	com.args[0] = .2;
-	com.args[1] = .2;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = trans;
-	com.args[0] = 0.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = cube;
-	com.args[0] = 1.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-	com.op = pop;
-	com.args[0] = 1.0;
-	com.args[1] = 0;
-	com.args[2] = 0.5;
-	com.args[3] = 1;
-	commands.push_back(com);
-	
-		
+	std::string cmd;
+	std::stringstream ss(line);
+	ss >> cmd;
+	if(line[0] == '#') { // comment
+		return;
+	} else if(cmd == "") { // blank line
+		return;
+	} else if(cmd == "size") {
+		ss >> wid >> high;
+	} else if(cmd == "camera") {
+		ss >> lookfromx >> lookfromy >> lookfromz >> lookatx >> lookaty >> lookatz >> upx >> upy >> upz >> fovy;
+		eyeinit[0] = lookfromx;
+		eyeinit[1] = lookfromy;
+		eyeinit[2] = lookfromz;
+		center[0] = lookatx;
+		center[1] = lookaty;
+		center[2] = lookatz;
+		upinit[0] = upx;
+		upinit[1] = upy;
+		upinit[2] = upz;
+	} else if(cmd == "light") {
+		if(numLights > 9) {
+			return;
+		} else {
+			ss >> x >> y >> z >> w >> r >> g >> b >> a;
+			lightPosn[numLights][0] = x;
+			lightPosn[numLights][1] = y;
+			lightPosn[numLights][2] = z;
+			lightPosn[numLights][3] = w;
+			lightColor[numLights][0] = r;
+			lightColor[numLights][1] = g;
+			lightColor[numLights][2] = b;
+			lightColor[numLights][3] = a;
+			numLights++;
+		}
+	} else if(cmd == "ambient") {
+		ss >> r >> g >> b >> a;
+		command com;
+		com.op = amb;
+		com.args[0] = r;
+		com.args[1] = g;
+		com.args[2] = b;
+		com.args[3] = a;
+		commands.add(com);
+	} else if(cmd == "diffuse") {
+		ss >> r >> g >> b >> a;
+		command com;
+		com.op = diff;
+		com.args[0] = r;
+		com.args[1] = g;
+		com.args[2] = b;
+		com.args[3] = a;
+		commands.add(com);
+	} else if(cmd == "specular") {
+		ss >> r >> g >> b >> a;
+		command com;
+		com.op = spec;
+		com.args[0] = r;
+		com.args[1] = g;
+		com.args[2] = b;
+		com.args[3] = a;
+		commands.add(com);
+	} else if(cmd == "emission") {
+		ss >> r >> g >> b >> a;
+		command com;
+		com.op = emis;
+		com.args[0] = r;
+		com.args[1] = g;
+		com.args[2] = b;
+		com.args[3] = a;
+		commands.add(com);
+	} else if(cmd == "shininess") {
+		ss >> s;
+		command com;
+		com.op = shin;
+		com.args[0] = s;
+		commands.add(com);
+	} else if(cmd == "teapot") {
+		ss >> size;
+		command com;
+		com.op = teapot;
+		com.args[0] = size;
+		command.add(com);
+	} else if(cmd == "sphere") {
+		ss >> size;
+		command com;
+		com.op = sphere;
+		com.args[0] = size;
+		command.add(com);
+	} else if(comd == "cube") {
+		ss >> size;
+		command com;
+		com.op = cube;
+		com.args[0] = size;
+		command.add(com);
+	} else if(cmd == "translate") {
+		ss >> x >> y >> z;
+		command com;
+		com.op = trans;
+		com.args[0] = x;
+		com.args[1] = y;
+		com.args[2] = z;
+		command.add(com);
+	} else if(cmd == "rotate") {
+		ss >> x >> y >> z >> theta;
+		command com;
+		com.op = rot;
+		com.args[0] = x;
+		com.args[1] = y;
+		com.args[2] = z;
+		com.args[3] = theta;
+		command.add(com);
+	} else if(cmd == "scale") {
+		ss >> x >> y >> z;
+		command com;
+		com.op = scal;
+		com.args[0] = x;
+		com.args[1] = y;
+		com.args[2] = z;
+		command.add(com);
+	} else if(cmd == "pushTransform") {
+		command com;
+		com.op = push;
+	} else if(cmd == "popTransform") {
+		command com;
+		com.op = pop;
+	}
 }
 
 
@@ -706,7 +540,7 @@ void display() {
 }
 
 int main(int argc, char* argv[]) {
-	parseFile();
+	parse();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("HW2: Scene Viewer");
@@ -715,7 +549,7 @@ int main(int argc, char* argv[]) {
 	glutSpecialFunc(specialKey);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
-	glutReshapeWindow(w,h);
+	glutReshapeWindow(wid,high);
 	printHelp();
 	glutMainLoop();
 	return 0;
