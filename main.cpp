@@ -363,7 +363,6 @@ void parseLine(std::string l) {
 }
 
 void parse(char* filename) {
-	numLights = 0;
 	std::ifstream myfile(filename,std::ifstream::in);
 	std::string line;
 	if(myfile.is_open()) {
@@ -373,6 +372,16 @@ void parse(char* filename) {
 		}
 	}
 	else std::cout << "Unable to open file " << filename << std::endl;
+}
+
+void def() {
+	numLights = 0;
+	fovy = 90;
+	wid = 600;
+	high = 400;
+	eyeinit = vec3(0,0,5);
+	center = vec3(0,0,0);
+	upinit = vec3(0,1,0);
 }
 
 void init() {
@@ -542,6 +551,7 @@ void display() {
 }
 
 int main(int argc, char* argv[]) {
+	def();
 	if (argc <= 1) {
 		std::cerr << "You need a text file as the argument\n";
 		exit(1);
