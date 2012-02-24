@@ -26,6 +26,7 @@ void Transform::left(float degrees, vec3& eye, vec3& up) {
 	eye = eye * R;
 }
 
+
 void Transform::up(float degrees, vec3& eye, vec3& up) {
 	vec3 side = glm::cross(up,eye);
 	side = glm::normalize(side);
@@ -33,6 +34,7 @@ void Transform::up(float degrees, vec3& eye, vec3& up) {
 	eye = eye*R;
 	up = up*R;
 }
+
 
 mat4 Transform::lookAt(const vec3& eye, const vec3& center, const vec3& up) {
 	vec3 a = eye-center; //vector from center to eye
