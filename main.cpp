@@ -32,22 +32,21 @@ enum oper {amb,diff,spec,emis,shin,teapot,sphere,cube,trans,rot,scal,push,pop};
 float sx, sy ; // the scale in x and y 
 float tx, ty ; // the translation in x and y
 float fovy;    // field of view
-GLfloat light_position[10][4]; //current position of the 10 lights
-vec4 light_position_init[10];  //initial position of lights
-GLfloat light_specular[10][4]; //color of lights
-vec3 lightUp[10];	//up vectors for all the lights
+vec4 light_position[MAXLIGHTS]; //current position of the 10 lights
+vec4 light_position_init[MAXLIGHTS];  //initial position of lights
+vec4 light_specular[MAXLIGHTS]; //color of lights
+vec3 lightUp[MAXLIGHTS];	//up vectors for all the lights
 int currentLight;	//current light being moved
 int numLights;		//number of lights in the scene
 
 /* Data structure for input command */
 struct command {
 	oper op;
-	GLfloat args[4];
+	vec4 args;
 };
 
 /* List of commands ran every time drawObjects() is called */
 std::vector<command> commands; 
-
 
 /* Variables to set uniform params for lighting fragment shader */
 GLuint islight ; 
@@ -59,22 +58,9 @@ GLuint specular ;
 GLuint shininess ;
 GLuint emission ;
 
-GLuint lightPosn[MAXLIGHTS];
-GLuint lightColor[MAXLIGHTS];
+GLuint lightPosn;
+GLuint lightColor;
 
-
-// New helper transformation function to transform vector by modelview 
-// May be better done using newer glm functionality.
-void transformvec (GLfloat input[4], GLfloat output[4]) {
-  GLfloat modelview[16] ; // in column major order
-  glGetFloatv(GL_MODELVIEW_MATRIX, modelview) ; 
-  
-  for (int i = 0 ; i < 4 ; i++) {
-	output[i] = 0 ; 
-	for (int j = 0 ; j < 4 ; j++) 
-	  output[i] += modelview[4*j+i] * input[j] ; 
-  }
-}
 
 /* Uses the Projection matrices (technically deprecated) to set perspective 
    We could also do this in a more modern fashion with glm.	*/ 
@@ -138,10 +124,7 @@ void keyboard(unsigned char key, int x, int y) {
 		sx = sy = 1.0 ; 
 		tx = ty = 0.0 ; 
 		for(int i=0; i<numLights; i++) {
-			light_position[i][0] = light_position_init[i][0];
-			light_position[i][1] = light_position_init[i][1];
-			light_position[i][2] = light_position_init[i][2];
-			light_position[i][3] = light_position_init[i][3];
+			light_position[i] = light_position_init[i];
 		}
 		break ;	  
 	case 'v': 
@@ -178,12 +161,11 @@ void keyboard(unsigned char key, int x, int y) {
 		}
 		transop = light;
 		currentLight = num;
-		vec3 a(light_position[num][0],light_position[num][1],light_position[num][2]);
+		vec3 a = vec3(light_position[num]);
 		vec3 side = glm::cross(a,up);
 		lightUp[num] = glm::normalize(glm::cross(side,a));
 		std::cout << "Now controlling light "<<num<<"\n";
 		break;
-	
 	}
 	glutPostRedisplay();
 }
@@ -197,11 +179,8 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == scale) sx -= amount * 0.01 ; 
 		  else if (transop == translate) tx -= amount * 0.01 ;
 		  else if (transop == light){
-			vec3 a(light_position[currentLight][0],light_position[currentLight][1],light_position[currentLight][2]);
-			Transform::left(amount,a,lightUp[currentLight]);
-			light_position[currentLight][0] = a[0];
-			light_position[currentLight][1] = a[1];
-			light_position[currentLight][2] = a[2];
+			vec3 a = vec3(light_position[currentLight]);
+			Transform::left(amount, a, lightUp[currentLight]);
 		  }
 		  break;
 	case 101: //up
@@ -209,11 +188,8 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == scale) sy += amount * 0.01 ; 
 		  else if (transop == translate) ty += amount * 0.01 ;
 		  else if (transop == light){
-			vec3 a(light_position[currentLight][0],light_position[currentLight][1],light_position[currentLight][2]);
+			vec3 a = vec3(light_position[currentLight]);
 			Transform::up(amount,a,lightUp[currentLight]);
-			light_position[currentLight][0] = a[0];
-			light_position[currentLight][1] = a[1];
-			light_position[currentLight][2] = a[2];
 		  }
 		  break;
 	case 102: //right
@@ -221,11 +197,8 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == scale) sx += amount * 0.01 ; 
 		  else if (transop == translate) tx += amount * 0.01 ; 
 		  else if (transop == light){
-			vec3 a(light_position[currentLight][0],light_position[currentLight][1],light_position[currentLight][2]);
+			vec3 a = vec3(light_position[currentLight]);
 			Transform::left(-amount,a,lightUp[currentLight]);
-			light_position[currentLight][0] = a[0];
-			light_position[currentLight][1] = a[1];
-			light_position[currentLight][2] = a[2];
 		  }
 		  break;
 	case 103: //down
@@ -233,11 +206,8 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == scale) sy -= amount * 0.01 ; 
 		  else if (transop == translate) ty -= amount * 0.01 ; 
 		  else if (transop == light){
-			vec3 a(light_position[currentLight][0],light_position[currentLight][1],light_position[currentLight][2]);
+			vec3 a = vec3(light_position[currentLight]);
 			Transform::up(-amount,a,lightUp[currentLight]);
-			light_position[currentLight][0] = a[0];
-			light_position[currentLight][1] = a[1];
-			light_position[currentLight][2] = a[2];
 		  }
 		  break;
 	}
@@ -258,7 +228,8 @@ void parseLine(std::string l) {
 	} else if(cmd == "size") {
 		line >> wid >> high;
 	} else if(cmd == "camera") {
-		line >> lookfromx >> lookfromy >> lookfromz >> lookatx >> lookaty >> lookatz >> upx >> upy >> upz >> fovy;
+		line >> lookfromx >> lookfromy >> lookfromz >> lookatx >> 
+			lookaty >> lookatz >> upx >> upy >> upz >> fovy;
 		eyeinit = vec3(lookfromx,lookfromy,lookfromz);
 		center = vec3(lookatx,lookaty,lookatz);
 		upinit = vec3(upx,upy,upz);
@@ -268,96 +239,74 @@ void parseLine(std::string l) {
 		} else {
 			line >> x >> y >> z >> w >> r >> g >> b >> a;
 			light_position_init[numLights] = vec4(x,y,z,w);
-			light_specular[numLights][0] = r;
-			light_specular[numLights][1] = g;
-			light_specular[numLights][2] = b;
-			light_specular[numLights][3] = a;
+			light_specular[numLights] = vec4(r,g,b,a);
 			numLights++;
 		}
 	} else if(cmd == "ambient") {
 		line >> r >> g >> b >> a;
 		command com;
 		com.op = amb;
-		com.args[0] = r;
-		com.args[1] = g;
-		com.args[2] = b;
-		com.args[3] = a;
+		com.args = vec4(r,g,b,a);
 		commands.push_back(com);
 	} else if(cmd == "diffuse") {
 		line >> r >> g >> b >> a;
 		command com;
 		com.op = diff;
-		com.args[0] = r;
-		com.args[1] = g;
-		com.args[2] = b;
-		com.args[3] = a;
+		com.args = vec4(r,g,b,a);
 		commands.push_back(com);
 	} else if(cmd == "specular") {
 		line >> r >> g >> b >> a;
 		command com;
 		com.op = spec;
-		com.args[0] = r;
-		com.args[1] = g;
-		com.args[2] = b;
-		com.args[3] = a;
+		com.args = vec4(r,g,b,a);
 		commands.push_back(com);
 	} else if(cmd == "emission") {
 		line >> r >> g >> b >> a;
 		command com;
 		com.op = emis;
-		com.args[0] = r;
-		com.args[1] = g;
-		com.args[2] = b;
-		com.args[3] = a;
+		com.args = vec4(r,g,b,a);
 		commands.push_back(com);
 	} else if(cmd == "shininess") {
 		line >> s;
 		command com;
 		com.op = shin;
-		com.args[0] = s;
+		com.args = vec4(s,0.0,0.0,0.0);
 		commands.push_back(com);
 	} else if(cmd == "teapot") {
 		line >> size;
 		command com;
 		com.op = teapot;
-		com.args[0] = size;
+		com.args = vec4(size,0.0,0.0,0.0);
 		commands.push_back(com);
 	} else if(cmd == "sphere") {
 		line >> size;
 		command com;
 		com.op = sphere;
-		com.args[0] = size;
+		com.args = vec4(size,0.0,0.0,0.0);
 		commands.push_back(com);
 	} else if(cmd == "cube") {
 		line >> size;
 		command com;
 		com.op = cube;
-		com.args[0] = size;
+		com.args = vec4(size,0.0,0.0,0.0);
 		commands.push_back(com);
 	} else if(cmd == "translate") {
 		line >> x >> y >> z;
 		command com;
 		com.op = trans;
-		com.args[0] = x;
-		com.args[1] = y;
-		com.args[2] = z;
+		com.args = vec4(x,y,z,0.0);
 		commands.push_back(com);
 	} else if(cmd == "rotate") {
 		line >> x >> y >> z >> theta;
 		command com;
 		com.op = rot;
-		com.args[0] = x;
-		com.args[1] = y;
-		com.args[2] = z;
-		com.args[3] = theta;
+		com.args = vec4(x,y,z,theta);
 		commands.push_back(com);
 	} else if(cmd == "scale") {
 		line >> x >> y >> z;
 		command com;
 		com.op = scal;
-		com.args[0] = x;
-		com.args[1] = y;
-		com.args[2] = z;
+		com.args = vec4(x,y,z,0.0);
 		commands.push_back(com);
 	} else if(cmd == "pushTransform") {
 		command com;
@@ -380,8 +329,10 @@ void parse(char* filename) {
 			getline(myfile, line);
 			parseLine(line);
 		}
+	} else { 
+		std::cerr << "Unable to open file " << filename << std::endl;
+		exit(1);
 	}
-	else std::cout << "Unable to open file " << filename << std::endl;
 }
 
 /* Default values so the program doesn't crash with empty input */
@@ -406,10 +357,7 @@ void init() {
 	useLights = true;
 	
 	for(int i=0; i<numLights; i++) {
-		light_position[i][0] = light_position_init[i][0];
-		light_position[i][1] = light_position_init[i][1];
-		light_position[i][2] = light_position_init[i][2];
-		light_position[i][3] = light_position_init[i][3];
+		light_position[i] = light_position_init[i];
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -426,36 +374,14 @@ void init() {
 	shininess = glGetUniformLocation(shaderprogram,"shininess");
 	emission = glGetUniformLocation(shaderprogram,"emission");
 	
-	lightPosn[0] = glGetUniformLocation(shaderprogram,"lightPosn[0]");
-	lightColor[0] = glGetUniformLocation(shaderprogram,"lightColor[0]");
-	lightPosn[1] = glGetUniformLocation(shaderprogram,"lightPosn[1]");
-	lightColor[1] = glGetUniformLocation(shaderprogram,"lightColor[1]");
-	lightPosn[2] = glGetUniformLocation(shaderprogram,"lightPosn[2]");
-	lightColor[2] = glGetUniformLocation(shaderprogram,"lightColor[2]");
-	lightPosn[3] = glGetUniformLocation(shaderprogram,"lightPosn[3]");
-	lightColor[3] = glGetUniformLocation(shaderprogram,"lightColor[3]");
-	lightPosn[4] = glGetUniformLocation(shaderprogram,"lightPosn[4]");
-	lightColor[4] = glGetUniformLocation(shaderprogram,"lightColor[4]");
-	lightPosn[5] = glGetUniformLocation(shaderprogram,"lightPosn[5]");
-	lightColor[5] = glGetUniformLocation(shaderprogram,"lightColor[5]");
-	lightPosn[6] = glGetUniformLocation(shaderprogram,"lightPosn[6]");
-	lightColor[6] = glGetUniformLocation(shaderprogram,"lightColor[6]");
-	lightPosn[7] = glGetUniformLocation(shaderprogram,"lightPosn[7]");
-	lightColor[7] = glGetUniformLocation(shaderprogram,"lightColor[7]");
-	lightPosn[8] = glGetUniformLocation(shaderprogram,"lightPosn[8]");
-	lightColor[8] = glGetUniformLocation(shaderprogram,"lightColor[8]");
-	lightPosn[9] = glGetUniformLocation(shaderprogram,"lightPosn[9]");
-	lightColor[9] = glGetUniformLocation(shaderprogram,"lightColor[9]");
-	
+	lightPosn = glGetUniformLocation(shaderprogram,"lightPosn");
+	lightColor = glGetUniformLocation(shaderprogram,"lightColor");
 	
 	/* Set variables that don't change during simulation */
 	glUniform1i(islight, useLights) ;
 	glUniform1i(numLightsShader, numLights);
 	
-	GLfloat light[4];
-	for (int i=0; i<numLights; i++){
-		glUniform4fv(lightColor[i], 1, light_specular[i]);	
-	}
+	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);
 	
 }
 
@@ -472,16 +398,16 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 		vec3 axis;
 		switch(com.op) {
 			case amb:
-				glUniform4fv(ambient,1,com.args);
+				glUniform4fv(ambient,1,(GLfloat*)&com.args[0]);
 				break;
 			case diff:
-				glUniform4fv(diffuse,1,com.args);
+				glUniform4fv(diffuse,1,(GLfloat*)&com.args[0]);
 				break;
 			case spec:
-				glUniform4fv(specular,1,com.args);
+				glUniform4fv(specular,1,(GLfloat*)&com.args[0]);
 				break;
 			case emis:
-			 	glUniform4fv(emission,1,com.args);
+			 	glUniform4fv(emission,1,(GLfloat*)&com.args[0]);
 				break;
 			case shin:
 				glUniform1f(shininess,com.args[0]);
@@ -507,8 +433,8 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 				matStack.top() = matStack.top()*transf;
 				break;
 			case rot:
-				axis = vec3(com.args[0],com.args[1],com.args[2]);
-				transf = mat4(Transform::rotate(com.args[3], axis));
+				//transf = mat4(Transform::rotate(com.args[3], axis));
+				transf = mat4(Transform::rotate(com.args[3], vec3(com.args)));
 				transf = glm::transpose(transf);
 				matStack.top() = matStack.top()*transf;
 				break;
@@ -544,11 +470,11 @@ void display() {
 		}
 	glLoadMatrixf(&mv[0][0]) ; 
 	
-	GLfloat light[4];
+	vec4 light[MAXLIGHTS];
 	for (int i=0; i<numLights; i++){
-		transformvec(light_position[i], light);
-		glUniform4fv(lightPosn[i], 1, light);
+		light[i] = mv * light_position[i];
 	}
+	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
 	// Transformations for Teapot, involving translation and scaling 
 	mat4 sc, tr; 
