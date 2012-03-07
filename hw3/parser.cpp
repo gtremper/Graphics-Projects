@@ -9,6 +9,8 @@
 #include "Transform.h"
 #include "globals.h"
 
+// COLORS: sky: (135/225.0, 206/255.0, 0) forest green: (34/255.0, 139/255.0, 34/255.0)
+
 #define BUFFER_OFFSET(bytes) ((GLubyte *) NULL + (bytes))
 #define NumberOf(array) (sizeof(array)/sizeof(array[0]))
 
