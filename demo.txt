@@ -5,13 +5,12 @@
 
 # Set the scene size and camera location 
 size 500 500
-camera 0 -2 2 0 0 0 0 1 1 30.0
+camera 0 -2 0 0 0 0 0 1 1 30.0
 
 # lights.  A single point and directional light
 # Note that your program must support up to 10 lights
 light 0 -0.6 0.1 1 0.5 0.5 1 1 
 light 0.6 0 0.1 0 1 0.5 0 1
-light 0 0 0.6 1 .2 .7 .3 1  
 
 # I do a global transform to move this down a little 
 # A good use of matrix stacks and hierarchy 
@@ -30,20 +29,6 @@ translate 0 0 -0.2
         rotate 1 0 0 90 
         teapot 0.15
   popTransform
-
-diffuse 0.2 0.2 0.2 1
-ambient 0.1 0.2 0.0 1
-specular .5 .5 .5 1 
-shininess 300
-
-  pushTransform
-		translate 0 0 0.8
-		sphere .2
-  popTransform	
-   diffuse 0.5 0.5 0.5 1
-	ambient 0.2 0.2 0.2 1 
-	specular 1 1 1 1
-	shininess 100
 
 # Floor (white but now with shading)
 # Materials first.  We don't change specular and shininess

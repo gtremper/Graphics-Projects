@@ -181,6 +181,7 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == light){
 			vec3 a = vec3(light_position[currentLight]);
 			Transform::left(amount, a, lightUp[currentLight]);
+			light_position[currentLight] = vec4(a,light_position[currentLight][3]);
 		  }
 		  break;
 	case 101: //up
@@ -190,6 +191,7 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == light){
 			vec3 a = vec3(light_position[currentLight]);
 			Transform::up(amount,a,lightUp[currentLight]);
+			light_position[currentLight] = vec4(a,light_position[currentLight][3]);
 		  }
 		  break;
 	case 102: //right
@@ -199,6 +201,7 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == light){
 			vec3 a = vec3(light_position[currentLight]);
 			Transform::left(-amount,a,lightUp[currentLight]);
+			light_position[currentLight] = vec4(a,light_position[currentLight][3]);
 		  }
 		  break;
 	case 103: //down
@@ -208,6 +211,7 @@ void specialKey(int key, int x, int y) {
 		  else if (transop == light){
 			vec3 a = vec3(light_position[currentLight]);
 			Transform::up(-amount,a,lightUp[currentLight]);
+			light_position[currentLight] = vec4(a,light_position[currentLight][3]);
 		  }
 		  break;
 	}
