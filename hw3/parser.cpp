@@ -334,10 +334,8 @@ void draw(int obj){
 	if(textures[obj] != 0){
 		// imma gonna deal with this later
 	}
-	cout << "GL_QUADS is "<<GL_QUADS<<endl;
-	cout << "drawing " << primType[obj]<<endl;
 	glDrawElements(primType[obj], size[obj], GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ;
-	glDisableClientState(GL_NORMAL_ARRAY);
+	//glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 

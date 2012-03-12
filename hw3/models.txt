@@ -1,1 +1,3 @@
+teapot.obj
 maze.obj4
+triangle.obj

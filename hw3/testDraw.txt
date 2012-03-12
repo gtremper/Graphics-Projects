@@ -1,9 +1,14 @@
 size 800 600
-camera 0 1 5 0 0 45.0
+camera 33 1 -2.5 90.0 0 45.0
 
 # lights.  A single point and directional light
 # Note that your program must support up to 10 lights
-light 0 -0.6 0.1 1 0.5 0.5 1 1 
-light 0.6 0 0.1 0 1 0.5 0 1
+light 15 6 -20 1 1 0.5 0.5 1 1 
+light 0.1 1 0.1 0 1 0.5 0 1
+
+ambient 0.13333 0.5451 0.1333 1 
+diffuse 0.5 0.5 0.5 1
+specular 1 1 1 1
+shininess 20
 
 maze.obj4

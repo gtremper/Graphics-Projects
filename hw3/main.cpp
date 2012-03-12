@@ -300,30 +300,7 @@ void display() {
 	}
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
-	
 	drawObjects(commands,mv);	
-	//GLfloat verticies[] = {0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f,0.0f};
-	//GLushort indicies[] = {1,2,3};
-	
-	//glEnableClientState(GL_VERTEX_ARRAY);
-	//glVertexPointer(3, GL_FLOAT, NULL, verticies);
-	/*
-	glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID1);
-	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glColorPointer(3,GL_FLOAT, 32, BUFFER_OFFSET(12));
-	glEnableClientState(GL_COLOR_ARRAY);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID1);
-		
-	glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID2);
-	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glColorPointer(3,GL_FLOAT, 32, BUFFER_OFFSET(12));
-	glEnableClientState(GL_COLOR_ARRAY);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID2);
-	
-	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ; 
-	*/
 	
 	glutSwapBuffers();
 }

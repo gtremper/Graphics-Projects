@@ -70,7 +70,7 @@ void main (void)
 	        totalCol += ComputeLight(direction, lightColor[i], normal, halfAngle, diffuse, specular, shininess);
 		}
 		
-		gl_FragColor = color;		
+		gl_FragColor = totalCol;		
 	}
 }
 		

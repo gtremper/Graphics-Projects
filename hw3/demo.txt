@@ -5,7 +5,7 @@
 
 # Set the scene size and camera location 
 size 800 600
-camera 33 1 -2.5 90.0 0 45.0
+camera 0 1 3 0 0 45.0
 
 # lights.  A single point and directional light
 # Note that your program must support up to 10 lights
