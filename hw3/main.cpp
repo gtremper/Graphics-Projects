@@ -6,14 +6,19 @@
 #include <sstream>
 #include <fstream>
 #include <stack>
+#include <map>
 #include <vector>
 #include <string>
 #include <GLUT/glut.h>
 #include "shaders.h"
 #include "Transform.h"
 
+#define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
+
+using namespace std;
+
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 0.05;
+const float WALKSPEED = 0.5;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 FORWARD = vec3(0.0,0.0,-1.0);
@@ -27,6 +32,7 @@ float pitchInit;
 float yawInit;
 
 bool useLights; // Toggle light shading on and off
+bool istex;
 bool passive; // Toggle passive mouse movement
 int width, height;  
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -42,7 +48,11 @@ std::vector<command> commands;
 
 /* Forward Declaration */
 std::vector<command> parseInput(char*);
-void loadObjects(char*);
+
+//void loadObjects(char*);
+
+#include "parser.h"
+
 
 
 /* Variables to set uniform params for lighting fragment shader */
@@ -199,9 +209,7 @@ void init() {
 	glUniform1i(islight, useLights) ;
 	glUniform1i(numLightsShader, numLights);
 	
-	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);
-	
-	
+	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);	
 }
 
 /* Draws objects based on list of commands */ 
@@ -274,7 +282,7 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 
 /* main display */
 void display() {
-	glClearColor(0, 0, 1, 0);
+	glClearColor(135/225.0, 206/255.0, 250/255.0, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	
@@ -289,22 +297,46 @@ void display() {
 		light[i] = mv * light_position[i];
 	}
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
-		
-	drawObjects(commands,mv);	
+	
+	
+	//drawObjects(commands,mv);	
+	//GLfloat verticies[] = {0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f,0.0f};
+	//GLushort indicies[] = {1,2,3};
+	
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	//glVertexPointer(3, GL_FLOAT, NULL, verticies);
+	glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID1);
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glColorPointer(3,GL_FLOAT, 32, BUFFER_OFFSET(12));
+	glEnableClientState(GL_COLOR_ARRAY);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID1);
+	
+	glDrawElements(GL_QUADS, 368, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ;
+	
+	glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID2);
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glColorPointer(3,GL_FLOAT, 32, BUFFER_OFFSET(12));
+	glEnableClientState(GL_COLOR_ARRAY);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID2);
+	
+	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ; 
+	
 	glutSwapBuffers();
 }
 
 int main(int argc, char* argv[]) {
 	def();
-	if (argc != 2) {
-		std::cerr << "You need 2 text file as the arguments\n Scene then models";
+	if (argc != 3) {
+		std::cerr << "You need 2 text file as the arguments\n Scene then models\n";
 		exit(1);
 	}
-	//loadObjects(argv[2]);
-	commands = parseInput(argv[1]);
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("HW3: Hedge Maze");
+	loadObjects(argv[2]);
+	commands = parseInput(argv[1]);
 	init();
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);

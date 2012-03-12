@@ -1,34 +1,20 @@
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <stack>
-#include <vector>
-#include <string>
-#include <map>
-#include <GLUT/glut.h>
-#include "Transform.h"
-#include "globals.h"
-
-// COLORS: sky: (135/225.0, 206/255.0, 250/255) forest green: (34/255.0, 139/255.0, 34/255.0)
-
-#define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
-#define NumberOf(array) (sizeof(array)/sizeof(array[0]))
-
-using namespace std;
 
 map<string,int> modelMap;
 
-static int NUMBEROFOBJECTS = 10;
-
-vertexList objects[NUMBEROFOBJECTS];
-
-struct vertexList {
-	int size;
-	GLfloat* verticies;
-	GLfloat* indicies;
+struct testVertex {
+	GLfloat x, y, z;
+	GLfloat r, g, b;
+	GLfloat padding[2];
 };
 
+GLuint VertexVBOID1;
+GLuint VertexIBOID1;
 
+GLuint VertexVBOID2;
+GLuint VertexIBOID2;
+
+int indicies;
+bool derp=true;
 
 /* Parses a line of input and takes appropriate action */
 void parseLine(string l, vector<command> &commands) {
@@ -152,9 +138,9 @@ vector<command> parseInput(char* filename) {
 }
 
 
-void parseOBJ(string filename, int modelNum){
+void parseOBJ(string filename, int modelNumber){
 	vector<vec3> v; // vectors
-	vector<vec3> f; // faces
+	vector<vec4> f; // faces
 	ifstream myfile(filename.c_str(), ifstream::in);
 	int numVerts = 0;
 	int numInds = 0;
@@ -173,28 +159,80 @@ void parseOBJ(string filename, int modelNum){
 				numVerts++;
 			}
 			if(cmd == "f") {
-				int v1, v2, v3;
-				ln >> v1 >> v2 >> v3;
-				vec3 t(v1-1, v2-1, v3-1);
+				int v1, v2, v3, v4;
+				ln >> v1 >> v2 >> v3 >> v4;
+				vec4 t(v1-1, v2-1, v3-1, v4-1);
 				f.push_back(t);
-				numInds+=3;
+				numInds++;
 			}
 		}
 	} else {
 		cout << "Unable to open file " << filename << endl;
 	}
 	
-	objects[modelNum].size = numInds;
-	float verts[numVerts*3];
-	for(int i=0; i<numVerts*3; i+=3){
-		verts[i] = v[i][0];
-		verts[i+1] = v[i][1];
-		verts[i+2] = v[i][2];
-	}
-	//objects[modelNum].indicies = (float*)f;
 	
+	cout << "verts: " << numVerts << endl;
+	cout << "inds: " << numInds << endl;
+	
+	testVertex verts[numVerts];
+	unsigned short inds[numInds*4];
+	indicies = numInds*4;
+	for (int i=0; i<numVerts; i++) {
+		verts[i].x = v[i][0];
+		verts[i].y = v[i][1];
+		verts[i].z = v[i][2];
+		if (derp) {
+		verts[i].r = 34.0f/255.0;
+		verts[i].g = 139.0f/255.0;
+		verts[i].b = 34.0f/255.0;
+		} else {
+		verts[i].r = 205.0f/255.0;
+		verts[i].g = 201.0f/255.0;
+		verts[i].b = 201.0f/255.0;	
+		}
+	}
+	for (int i=0; i<numInds; i++){
+		inds[4*i] = f[i][0];
+		inds[4*i+1] = f[i][1];
+		inds[4*i+2] = f[i][2];
+		inds[4*i+3] = f[i][3];
+	}
+	if (derp){
+	glGenBuffers(1, &VertexVBOID1);
+	glGenBuffers(1, &VertexIBOID1);
+	
+	cout << "sizeofverts"<<sizeof(verts)<<endl;
+	
+	glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID1);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glColorPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(12));
+	glEnableClientState(GL_COLOR_ARRAY);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID1);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);
+	} else {
+		glGenBuffers(1, &VertexVBOID2);
+		glGenBuffers(1, &VertexIBOID2);
+
+		cout << "sizeofverts"<<sizeof(verts)<<endl;
+
+		glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID2);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+		glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glColorPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(12));
+		glEnableClientState(GL_COLOR_ARRAY);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID2);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);	
+	}
+	
+	
+	derp = false;
 }
+
 
 
 void loadObjects(char* filename) {
@@ -231,4 +269,3 @@ void loadObjects(char* filename) {
 		}
 	}
 }
-

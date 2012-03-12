@@ -1,2 +1,2 @@
-derp.obj
-herp.raw
+maze.obj
+cube.obj
