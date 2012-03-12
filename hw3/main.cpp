@@ -89,10 +89,7 @@ void reshape(int w, int h){
 
 void printHelp() {
   std::cout << "\npress 'h' to print this message again.\n" 
-	   << "press '+' or '-' to change the amount of rotation that\noccurs with each arrow press.\n" 
-			<< "press 'g' to switch between using glm::lookAt and glm::Perspective or your own LookAt.\n"		
-			<< "press 'r' to reset the transformations.\n"
-			<< "press 'v' 't' 's' to do view [default], translate, scale.\n"
+			<< "press 'f' to switch to fly mode.\n"
 			<< "press ESC to quit.\n" ;	 
 	
 }
