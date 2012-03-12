@@ -163,6 +163,10 @@ vector<command> parseInput(char* filename) {
 	return commands;
 }
 
+void parseOBJ(string filename, int modelNum){
+	vector<float> v;
+	
+
 
 void parseOBJ(string filename, int modelNum){
 	vector<vec3> v; // vectors
