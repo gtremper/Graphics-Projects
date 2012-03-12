@@ -28,9 +28,9 @@ int textures[MAXOBJECTS]; //Does the object have textures, if so which?
 
 
 struct vertex {
-	GLfloat x, y, z;
-	GLfloat nx, ny, nz;
-	GLfloat u, v;
+	GLfloat x, y, z; //position
+	GLfloat nx, ny, nz; //normal
+	GLfloat u, v; // texture coordinates
 };
 
 
@@ -163,9 +163,53 @@ vector<command> parseInput(char* filename) {
 	return commands;
 }
 
-void parseOBJ(string filename, int modelNum){
+void parseRAW(string filename, int modelNum){
+	ifstream myfile(filename.c_str(), ifstream::in);
 	vector<float> v;
+	int numVerts = 0;
+	if(myfile.is_open()) {
+		while(myfile.good()) {
+			string line;
+			getline(myfile,line);
+			if (line[0] == '#'){
+				continue;
+			}
+			stringstream ln(line);
+			float vert;
+			for(int i=0; i<9; i++){
+				ln>>vert;
+				v.push_back(vert);
+				numVerts++;
+			}
+		}
+	} else {
+		cout << "Unable to open file " << filename << endl;
+	}
 	
+	vertex verts[numVerts/3];
+	GLushort inds[numVerts/3];
+	for(int i=0; i<(numVerts/3); i++){
+		verts[i].x = v[3*i];
+		verts[i].y = v[3*i+1];
+		verts[i].z = v[3*i+2];
+		cout<< "verts: "<< v[3*i] << ", "<<v[3*i+1] << ", " << v[3*i+2] << endl;
+		inds[i] = i;
+	}
+	
+	glGenBuffers(2, &objects[modelNum][0]);
+	glBindBuffer(GL_ARRAY_BUFFER, objects[modelNum][0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[modelNum][1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);
+	
+	size[modelNum] = numVerts/3;
+	primType[modelNum] = GL_TRIANGLES;
+	normals[modelNum] = false;
+	textures[modelNum] = 0 ;	
+}
 
 
 void parseOBJ(string filename, int modelNum){
@@ -315,7 +359,7 @@ void loadObjects(char* filename) {
 		} else if (extension == "obj4"){
 			parseOBJ4(file,i);
 		} else if (extension == "raw") {
-			//run raw parser
+			parseRAW(file,i);
 		} else {
 			cerr << "The extension \'" << extension <<"\' is not supported." << endl;
 			exit(1);
@@ -339,7 +383,7 @@ void draw(int obj){
 		// imma gonna deal with this later
 	}
 	glDrawElements(primType[obj], size[obj], GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ;
-	//glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
