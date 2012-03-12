@@ -18,14 +18,19 @@ using namespace std;
 
 map<string,int> modelMap;
 
-static int NUMBEROFOBJECTS = 10;
+const int MAXOBJECTS = 10;
 
-vertexList objects[NUMBEROFOBJECTS];
+GLuint objects[MAXOBJECTS][2]; // Object buffer IDs
+int size[MAXOBJECTS]; //number of indicies
+GLenum primType[MAXOBJECTS]; // primative type
+bool normals[MAXOBJECTS]; //Does the object have normals?
+int textures[MAXOBJECTS]; //Does the object have textures, if so which?
 
-struct vertexList {
-	int size;
-	GLfloat* verticies;
-	GLfloat* indicies;
+
+struct vertex {
+	GLfloat x, y, z;
+	GLfloat nx, ny, nz;
+	GLfloat u, v;
 };
 
 
@@ -130,6 +135,13 @@ void parseLine(string l, vector<command> &commands) {
 		command com;
 		com.op = pop;
 		commands.push_back(com);
+	} else if (modelMap.find(cmd) != modelMap.end()) {
+		command com;
+		com.op = -modelMap[cmd]-1;
+		commands.push_back(com);
+	} else {
+		cerr << "Command \""<< cmd <<"\" not supported\n";
+		exit(1);
 	}
 }
 
@@ -157,7 +169,7 @@ void parseOBJ(string filename, int modelNum){
 	vector<vec3> f; // faces
 	ifstream myfile(filename.c_str(), ifstream::in);
 	int numVerts = 0;
-	int numInds = 0;
+	int numFaces = 0;
 	if(myfile.is_open()) {
 		while(myfile.good()) {
 			string line;
@@ -177,23 +189,96 @@ void parseOBJ(string filename, int modelNum){
 				ln >> v1 >> v2 >> v3;
 				vec3 t(v1-1, v2-1, v3-1);
 				f.push_back(t);
-				numInds+=3;
+				numFaces++;
 			}
 		}
 	} else {
 		cout << "Unable to open file " << filename << endl;
 	}
-	
-	objects[modelNum].size = numInds;
-	float verts[numVerts*3];
-	for(int i=0; i<numVerts*3; i+=3){
-		verts[i] = v[i][0];
-		verts[i+1] = v[i][1];
-		verts[i+2] = v[i][2];
+	vertex verts[numVerts];
+	GLushort inds[numFaces*3];
+	for(int i=0; i<numVerts; i++){
+		verts[i].x = v[i][0];
+		verts[i].y = v[i][1];
+		verts[i].z = v[i][2];
 	}
-	//objects[modelNum].indicies = (float*)f;
+	for(int i=0; i<numFaces; i++){
+		inds[3*i] = f[i][0];
+		inds[3*i+1] = f[i][1];
+		inds[3*i+2] = f[i][2];
+	}
+	glGenBuffers(2, &objects[modelNum][0]);
+	glBindBuffer(GL_ARRAY_BUFFER, objects[modelNum][0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glEnableClientState(GL_VERTEX_ARRAY);
 	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[modelNum][1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);
+	
+	size[modelNum] = numFaces*3;
+	primType[modelNum] = GL_TRIANGLES;
+	normals[modelNum] = false;
+	textures[modelNum] = 0 ;
+}
 
+void parseOBJ4(string filename, int modelNum){
+	vector<vec3> v; // vectors
+	vector<vec4> f; // faces
+	ifstream myfile(filename.c_str(), ifstream::in);
+	int numVerts = 0;
+	int numFaces = 0;
+	if(myfile.is_open()) {
+		while(myfile.good()) {
+			string line;
+			string cmd;
+			getline(myfile, line);
+			stringstream ln(line);
+			ln >> cmd;
+			if(cmd == "v") {
+				float x,y,z;
+				ln >> x >> y >> z;
+				vec3 p(x, y, z);
+				v.push_back(p);
+				numVerts++;
+			}
+			if(cmd == "f") {
+				int v1, v2, v3, v4;
+				ln >> v1 >> v2 >> v3 >> v4;
+				vec4 t(v1-1, v2-1, v3-1, v4-1);
+				f.push_back(t);
+				numFaces++;
+			}
+		}
+	} else {
+		cout << "Unable to open file " << filename << endl;
+	}
+	vertex verts[numVerts];
+	GLushort inds[numFaces*4];
+	for(int i=0; i<numVerts; i++){
+		verts[i].x = v[i][0];
+		verts[i].y = v[i][1];
+		verts[i].z = v[i][2];
+	}
+	for(int i=0; i<numFaces; i++){
+		inds[4*i] = f[i][0];
+		inds[4*i+1] = f[i][1];
+		inds[4*i+2] = f[i][2];
+		inds[4*i+3] = f[i][3];
+	}
+	glGenBuffers(2, &objects[modelNum][0]);
+	glBindBuffer(GL_ARRAY_BUFFER, objects[modelNum][0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[modelNum][1]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(inds), inds, GL_STATIC_DRAW);
+	
+	size[modelNum] = numFaces*4;
+	primType[modelNum] = GL_QUADS;
+	normals[modelNum] = false;
+	textures[modelNum] = 0 ;
 }
 
 
@@ -223,6 +308,8 @@ void loadObjects(char* filename) {
 		string extension = file.substr(file.find_last_of(".") + 1);
 		if(extension == "obj") {
 			parseOBJ(file,i);
+		} else if (extension == "obj4"){
+			parseOBJ4(file,i);
 		} else if (extension == "raw") {
 			//run raw parser
 		} else {
@@ -231,4 +318,36 @@ void loadObjects(char* filename) {
 		}
 	}
 }
+
+void draw(int obj){
+	glBindBuffer(GL_ARRAY_BUFFER, objects[obj][0]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[obj][1]);
+	
+	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
+	glEnableClientState(GL_VERTEX_ARRAY);
+	
+	if(normals[obj]){
+		glNormalPointer(GL_FLOAT, 32, BUFFER_OFFSET(12));
+		glEnableClientState(GL_NORMAL_ARRAY);
+	}
+	
+	if(textures[obj] != 0){
+		// imma gonna deal with this later
+	}
+	cout << "GL_QUADS is "<<GL_QUADS<<endl;
+	cout << "drawing " << primType[obj]<<endl;
+	glDrawElements(primType[obj], size[obj], GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ;
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+
+
+
+
+
+
+
+
+
 

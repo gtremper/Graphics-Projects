@@ -49,9 +49,9 @@ std::vector<command> commands;
 /* Forward Declaration */
 std::vector<command> parseInput(char*);
 
-//void loadObjects(char*);
+void loadObjects(char*);
+void draw(int);
 
-#include "parser.h"
 
 
 
@@ -273,6 +273,11 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 			case pop:
 				matStack.pop();
 				break;
+			default:
+				transf = mv*matStack.top();
+				glLoadMatrixf(&transf[0][0]);
+				draw(-com.op-1); // negative so doesnt conflict with enum
+				break;
 		}	
 	}
 }
@@ -296,21 +301,20 @@ void display() {
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
 	
-	//drawObjects(commands,mv);	
+	drawObjects(commands,mv);	
 	//GLfloat verticies[] = {0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f,0.0f};
 	//GLushort indicies[] = {1,2,3};
 	
 	//glEnableClientState(GL_VERTEX_ARRAY);
 	//glVertexPointer(3, GL_FLOAT, NULL, verticies);
+	/*
 	glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID1);
 	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glColorPointer(3,GL_FLOAT, 32, BUFFER_OFFSET(12));
 	glEnableClientState(GL_COLOR_ARRAY);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID1);
-	
-	glDrawElements(GL_QUADS, 368, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ;
-	
+		
 	glBindBuffer(GL_ARRAY_BUFFER, VertexVBOID2);
 	glVertexPointer(3, GL_FLOAT, 32, BUFFER_OFFSET(0));
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -319,6 +323,7 @@ void display() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VertexIBOID2);
 	
 	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ; 
+	*/
 	
 	glutSwapBuffers();
 }
