@@ -21,6 +21,7 @@ map<string,int> modelMap;
 const int MAXOBJECTS = 10;
 
 GLuint objects[MAXOBJECTS][2]; // Object buffer IDs
+
 int size[MAXOBJECTS]; //number of indicies
 GLenum primType[MAXOBJECTS]; // primative type
 bool normals[MAXOBJECTS]; //Does the object have normals?
@@ -192,7 +193,6 @@ void parseRAW(string filename, int modelNum){
 		verts[i].x = v[3*i];
 		verts[i].y = v[3*i+1];
 		verts[i].z = v[3*i+2];
-		cout<< "verts: "<< v[3*i] << ", "<<v[3*i+1] << ", " << v[3*i+2] << endl;
 		inds[i] = i;
 	}
 	
@@ -271,11 +271,9 @@ void parseOBJ(string filename, int modelNum){
 }
 
 void parseOBJ4(string filename, int modelNum){
-	vector<vec3> v; // vectors
+	vector<vec3> v; // verticies
 	vector<vec4> f; // faces
 	ifstream myfile(filename.c_str(), ifstream::in);
-	int numVerts = 0;
-	int numFaces = 0;
 	if(myfile.is_open()) {
 		while(myfile.good()) {
 			string line;
@@ -288,32 +286,40 @@ void parseOBJ4(string filename, int modelNum){
 				ln >> x >> y >> z;
 				vec3 p(x, y, z);
 				v.push_back(p);
-				numVerts++;
 			}
 			if(cmd == "f") {
 				int v1, v2, v3, v4;
 				ln >> v1 >> v2 >> v3 >> v4;
 				vec4 t(v1-1, v2-1, v3-1, v4-1);
 				f.push_back(t);
-				numFaces++;
 			}
 		}
 	} else {
 		cout << "Unable to open file " << filename << endl;
 	}
-	vertex verts[numVerts];
+	int numFaces = f.size();
+	vertex verts[numFaces*4];
 	GLushort inds[numFaces*4];
-	for(int i=0; i<numVerts; i++){
-		verts[i].x = v[i][0];
-		verts[i].y = v[i][1];
-		verts[i].z = v[i][2];
-	}
+	
 	for(int i=0; i<numFaces; i++){
-		inds[4*i] = f[i][0];
-		inds[4*i+1] = f[i][1];
-		inds[4*i+2] = f[i][2];
-		inds[4*i+3] = f[i][3];
+		vec4 face = f[i];
+		vec3 a = v[face[1]]-v[face[0]];
+		vec3 b = v[face[3]]-v[face[0]];
+		vec3 normal = glm::normalize(glm::cross(a,b));
+		
+		for (int j=0; j<4; j++){
+			verts[4*i+j].x = v[face[j]][0];
+			verts[4*i+j].y = v[face[j]][1];
+			verts[4*i+j].z = v[face[j]][2];
+			verts[4*i+j].nx = normal[0];
+			verts[4*i+j].ny = normal[1];
+			verts[4*i+j].nz = normal[2];
+		}
 	}
+	for(int i=0; i<numFaces*4; i++){
+		inds[i]=i;
+	}
+	
 	glGenBuffers(2, &objects[modelNum][0]);
 	glBindBuffer(GL_ARRAY_BUFFER, objects[modelNum][0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
@@ -325,7 +331,7 @@ void parseOBJ4(string filename, int modelNum){
 	
 	size[modelNum] = numFaces*4;
 	primType[modelNum] = GL_QUADS;
-	normals[modelNum] = false;
+	normals[modelNum] = true;
 	textures[modelNum] = 0 ;
 }
 
