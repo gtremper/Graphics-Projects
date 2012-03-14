@@ -45,6 +45,7 @@ int lastx, lasty ; // For mouse motion
 
 float teapotangle = 0.0;
 int animate = 0;
+bool wire;
 
 std::vector<command> commands; 
 
@@ -162,6 +163,10 @@ void keyboard(unsigned char key, int x, int y) {
 		break; 
 	case 'p': // to pause/restart animation
 		animate = !animate;
+		break;
+	case 'q': //wireframe mode for maze
+		wire = !wire;
+		std::cout << "wireframe is now set to" << (wire ? " true " : " false ") << "\n" ;
 		break;
 	}
 	glutPostRedisplay();

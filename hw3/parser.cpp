@@ -429,8 +429,11 @@ void draw(int obj){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY) ; 
 		glTexCoordPointer(2, GL_FLOAT, 32, BUFFER_OFFSET(24)) ;
 	}
-	
+	if (obj==0 && wire) {
+		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	}
 	glDrawElements(primType[obj], size[obj], GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ;
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glUniform1i(istex, false) ;

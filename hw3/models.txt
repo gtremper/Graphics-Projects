@@ -1,5 +1,5 @@
-teapot.obj
 maze.obj4
+teapot.obj
 triangle.obj
 triforce.raw
 ground.obj4

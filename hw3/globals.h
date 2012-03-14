@@ -15,5 +15,6 @@ extern vec4 light_specular[];
 extern bool useLights;
 extern GLuint shaderprogram;
 extern GLuint istex;
+extern bool wire;
 
 #endif
