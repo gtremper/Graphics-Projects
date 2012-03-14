@@ -1,7 +1,7 @@
 size 800 600
-# camera 33 2 -2.5 90.0 0 45.0
+camera 33 2 -2.5 90.0 0 45.0
 # flying camera:
-camera 15 50 20 0 -55.0 45.0
+#camera 15 50 20 0 -55.0 45.0
 
 # lights.  A single point and directional light
 # Note that your program must support up to 10 lights
@@ -27,6 +27,12 @@ pushTransform
 	translate 6.5 1 -7.5
 	rotate 0 1 0 270.0
 	scale 1.1 1.1 1.1
+	triforce.raw
+popTransform
+
+pushTransform
+	translate 24.5 1 -23
+	rotate 0 1 0 180.0
 	triforce.raw
 popTransform
 
