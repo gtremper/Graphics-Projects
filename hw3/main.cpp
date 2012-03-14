@@ -18,7 +18,7 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 1.5;
+const float WALKSPEED = 0.5;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 FORWARD = vec3(0.0,0.0,-1.0);
@@ -96,7 +96,8 @@ void printHelp() {
 			<< "press 'f' to switch to fly mode.\n"
 			<< "press 'p' to begin the animation.\n"
 			<< "press 'l' to toggle lights and textures.\n"
-			<< "press 'q' to toggle wireframe mode\n"
+			<< "press 'q' to toggle wireframe mode.\n"
+			<< "press 'v' to toggle vertex shading.\n"
 			<< "press ESC to quit.\n";
 	
 }
