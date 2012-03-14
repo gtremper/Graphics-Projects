@@ -18,7 +18,7 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 1.5;
+const float WALKSPEED = 0.5;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 FORWARD = vec3(0.0,0.0,-1.0);
@@ -42,6 +42,9 @@ vec4 light_position[MAXLIGHTS]; //current position of the 10 lights
 vec4 light_specular[MAXLIGHTS]; //color of lights
 int numLights;
 int lastx, lasty ; // For mouse motion
+
+float teapotangle = 0.0;
+int animate = 0;
 
 std::vector<command> commands; 
 
@@ -68,9 +71,6 @@ GLuint emission ;
 
 GLuint lightPosn;
 GLuint lightColor;
-
-GLfloat teapotangle = 0;
-GLint animate = 0;
 
 /* Uses the Projection matrices (technically deprecated) to set perspective 
    We could also do this in a more modern fashion with glm.	*/ 

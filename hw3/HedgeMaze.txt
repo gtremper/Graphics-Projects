@@ -1,7 +1,7 @@
 size 800 600
-# camera 33 2 -2.5 90.0 0 45.0
+camera 33 2 -2.5 90.0 0 45.0
 # flying camera:
-camera 15 50 20 0 -55.0 45.0
+#camera 15 50 20 0 -55.0 45.0
 
 # lights.  A single point and directional light
 # Note that your program must support up to 10 lights
