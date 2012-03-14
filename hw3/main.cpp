@@ -97,7 +97,7 @@ void printHelp() {
 			<< "press 'l' to toggle lights and textures.\n"
 			<< "press 'p' to begin the animation.\n"
 			<< "press 'q' to toggle wireframe mode.\n"
-			<< "press 't' to toggle textures and leave lights\n"
+			<< "press 't' to toggle textures and leave lights on\n"
 			<< "press 'v' to toggle vertex shading.\n"
 			<< "press ESC to quit.\n";
 	
