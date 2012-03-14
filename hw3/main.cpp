@@ -156,10 +156,16 @@ void keyboard(unsigned char key, int x, int y) {
 	case 27:  // Escape to quit
 			exit(0) ;
 			break ;
-	case 'f': // switch between fly and no fly 
-		eye = eyeinit ; 
-		pitch = pitchInit;
-		yaw = yawInit;
+	case 'f': // switch between fly and no fly
+		if(!flyMode) {
+			eye = vec3(15,50,20);
+			pitch = -55.0;
+			yaw = 0.0;
+		} else {
+			eye = eyeinit ; 
+			pitch = pitchInit;
+			yaw = yawInit;
+		}
 		useLights = true;
 		flyMode = !flyMode;
 		glUniform1i(islight, useLights) ;

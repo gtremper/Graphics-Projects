@@ -1,11 +1,20 @@
-The first thing we did was complete hw1's Transform.cpp by adding the perspective matrix as well as translation and scale methods.
+To run the scene after compiling, run "./transforms HedgeMaze.txt models.txt" from the command line.
+The movement is similar to a first person game where dragging the mouse controls where to look, and the "WASD" keys control movement. You can move the mouse without moving the eye by clicking first and then dragging. By pressing the "f" key, you can switch to fly mode where you can leave the ground and get a bird's eye view of the scene. The orientation we are using is such that the two entrances to the maze are at the top left corner (facing up), and bottom right corner (facing right).
+The object created by hand is all the walls of the maze itself. This can pretty much be seen from anywhere.
+The objects loaded from an .obj file are the maze walls, the ground, and the cube. The first two can be seen anywhere, while the cube is in the lower right corner of the maze.
+The object created from a .raw triangle file is the 3D triforce symbol, which can be found near the bottom left corner of the maze.
+The two objects that are textured are the maze walls and the ground.
+One object that is shiny in appearance is the large teapot found in the center of the maze. The smaller teapot right next to that is dull in appearance.
+There is one overhead directional white light.
+There are five point lights of various colors located in the four corners and the center of the scene.
+The two teapots in the center of the maze is the same object that is instantiated twice. They are of different size, translated differently, and have different specular properties.
+The maze walls can switch to and from wireframe mode. This is toggled using the 'q' key.
+The maze walls, the ground, all elements of the table, the teapots, and the sphere all have correct normals. The table can be found in the central area of the maze, while the sphere is located near the top right corner.
+The 'l' key toggles both lights and textures, while the 't' key just toggles textures and leaves the lights on.
+In the vertex shader, we added light attenuation, and added a cartoon-like shader. This can be toggled with the 'c' key.
+We calculated the smooth Lambertian shading at either the vertex or fragment level. This can be toggled with the 'v' key.
+The larger teapot is constantly animated, while the smaller teapot's animation can be toggled using the 'p' key.
 
-In order to properly draw the scene, we needed to create a data structure that would store the commands and arguments specified in the input file. We created a struct to store this information and made a vector of them to store the series of commands in the correct order. 
 
-Next, we added the parser to take in the txt file and set the global variables to their initial values. It created a list of commands that was used by the function drawObjects() to render the scene.
-
-Next, we extended the lights from hw1 to handle more than two lights by storing the light positions and light colors in arrays. We also handled the case when there is a directional light. Then, we added the 0-9 keys to be able to control each light. This required creating an array of up vectors for each light. These were specified whenever a user selects a light to manipulate. We also created a separate light_position_init array to store the initial location of the lights, which we used for "reset."
-
-Additional Features:
-	Set default parameters to ensure the program can handle any input.
-	You can turn on and off the lights using the 'l' key.
+http://inst.cs.berkeley.edu/~cs184-bj/
+http://inst.cs.berkeley.edu/~cs184-dy/
