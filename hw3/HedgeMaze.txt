@@ -1,7 +1,7 @@
 size 800 600
-camera 33 2 -2.5 90.0 0 45.0
+#camera 33 2 -2.5 90.0 0 45.0
 # flying camera:
-#camera 15 50 20 0 -55.0 45.0
+camera 15 50 20 0 -55.0 45.0
 
 # lights.  A single point and directional light
 # Note that your program must support up to 10 lights
@@ -91,4 +91,13 @@ pushTransform
 	translate 18 2.75 -22
 	scale 0.3 0.3 0.3
 	constanim 5 0.5
+popTransform
+
+ambient 0.1 0.1 0.1 1
+diffuse 0.3 0.3 0.3 1
+specular 0.2 0.2 0.2 1
+
+pushTransform
+	translate 23.5 2.5 -23
+	sphere 1
 popTransform
