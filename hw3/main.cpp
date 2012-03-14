@@ -18,7 +18,7 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 0.5;
+const float WALKSPEED = 1.5;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 FORWARD = vec3(0.0,0.0,-1.0);
@@ -45,6 +45,7 @@ int lastx, lasty ; // For mouse motion
 
 float teapotangle = 0.0;
 int animate = 0;
+float teapotangle2 = 0.0;
 bool wire;
 
 std::vector<command> commands; 
@@ -93,6 +94,7 @@ void printHelp() {
 			<< "press 'f' to switch to fly mode.\n"
 			<< "press 'p' to begin the animation.\n"
 			<< "press 'l' to toggle lights and textures.\n"
+			<< "press 'q' to toggle wireframe mode\n"
 			<< "press ESC to quit.\n";
 	
 }
@@ -163,6 +165,7 @@ void keyboard(unsigned char key, int x, int y) {
 		break; 
 	case 'p': // to pause/restart animation
 		animate = !animate;
+		std::cout << "animation is now set to" << (animate ? " true " : " false ") << "\n";
 		break;
 	case 'q': //wireframe mode for maze
 		wire = !wire;
@@ -295,9 +298,16 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 				glLoadMatrixf(&transf[0][0]);
 				glRotatef(teapotangle*com.args[1], 0.0, 1.0, 0.0);
 				glutSolidTeapot(com.args[0]);
+				break;
 				// transf = mat4(Transform::rotate(teapotangle*com.args[1], UP));
 				// transf = glm::transpose(transf);
 				// transf = matStack.top()*transf;
+			case constanim:
+				transf = mv*matStack.top();
+				glLoadMatrixf(&transf[0][0]);
+				glRotatef(teapotangle2*com.args[1], 0.0, 1.0, 0.0);
+				glutSolidTeapot(com.args[0]);
+				break;
 			default:
 				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
@@ -309,6 +319,10 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 
 void animation(void) {
 	teapotangle = teapotangle + 1.0;
+}
+
+void constanimation(void) {
+	teapotangle2 = teapotangle2 - 1.0;
 }
 
 /* main display */
@@ -334,6 +348,9 @@ void display() {
 	if(animate) {
 		animation();
 	}
+	
+	constanimation();
+	
 	glutSwapBuffers();
 }
 

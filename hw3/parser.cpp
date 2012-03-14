@@ -147,7 +147,13 @@ void parseLine(string l, vector<command> &commands) {
 		com.op = anim;
 		com.args = vec4(arg1,arg2,0.0,0.0);
 		commands.push_back(com);
-	} else if(modelMap.find(cmd) != modelMap.end()) {
+	} else if(cmd == "constanim") {
+		line >> arg1 >> arg2; //size speed
+		command com;
+		com.op = constanim;
+		com.args = vec4(arg1,arg2,0.0,0.0);
+		commands.push_back(com);
+	}	else if(modelMap.find(cmd) != modelMap.end()) {
 		command com;
 		com.op = -modelMap[cmd]-1;
 		commands.push_back(com);
