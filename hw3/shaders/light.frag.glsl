@@ -8,13 +8,16 @@
 
 varying vec4 color ;
 varying vec3 mynormal ; 
-varying vec4 myvertex ; 
+varying vec4 myvertex ;
+varying vec4 lambertVert; 
 
 uniform sampler2D tex ; 
 
 uniform int istex ;
 uniform int islight ; // are we lighting. 
 uniform int numLights;
+
+uniform int vertexShading;
 
 /* Color and Position for lights */
 uniform vec4 lightPosn[10];
@@ -31,17 +34,21 @@ uniform vec4 diffuse ;
 uniform vec4 specular ; 
 uniform float shininess ; 
 
-vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in vec3 normal, const in vec3 halfvec, const in vec4 mydiffuse, const in vec4 myspecular, const in float myshininess) {
-
-        float nDotL = dot(normal, direction)  ;         
-        vec4 lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;  
+vec4 ComputePhong (const in vec4 lightcolor, const in vec3 normal, const in vec3 halfvec, const in vec4 myspecular, const in float myshininess) {
 
         float nDotH = dot(normal, halfvec) ; 
         vec4 phong = myspecular * lightcolor * pow (max(nDotH, 0.0), myshininess) ; 
 
-        vec4 retval = lambert + phong ; 
-        return retval ;            
-}       
+        return phong ;            
+} 
+
+vec4 ComputeLambert (const in vec3 direction, const in vec4 lightcolor, const in vec3 normal, const in vec4 mydiffuse) {
+
+        float nDotL = dot(normal, direction)  ;         
+        vec4 lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;  
+ 
+        return lambert ;            
+}     
 
 void main (void) 
 {   
@@ -59,7 +66,8 @@ void main (void)
 
 		/* Initialize variables */   
 		vec3 position, direction, halfAngle;
-		vec4 totalCol = vec4(0,0,0,0);
+		vec4 totalLambert = vec4(0,0,0,0);
+		vec4 totalPhong = vec4(0,0,0,0);
 		
 		/* Sum over all lights */  
 		for(int i=0; i<numLights ;i++) {	
@@ -69,15 +77,23 @@ void main (void)
 	        	position = lightPosn[i].xyz / lightPosn[i].w ; 
 				direction = normalize (position-mypos) ;
 			}
-	        halfAngle = normalize (direction + eyedirn) ;  
-	        totalCol += ComputeLight(direction, lightColor[i], normal, halfAngle, diffuse, specular, shininess);
+	        halfAngle = normalize (direction + eyedirn) ;
+			
+	        totalPhong += ComputePhong(lightColor[i], normal, halfAngle, specular, shininess);
+			if (vertexShading==0) {
+				totalLambert += ComputeLambert(direction, lightColor[i], normal, diffuse);
+			}
 		}
+		
+		if (vertexShading != 0){
+			totalLambert = lambertVert;
+		}
+		
 		if (istex != 0) {
-			gl_FragColor = totalCol * texture2D(tex, gl_TexCoord[0].st) ; 
+			gl_FragColor = (totalPhong+totalLambert) * texture2D(tex, gl_TexCoord[0].st) ; 
 		} else {
-			gl_FragColor = totalCol + ambient + emission;
+			gl_FragColor = totalPhong + totalLambert + ambient + emission;
 		}		
-	}
-	
+	}	
 }
 		

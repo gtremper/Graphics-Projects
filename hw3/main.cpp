@@ -33,6 +33,7 @@ float yawInit;
 
 bool useLights; // Toggle light shading on and off
 bool useTex; // Toggle if using a texture for this object
+bool useVertex = false;
 bool passive; // Toggle passive mouse movement
 int width, height;  
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -58,6 +59,7 @@ void draw(int);
 /* Variables to set uniform params for lighting fragment shader */
 GLuint islight ;
 GLuint istex;
+GLuint isvertex;
 GLuint numLightsShader;
 
 GLuint ambient ; 
@@ -168,9 +170,14 @@ void keyboard(unsigned char key, int x, int y) {
 		wire = !wire;
 		std::cout << "wireframe is now set to" << (wire ? " true " : " false ") << "\n" ;
 		break;
+	case 'v':
+		useVertex = !useVertex;
+		std::cout << "vertex shading is now set to" << (useVertex ? " true " : " false ") << "\n" ;
+		glUniform1i(isvertex, useVertex) ;
 	}
 	glutPostRedisplay();
 }
+
 
 
 /* Default values so the program doesn't crash with empty input */
@@ -203,6 +210,7 @@ void init() {
 	shaderprogram = initprogram(vertexshader, fragmentshader);
 	istex = glGetUniformLocation(shaderprogram,"istex");
 	islight = glGetUniformLocation(shaderprogram,"islight");
+	isvertex = glGetUniformLocation(shaderprogram,"vertexShading");
 	numLightsShader = glGetUniformLocation(shaderprogram,"numLights");
 	
 	ambient = glGetUniformLocation(shaderprogram,"ambient");
@@ -216,6 +224,7 @@ void init() {
 	
 	/* Set variables that don't change during simulation */
 	glUniform1i(islight, useLights) ;
+	glUniform1i(isvertex, false) ;
 	glUniform1i(numLightsShader, numLights);
 	
 	glUniform1i(istex,false);
@@ -306,6 +315,7 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 		}	
 	}
 }
+
 
 void animation(void) {
 	teapotangle = teapotangle + 1.0;
