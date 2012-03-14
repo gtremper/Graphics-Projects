@@ -19,6 +19,8 @@ uniform int numLights;
 
 uniform int vertexShading;
 
+uniform int cartoonShading;
+
 /* Color and Position for lights */
 uniform vec4 lightPosn[10];
 uniform vec4 lightColor[10];
@@ -37,7 +39,17 @@ uniform float shininess ;
 vec4 ComputePhong (const in vec4 lightcolor, const in vec3 normal, const in vec3 halfvec, const in vec4 myspecular, const in float myshininess) {
 
         float nDotH = dot(normal, halfvec) ; 
-        vec4 phong = myspecular * lightcolor * pow (max(nDotH, 0.0), myshininess) ; 
+		vec4 phong;
+
+		if (cartoonShading==0){
+			phong = myspecular * lightcolor * pow (max(nDotH, 0.0), myshininess) ; 
+		} else {
+			if(pow (max(nDotH, 0.0), myshininess)>0.5){
+				phong = myspecular*lightcolor;
+			} else {
+				phong = vec4(0,0,0,0);
+			}
+		}
 
         return phong ;            
 } 
@@ -45,8 +57,17 @@ vec4 ComputePhong (const in vec4 lightcolor, const in vec3 normal, const in vec3
 vec4 ComputeLambert (const in vec3 direction, const in vec4 lightcolor, const in vec3 normal, const in vec4 mydiffuse) {
 
         float nDotL = dot(normal, direction)  ;         
-        vec4 lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;  
- 
+		vec4 lambert;
+  		
+		if(cartoonShading == 0){
+			lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;
+		} else {
+			if(max (nDotL, 0.0)>0.65){
+				lambert = mydiffuse*lightcolor;
+			} else {
+				lambert = vec4(0,0,0,0);
+			}
+ 		}
         return lambert ;            
 }     
 

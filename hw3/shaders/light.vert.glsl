@@ -14,6 +14,7 @@ varying vec4 lambertVert;
 
 uniform vec4 diffuse ; 
 uniform int vertexShading;
+uniform int cartoonShading;
 /* Color and Position for lights */
 uniform int numLights;
 uniform vec4 lightPosn[10];
@@ -22,9 +23,18 @@ uniform vec4 lightColor[10];
 vec4 ComputeLambert (const in vec3 direction, const in vec4 lightcolor, const in vec3 normal, const in vec4 mydiffuse) {
 
         float nDotL = dot(normal, direction)  ;         
-        vec4 lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;  
- 
-        return lambert ;            
+		vec4 lambert;
+  		
+		if(cartoonShading == 0){
+			lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;
+		} else {
+			if(max (nDotL, 0.0)>0.5){
+				lambert = mydiffuse*lightcolor;
+			} else {
+				lambert = vec4(0,0,0,0);
+			}
+ 		}
+        return lambert ;           
 }
 
 
@@ -41,12 +51,15 @@ void main() {
         vec3 mypos = _mypos.xyz / _mypos.w ; // Dehomogenize current location
 
 		vec3 position, direction;
-
+		float atten = 1.0;
 		for(int i=0; i<numLights ;i++) {	
 			if (lightPosn[i].w==0) {
+				atten = 1.0;
 				direction = normalize(lightPosn[i].xyz);
 			} else {
-	        	position = lightPosn[i].xyz / lightPosn[i].w ; 
+	        	position = lightPosn[i].xyz / lightPosn[i].w ;
+				float dist = length(position-mypos);
+				atten = 1.0/(1.0+0.01*dist+0.001*dist*dist); 
 				direction = normalize (position-mypos) ;
 			}
 	

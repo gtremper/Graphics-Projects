@@ -34,6 +34,7 @@ float yawInit;
 bool useLights; // Toggle light shading on and off
 bool useTex; // Toggle if using a texture for this object
 bool useVertex = false;
+bool useCartoon = false;
 bool passive; // Toggle passive mouse movement
 int width, height;  
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -62,9 +63,7 @@ GLuint islight ;
 GLuint istex;
 GLuint isvertex;
 GLuint numLightsShader;
-
-GLuint fboId;
-GLuint depthTextureId;
+GLuint iscartoon;
 
 GLuint ambient ; 
 GLuint diffuse ; 
@@ -187,6 +186,11 @@ void keyboard(unsigned char key, int x, int y) {
 		std::cout << "vertex shading is now set to" << (useVertex ? " true " : " false ") << "\n";
 		glUniform1i(isvertex, useVertex) ;
 		break;
+	case 'c':
+		useCartoon = !useCartoon;
+		std::cout << "cartoon shading is now set to" << (useCartoon ? " true " : " false ") << "\n";
+		glUniform1i(iscartoon, useCartoon) ;
+		break;
 	}
 	glutPostRedisplay();
 }
@@ -224,6 +228,7 @@ void init() {
 	islight = glGetUniformLocation(shaderprogram,"islight");
 	isvertex = glGetUniformLocation(shaderprogram,"vertexShading");
 	numLightsShader = glGetUniformLocation(shaderprogram,"numLights");
+	iscartoon = glGetUniformLocation(shaderprogram,"cartoonShading");
 	
 	ambient = glGetUniformLocation(shaderprogram,"ambient");
 	diffuse = glGetUniformLocation(shaderprogram,"diffuse");
