@@ -8,13 +8,17 @@
 #include <GLUT/glut.h>
 #include "Transform.h"
 #include "globals.h"
+#include "FreeImage.h"
+
+using namespace std;
+
+bool loadBitmap(string filename, FIBITMAP* &bitmap);
+bool loadTexture(string filename, GLuint &texture);
 
 // COLORS: sky: (135/225.0, 206/255.0, 250/255) forest green: (34/255.0, 139/255.0, 34/255.0)
 
 #define BUFFER_OFFSET(i) (reinterpret_cast<void*>(i))
 #define NumberOf(array) (sizeof(array)/sizeof(array[0]))
-
-using namespace std;
 
 map<string,int> modelMap;
 
@@ -393,6 +397,8 @@ void draw(int obj){
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
+
+/*
 // load a texture into opengl with freeimage
 bool loadTexture(string filename, GLuint &texture) {
   FIBITMAP *bitmap = NULL;
@@ -430,8 +436,7 @@ bool loadTexture(string filename, GLuint &texture) {
 }
 
 
-
-
+*/
 
 
 
