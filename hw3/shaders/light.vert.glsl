@@ -50,7 +50,7 @@ void main() {
 				direction = normalize (position-mypos) ;
 			}
 	
-	        lambertVert += ComputeLambert(direction,lightColor[i],gl_Normal,diffuse);
+	        lambertVert += ComputeLambert(direction,lightColor[i],normalize(gl_NormalMatrix * mynormal),diffuse);
 		}
 	}
 }
