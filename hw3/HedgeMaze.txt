@@ -13,4 +13,5 @@ specular 1 1 1 1
 shininess 20
 
 maze.obj4
+ground.obj4
 #triforce.raw
