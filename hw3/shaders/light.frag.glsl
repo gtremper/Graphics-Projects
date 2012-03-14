@@ -9,6 +9,10 @@
 varying vec4 color ;
 varying vec3 mynormal ; 
 varying vec4 myvertex ; 
+
+uniform sampler2D tex ; 
+
+uniform int istex ;
 uniform int islight ; // are we lighting. 
 uniform int numLights;
 
@@ -40,25 +44,29 @@ vec4 ComputeLight (const in vec3 direction, const in vec4 lightcolor, const in v
 }       
 
 void main (void) 
-{       
-    if (islight == 0) gl_FragColor = color ; 
+{   
+	if (istex != 0) gl_FragColor = texture2D(tex, gl_TexCoord[0].st);
+	else gl_FragColor = color ; 
+	/*
+	if (istex != 0) gl_FragColor = texture2D(tex, gl_TexCoord[0].st) ; 
+    else if (islight == 0) gl_FragColor = color ; 
     else { 
         /* They eye is always at (0,0,0) looking down -z axis 
-           Also compute current fragment position and direction to eye */ 
+           Also compute current fragment position and direction to eye */ /*
         const vec3 eyepos = vec3(0,0,0) ; 
         vec4 _mypos = gl_ModelViewMatrix * myvertex ; 
         vec3 mypos = _mypos.xyz / _mypos.w ; // Dehomogenize current location 
         vec3 eyedirn = normalize(eyepos - mypos) ; 
 
-        /* Compute normal, needed for shading. */
+        /* Compute normal, needed for shading. */   /*
          vec3 normal = normalize(gl_NormalMatrix * mynormal) ; 
 
-		/* Initialize variables */
+		/* Initialize variables */   /*
 		vec3 position, direction, halfAngle;
 		vec4 totalCol = vec4(0,0,0,0);
 		totalCol = ambient + emission;
 		
-		/* Sum over all lights */
+		/* Sum over all lights */  /*
 		for(int i=0; i<numLights ;i++) {	
 			if (lightPosn[i].w==0) {
 				direction = normalize(lightPosn[i].xyz);
@@ -72,5 +80,7 @@ void main (void)
 		
 		gl_FragColor = totalCol;		
 	}
+	*/
+	
 }
 		

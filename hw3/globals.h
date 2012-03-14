@@ -13,6 +13,7 @@ extern const int MAXLIGHTS;
 extern vec4 light_position[];
 extern vec4 light_specular[];
 extern bool useLights;
-extern bool istex;
+extern GLuint shaderprogram;
+extern GLuint istex;
 
 #endif

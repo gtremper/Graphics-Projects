@@ -30,12 +30,13 @@ int size[MAXOBJECTS]; //number of indicies
 GLenum primType[MAXOBJECTS]; // primative type
 bool normals[MAXOBJECTS]; //Does the object have normals?
 int textures[MAXOBJECTS]; //Does the object have textures, if so which?
+GLuint texBuff[3]; //Texture buffers. Change size if adding textures
 
 
 struct vertex {
 	GLfloat x, y, z; //position
 	GLfloat nx, ny, nz; //normal
-	GLfloat u, v; // texture coordinates
+	GLfloat tx, ty; // texture coordinates
 };
 
 
@@ -212,7 +213,7 @@ void parseRAW(string filename, int modelNum){
 	size[modelNum] = numVerts/3;
 	primType[modelNum] = GL_TRIANGLES;
 	normals[modelNum] = false;
-	textures[modelNum] = 0 ;	
+	textures[modelNum] = -1 ;	
 }
 
 
@@ -271,10 +272,13 @@ void parseOBJ(string filename, int modelNum){
 	size[modelNum] = numFaces*3;
 	primType[modelNum] = GL_TRIANGLES;
 	normals[modelNum] = false;
-	textures[modelNum] = 0 ;
+	textures[modelNum] = -1 ;
 }
 
+int texCounter = 0;
 void parseOBJ4(string filename, int modelNum){
+	textures[modelNum] = -1;
+	
 	vector<vec3> v; // verticies
 	vector<vec4> f; // faces
 	ifstream myfile(filename.c_str(), ifstream::in);
@@ -297,6 +301,18 @@ void parseOBJ4(string filename, int modelNum){
 				vec4 t(v1-1, v2-1, v3-1, v4-1);
 				f.push_back(t);
 			}
+			if(cmd == "t") {
+				string path;
+				ln >> path;
+				if ( loadTexture(path,texBuff[texCounter]) ){
+					textures[modelNum] = texCounter;
+					texCounter++;
+					cout << "texture \""<<path <<"\" loaded" <<endl;
+				} else {
+					cerr << "Texture \""<< path <<"\" failed to load";
+					exit(1);
+				}
+			}
 		}
 	} else {
 		cout << "Unable to open file " << filename << endl;
@@ -311,6 +327,13 @@ void parseOBJ4(string filename, int modelNum){
 		vec3 b = v[face[3]]-v[face[0]];
 		vec3 normal = glm::normalize(glm::cross(a,b));
 		
+		float h = glm::length(a);
+		float w = glm::length(b);
+		w*=0.25;
+		h*=0.25;
+		float texcoordx[] = {w,w,0,0};
+		float texcoordy[] = {0,h,h,0};
+		
 		for (int j=0; j<4; j++){
 			verts[4*i+j].x = v[face[j]][0];
 			verts[4*i+j].y = v[face[j]][1];
@@ -318,6 +341,9 @@ void parseOBJ4(string filename, int modelNum){
 			verts[4*i+j].nx = normal[0];
 			verts[4*i+j].ny = normal[1];
 			verts[4*i+j].nz = normal[2];
+			
+			verts[4*i+j].tx = texcoordx[j];
+			verts[4*i+j].ty = texcoordy[j];
 		}
 	}
 	for(int i=0; i<numFaces*4; i++){
@@ -336,7 +362,6 @@ void parseOBJ4(string filename, int modelNum){
 	size[modelNum] = numFaces*4;
 	primType[modelNum] = GL_QUADS;
 	normals[modelNum] = true;
-	textures[modelNum] = 0 ;
 }
 
 
@@ -377,6 +402,7 @@ void loadObjects(char* filename) {
 	}
 }
 
+/* Draw object number "obj" */
 void draw(int obj){
 	glBindBuffer(GL_ARRAY_BUFFER, objects[obj][0]);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, objects[obj][1]);
@@ -389,16 +415,40 @@ void draw(int obj){
 		glEnableClientState(GL_NORMAL_ARRAY);
 	}
 	
-	if(textures[obj] != 0){
-		// imma gonna deal with this later
+	if(textures[obj] != -1){
+		glUniform1i(istex, true) ;
+		glActiveTexture(GL_TEXTURE0) ; 
+		glEnable(GL_TEXTURE_2D) ; 
+		glBindTexture(GL_TEXTURE_2D, texBuff[textures[obj]]) ; 
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY) ; 
+		glTexCoordPointer(2, GL_FLOAT, 32, BUFFER_OFFSET(24)) ;
 	}
+	
 	glDrawElements(primType[obj], size[obj], GL_UNSIGNED_SHORT, BUFFER_OFFSET(0)) ;
 	glDisableClientState(GL_NORMAL_ARRAY);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glUniform1i(istex, false) ;
 }
 
 
-/*
+// load a bitmap with freeimage
+bool loadBitmap(string filename, FIBITMAP* &bitmap) {
+  // get the file format
+  FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename.c_str(), 0);
+  if (format == FIF_UNKNOWN)
+    format = FreeImage_GetFIFFromFilename(filename.c_str());
+  if (format == FIF_UNKNOWN)
+    return false;
+
+  // load the image
+  bitmap = FreeImage_Load(format, filename.c_str());
+  if (!bitmap)
+    return false;
+
+  return true;
+}
+
+
 // load a texture into opengl with freeimage
 bool loadTexture(string filename, GLuint &texture) {
   FIBITMAP *bitmap = NULL;
@@ -427,6 +477,10 @@ bool loadTexture(string filename, GLuint &texture) {
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT) ;
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT) ;
+
   gluBuild2DMipmaps(GL_TEXTURE_2D, 4, w, h, order, GL_UNSIGNED_BYTE, (GLvoid*)bits);
 
   // forget our copy of the bitmap now that it's stored the card
@@ -436,7 +490,6 @@ bool loadTexture(string filename, GLuint &texture) {
 }
 
 
-*/
 
 
 

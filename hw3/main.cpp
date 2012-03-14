@@ -32,7 +32,7 @@ float pitchInit;
 float yawInit;
 
 bool useLights; // Toggle light shading on and off
-bool istex;
+bool useTex; // Toggle if using a texture for this object
 bool passive; // Toggle passive mouse movement
 int width, height;  
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
@@ -57,6 +57,7 @@ void draw(int);
 
 /* Variables to set uniform params for lighting fragment shader */
 GLuint islight ;
+GLuint istex;
 GLuint numLightsShader;
 
 GLuint ambient ; 
@@ -180,6 +181,7 @@ void init() {
 	yaw = yawInit;
 	pitch = pitchInit;
 	useLights = true;
+	useTex = false;
 	flyMode = false;
 	passive = true;
 	lastx = width/2;
@@ -190,6 +192,7 @@ void init() {
 	vertexshader = initshaders(GL_VERTEX_SHADER, "shaders/light.vert.glsl");
 	fragmentshader = initshaders(GL_FRAGMENT_SHADER, "shaders/light.frag.glsl");
 	shaderprogram = initprogram(vertexshader, fragmentshader);
+	istex = glGetUniformLocation(shaderprogram,"istex");
 	islight = glGetUniformLocation(shaderprogram,"islight");
 	numLightsShader = glGetUniformLocation(shaderprogram,"numLights");
 	
@@ -205,6 +208,11 @@ void init() {
 	/* Set variables that don't change during simulation */
 	glUniform1i(islight, useLights) ;
 	glUniform1i(numLightsShader, numLights);
+	
+	glUniform1i(istex,false);
+	GLint texsampler ; 
+	texsampler = glGetUniformLocation(shaderprogram, "tex") ; 
+	glUniform1i(texsampler,0) ; // Could also be GL_TEXTURE0
 	
 	glUniform4fv(lightColor, MAXLIGHTS, (GLfloat*)&light_specular[0]);	
 }
