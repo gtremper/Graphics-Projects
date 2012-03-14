@@ -18,7 +18,7 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 1.5;
+const float WALKSPEED = 0.5;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 FORWARD = vec3(0.0,0.0,-1.0);
@@ -97,9 +97,11 @@ void reshape(int w, int h){
 void printHelp() {
   std::cout << "\npress 'h' to print this message again.\n" 
 			<< "press 'f' to switch to fly mode.\n"
-			<< "press 'p' to begin the animation.\n"
 			<< "press 'l' to toggle lights and textures.\n"
-			<< "press 'q' to toggle wireframe mode\n"
+			<< "press 'p' to begin the animation.\n"
+			<< "press 'q' to toggle wireframe mode.\n"
+			<< "press 't' to toggle textures and leave lights on\n"
+			<< "press 'v' to toggle vertex shading.\n"
 			<< "press ESC to quit.\n";
 	
 }
@@ -166,7 +168,7 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'l':
 		useLights = !useLights;
 		glUniform1i(islight, useLights) ;
-		std::cout << "useLights is now set to" << (useLights ? " true " : " false ") << "\n" ;
+		std::cout << "useLights is now set to" << (useLights ? " true " : " false ") << "\n";
 		break; 
 	case 'p': // to pause/restart animation
 		animate = !animate;
@@ -174,12 +176,17 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	case 'q': //wireframe mode for maze
 		wire = !wire;
-		std::cout << "wireframe is now set to" << (wire ? " true " : " false ") << "\n" ;
+		std::cout << "wireframe is now set to" << (wire ? " true " : " false ") << "\n";
+		break;
+	case 't':
+		useTex = !useTex;
+		std::cout << "useTex is now set to" << (useTex ? " true " : " false ") << "\n";
 		break;
 	case 'v':
 		useVertex = !useVertex;
-		std::cout << "vertex shading is now set to" << (useVertex ? " true " : " false ") << "\n" ;
+		std::cout << "vertex shading is now set to" << (useVertex ? " true " : " false ") << "\n";
 		glUniform1i(isvertex, useVertex) ;
+		break;
 	}
 	glutPostRedisplay();
 }
@@ -202,7 +209,7 @@ void init() {
 	yaw = yawInit;
 	pitch = pitchInit;
 	useLights = true;
-	useTex = false;
+	useTex = true;
 	flyMode = false;
 	passive = true;
 	lastx = width/2;

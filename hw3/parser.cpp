@@ -427,7 +427,7 @@ void draw(int obj){
 		glEnableClientState(GL_NORMAL_ARRAY);
 	}
 	
-	if(textures[obj] != -1){
+	if(textures[obj] != -1 && useTex){
 		glUniform1i(istex, true) ;
 		glActiveTexture(GL_TEXTURE0) ; 
 		glEnable(GL_TEXTURE_2D) ; 
