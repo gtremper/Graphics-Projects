@@ -95,6 +95,7 @@ void printHelp() {
   std::cout << "\npress 'h' to print this message again.\n" 
 			<< "press 'f' to switch to fly mode.\n"
 			<< "press 'p' to begin the animation.\n"
+			<< "press 'l' to toggle lights and textures.\n"
 			<< "press ESC to quit.\n";
 	
 }
@@ -289,9 +290,13 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 				matStack.pop();
 				break;
 			case anim:
-				transf = matStack.top();
-				transf = mat4(Transform::rotate(teapotangle*com.args[1], UP))*transf;
+				transf = mv*matStack.top();
+				glLoadMatrixf(&transf[0][0]);
+				glRotatef(teapotangle*com.args[1], 0.0, 1.0, 0.0);
 				glutSolidTeapot(com.args[0]);
+				// transf = mat4(Transform::rotate(teapotangle*com.args[1], UP));
+				// transf = glm::transpose(transf);
+				// transf = matStack.top()*transf;
 			default:
 				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
@@ -325,14 +330,9 @@ void display() {
 	
 	drawObjects(commands,mv);	
 	
-	glPushMatrix();
 	if(animate) {
 		animation();
 	}
-	glRotatef(teapotangle, 0.0, 1.0, 0.0);
-		glutSolidTeapot(2.0);
-		glPopMatrix();
-	
 	glutSwapBuffers();
 }
 
