@@ -48,14 +48,10 @@ int animate = 0;
 
 std::vector<command> commands; 
 
-
 /* Forward Declaration */
 std::vector<command> parseInput(char*);
-
 void loadObjects(char*);
 void draw(int);
-
-
 
 
 /* Variables to set uniform params for lighting fragment shader */
