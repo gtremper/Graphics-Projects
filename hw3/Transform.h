@@ -21,7 +21,7 @@ typedef glm::vec3 vec3 ;
 typedef glm::vec4 vec4 ; 
 const float pi = 3.14159265 ; // For portability across platforms
 
-enum {amb,diff,spec,emis,shin,teapot,sphere,cube,trans,rot,scal,push,pop};
+enum {amb,diff,spec,emis,shin,teapot,sphere,cube,trans,rot,scal,push,pop,animate};
 
 struct command {
 	int op;

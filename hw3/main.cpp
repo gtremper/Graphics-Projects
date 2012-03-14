@@ -18,7 +18,7 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 0.5;
+const float WALKSPEED = 1.5;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 FORWARD = vec3(0.0,0.0,-1.0);
@@ -69,6 +69,9 @@ GLuint emission ;
 GLuint lightPosn;
 GLuint lightColor;
 
+GLfloat teapotangle = 0;
+GLint animate = 0;
+
 /* Uses the Projection matrices (technically deprecated) to set perspective 
    We could also do this in a more modern fashion with glm.	*/ 
 void reshape(int w, int h){
@@ -91,7 +94,8 @@ void reshape(int w, int h){
 void printHelp() {
   std::cout << "\npress 'h' to print this message again.\n" 
 			<< "press 'f' to switch to fly mode.\n"
-			<< "press ESC to quit.\n" ;	 
+			<< "press 'p' to begin the animation.\n"
+			<< "press ESC to quit.\n";
 	
 }
 
@@ -159,6 +163,9 @@ void keyboard(unsigned char key, int x, int y) {
 		glUniform1i(islight, useLights) ;
 		std::cout << "useLights is now set to" << (useLights ? " true " : " false ") << "\n" ;
 		break; 
+	case 'p': // to pause/restart animation
+		animate = !animate;
+		break;
 	}
 	glutPostRedisplay();
 }
@@ -281,6 +288,10 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 			case pop:
 				matStack.pop();
 				break;
+			case anim:
+				transf = matStack.top();
+				transf = mat4(Transform::rotate(teapotangle*com.args[1], UP))*transf;
+				glutSolidTeapot(com.args[0]);
 			default:
 				transf = mv*matStack.top();
 				glLoadMatrixf(&transf[0][0]);
@@ -288,6 +299,10 @@ void drawObjects(std::vector<command> comms, mat4 mv) {
 				break;
 		}	
 	}
+}
+
+void animation(void) {
+	teapotangle = teapotangle + 1.0;
 }
 
 /* main display */
@@ -309,6 +324,14 @@ void display() {
 	glUniform4fv(lightPosn, MAXLIGHTS, (GLfloat*)&light[0]);
 	
 	drawObjects(commands,mv);	
+	
+	glPushMatrix();
+	if(animate) {
+		animation();
+	}
+	glRotatef(teapotangle, 0.0, 1.0, 0.0);
+		glutSolidTeapot(2.0);
+		glPopMatrix();
 	
 	glutSwapBuffers();
 }

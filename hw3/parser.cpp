@@ -141,7 +141,12 @@ void parseLine(string l, vector<command> &commands) {
 		command com;
 		com.op = pop;
 		commands.push_back(com);
-	} else if (modelMap.find(cmd) != modelMap.end()) {
+	} else if(cmd == "anim") {
+		line >> arg1 >> arg2; //size speed
+		command com;
+		com.op = anim;
+		commands.push_back(com);
+	} else if(modelMap.find(cmd) != modelMap.end()) {
 		command com;
 		com.op = -modelMap[cmd]-1;
 		commands.push_back(com);
@@ -177,7 +182,7 @@ void parseRAW(string filename, int modelNum){
 		while(myfile.good()) {
 			string line;
 			getline(myfile,line);
-			if (line[0] == '#'){
+			if(line[0] == '#'){
 				continue;
 			}
 			stringstream ln(line);
