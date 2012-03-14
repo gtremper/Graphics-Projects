@@ -69,19 +69,23 @@ void main (void)
 		vec4 totalLambert = vec4(0,0,0,0);
 		vec4 totalPhong = vec4(0,0,0,0);
 		
-		/* Sum over all lights */  
+		/* Sum over all lights */ 
+		float atten = 1.0; 
 		for(int i=0; i<numLights ;i++) {	
 			if (lightPosn[i].w==0) {
 				direction = normalize(lightPosn[i].xyz);
+				atten = 1.0;
 			} else {
 	        	position = lightPosn[i].xyz / lightPosn[i].w ; 
+				float dist = length(position-mypos);
+				atten = 1.0/(1.0+0.01*dist+0.001*dist*dist);
 				direction = normalize (position-mypos) ;
 			}
 	        halfAngle = normalize (direction + eyedirn) ;
 			
-	        totalPhong += ComputePhong(lightColor[i], normal, halfAngle, specular, shininess);
+	        totalPhong += ComputePhong(atten*lightColor[i], normal, halfAngle, specular, shininess);
 			if (vertexShading==0) {
-				totalLambert += ComputeLambert(direction, lightColor[i], normal, diffuse);
+				totalLambert += ComputeLambert(direction, atten*lightColor[i], normal, diffuse);
 			}
 		}
 		

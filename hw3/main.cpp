@@ -63,6 +63,9 @@ GLuint istex;
 GLuint isvertex;
 GLuint numLightsShader;
 
+GLuint fboId;
+GLuint depthTextureId;
+
 GLuint ambient ; 
 GLuint diffuse ; 
 GLuint specular ; 
@@ -180,7 +183,6 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	glutPostRedisplay();
 }
-
 
 
 /* Default values so the program doesn't crash with empty input */
