@@ -94,7 +94,8 @@ void reshape(int w, int h){
 
 
 void printHelp() {
-  std::cout << "\npress 'h' to print this message again.\n" 
+  std::cout << "\npress 'h' to print this message again.\n"
+			<< "press 'c' to toggle cartoon shading.\n"
 			<< "press 'f' to switch to fly mode.\n"
 			<< "press 'l' to toggle lights and textures.\n"
 			<< "press 'p' to begin the animation.\n"
