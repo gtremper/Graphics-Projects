@@ -176,7 +176,10 @@ void parseRAW(string filename, int modelNum){
 		while(myfile.good()) {
 			string line;
 			getline(myfile,line);
-			if (line[0] == '#'){
+			if(line[0] == '#'){
+				continue;
+			}
+			if(line[0] == "") {
 				continue;
 			}
 			stringstream ln(line);
