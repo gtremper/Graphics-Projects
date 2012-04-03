@@ -28,7 +28,7 @@ vec4 ComputeLambert (const in vec3 direction, const in vec4 lightcolor, const in
 		if(cartoonShading == 0){
 			lambert = mydiffuse * lightcolor * max (nDotL, 0.0) ;
 		} else {
-			if(max (nDotL, 0.0)>0.5){
+			if(max (nDotL, 0.0)>0.65){
 				lambert = mydiffuse*lightcolor;
 			} else {
 				lambert = vec4(0,0,0,0);

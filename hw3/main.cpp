@@ -18,7 +18,7 @@
 using namespace std;
 
 const int MAXLIGHTS = 10;
-const float WALKSPEED = 0.5;
+const float WALKSPEED = 0.35;
 const float SENSITIVITY = 0.3;
 const vec3 UP = vec3(0.0,1.0,0.0);
 const vec3 FORWARD = vec3(0.0,0.0,-1.0);
@@ -36,6 +36,7 @@ bool useTex; // Toggle if using a texture for this object
 bool useVertex = false;
 bool useCartoon = false;
 bool passive; // Toggle passive mouse movement
+bool pictureMode = false; // no movement so you can take picture
 int width, height;  
 GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
 bool flyMode;
@@ -121,7 +122,7 @@ void mouseClick(int button, int state, int x, int y) {
 
 void mouse(int x, int y) {
 	
-	if(!passive) return;
+	if(!passive || pictureMode) return;
 	
 	int diffx=x-lastx; 
     int diffy=y-lasty; 
@@ -198,6 +199,10 @@ void keyboard(unsigned char key, int x, int y) {
 		std::cout << "cartoon shading is now set to" << (useCartoon ? " true " : " false ") << "\n";
 		glUniform1i(iscartoon, useCartoon) ;
 		break;
+	case 'm':
+		pictureMode = !pictureMode;
+		std::cout << "picture mode is now set to" << (pictureMode ? " true " : " false ") << "\n";
+		break;
 	}
 	glutPostRedisplay();
 }
@@ -222,7 +227,7 @@ void init() {
 	useLights = true;
 	useTex = true;
 	flyMode = false;
-	passive = true;
+	passive = false;
 	lastx = width/2;
 	lasty = height/2;
 
