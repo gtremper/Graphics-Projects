@@ -6,10 +6,8 @@
 class Triangle : public Shape {
 	public:
 		Triangle(vec3,vec3,vec3);
-		virtual ~Triangle();
-		
-		virtual double intersect(Ray&);
-		virtual vec3 getNormal();
+		double intersect(Ray&);
+		vec3 getNormal();
 		
 	private:
 		vec3 p0;

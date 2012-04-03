@@ -17,6 +17,14 @@ using namespace std;
 Scene::Scene() {
 	filename = "OUTPUT";
 	maxdepth = 5; 
+	ambient = vec3(0.2,0.2,0.2);
+}
+
+Scene::~Scene() {
+	vector<Shape*>::iterator it;
+	for(it=objects.begin(); it!=objects.end(); it++){
+		delete *it;
+	}
 }
 
 
@@ -27,9 +35,9 @@ Scene::Scene() {
  
 void Scene::castEyeRay(int i, int j, Ray& ray){
 	double half = width/2.0;
-	double alpha = tan(fov*pi/360.0) * ((i-half)/half);
+	double alpha = tan(fovy*pi*width/(height*360.0)) * ((i-half)/half);
 	half = height/2.0;
-	double beta = tan(fov*pi/360.0) * ((half-j)/half);
+	double beta = tan(fovy*pi/360.0) * ((j-half)/half);
 	ray.origin = eye;
 	ray.direction = glm::normalize(alpha*u + beta*v - w);
 	//cout << "EyeRay"<<j<<"x"<<i<<": "<<
@@ -79,15 +87,16 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line >> arg3;
 		vec3 up = vec3(arg1,arg2,arg3);
 		setCoordinateFrame(lookat,up);
-		line >> fov;
+		line >> fovy;
 	} else if (cmd == "sphere") {
 		double arg1, arg2, arg3, arg4;
 		line >> arg1;
 		line >> arg2;
 		line >> arg3;
 		line >> arg4;
-		//Sphere s(vec3(arg1,arg2,arg3),arg4);
-		//objects.push_back(&s);
+		Sphere* s = new Sphere(vec3(arg1,arg2,arg3), arg4);
+		s->ambient = ambient;
+		objects.push_back(s);
 	} else if (cmd == "maxverts") {
 		line >> maxverts;
 		verts.reserve(maxverts);
@@ -118,6 +127,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		int a1, a2, a3;
 		line >> a1 >> a2 >> a3;
 		Triangle* t = new Triangle(verts[a1],verts[a2],verts[a3]);
+		t->ambient = ambient;
 		objects.push_back(t);
 	} else if(cmd == "trinormal") {
 		double arg1,arg2,arg3,arg4,arg5,arg6;
@@ -146,7 +156,11 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if (cmd == "attenuation") {
 		
 	} else if (cmd == "ambient") {
-		
+		double arg1, arg2, arg3;
+		line>>arg1;
+		line>>arg2;
+		line>>arg3;
+		ambient = vec3(arg1,arg2,arg3);
 	} else if (cmd == "diffuse") {
 		
 	} else if (cmd == "specular") {

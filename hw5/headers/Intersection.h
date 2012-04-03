@@ -5,7 +5,6 @@
 class Intersection {
 public:
 	Intersection(std::vector<Shape*>&, Ray&);
-	virtual ~Intersection();
 	Shape* primative;
 	vec3 point;
 };

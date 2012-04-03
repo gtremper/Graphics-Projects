@@ -8,10 +8,12 @@
 
 class Shape {
 	public:
-		Shape();
-		virtual ~Shape();
-		virtual double intersect(Ray& ray);
-		virtual vec3 getNormal();
+		virtual ~Shape(){};
+		virtual double intersect(Ray& ray)=0;
+		virtual vec3 getNormal()=0;
+		
+		/* material properties */
+		vec3 ambient;
 };
 
 #include "Triangle.h"

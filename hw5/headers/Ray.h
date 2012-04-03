@@ -1,4 +1,6 @@
 /* Class description for Ray */
+#ifndef RAY_H
+#define RAY_H
 
 class Ray {
 public:
@@ -6,3 +8,5 @@ public:
 	vec3 origin;
 	vec3 direction;	
 };
+
+#endif

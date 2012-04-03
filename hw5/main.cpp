@@ -1,6 +1,7 @@
 /* This is the main file for the raytracer */
 
 #include <iostream>
+#include <cstdio>
 #include <stack>
 #include <string>
 
@@ -14,14 +15,11 @@
 using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
-	//cout << "find color" << endl;
 	Intersection hit = Intersection(scene.objects, ray);
 	if (!hit.primative) {
-		//cout << "!hit" << endl; 
-		return vec3(0,0.0,0.1);
+		return vec3(0,0.0,0.0);
 	}
-	
-	return vec3(1,0,0);
+	return hit.primative->ambient;
 }
 
 void raytrace(Scene& scene) {
@@ -29,13 +27,13 @@ void raytrace(Scene& scene) {
 	
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	RGBQUAD rgb;
+	Ray ray;
 	
 	if (!bitmap) exit(1);
 	
 	// Draw function. This draws gradient blue to green
-	Ray ray;
 	for (int j=0; j<scene.height; j++){
-		//if (i%20==0) cout << "i equals " << i << endl;
+		printf("Progress: %2.0f%%\r",(float)j/scene.height);
 		for (int i=0; i<scene.width; i++) {
 			scene.castEyeRay(i,j,ray);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
@@ -45,7 +43,7 @@ void raytrace(Scene& scene) {
 			FreeImage_SetPixelColor(bitmap,i,j,&rgb);
 		}
 	}
-	
+	printf("Progress: 100%%\n");
 	if (FreeImage_Save(FIF_PNG, bitmap, scene.filename.c_str(), 0)){
 		cout << "Image successfully saved!" << endl;
 	}
@@ -64,30 +62,3 @@ int main(int argc, char* argv[]){
 	raytrace(scene);
 	return 0;
 }
-	
-	
-	
-	/*
-	FreeImage_Initialise();
-	FIBITMAP* bitmap = FreeImage_Allocate(WIDTH, HEIGHT, BPP);
-	RGBQUAD color;
-	
-	if (!bitmap) exit(1);
-	
-	// Draw function. This draws gradient blue to green
-	for (int i=0; i<WIDTH; i++){
-		for (int j=0; j<HEIGHT; j++) {
-			color.rgbRed = 0;
-			color.rgbGreen = (double)i / WIDTH * 255.0;
-			color.rgbBlue = (double)j / WIDTH * 255.0;
-			FreeImage_SetPixelColor(bitmap,i,j,&color);
-		}
-	}
-	
-	if (FreeImage_Save(FIF_PNG, bitmap, "test.png", 0)){
-		cout << "Image successfully saved!" << endl;
-	}
-	
-	FreeImage_DeInitialise();
-}
-*/

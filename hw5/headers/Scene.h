@@ -12,11 +12,14 @@ class Scene {
 		int maxverts;
 		int maxvertnorms;
 		std::string filename;
-		double fov;
+		double fovy;
 		vec3 eye;
 		std::vector<Shape*> objects;
 		
+		vec3 ambient;
+		
 		Scene();
+		~Scene();
 		void castEyeRay(int,int,Ray&);
 		void setCoordinateFrame(vec3&,vec3&);
 		void parseLine(std::string,std::stack<mat4>&,

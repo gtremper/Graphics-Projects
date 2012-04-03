@@ -14,9 +14,9 @@ size 640 480
 
 # There are 3 camera positions.  Make images for all 3
 
-camera -2 -2 2 0 0 0 1 1 2 60
+#camera -2 -2 2 0 0 0 1 1 2 60
 #camera +2 +2 2 0 0 0 -1 -1 2 60
-#camera -2 -2 -2 0 0 0 -1 -1 2 60
+camera -2 -2 -2 0 0 0 -1 -1 2 60
 
 
 # Now specify the geometry.  First the cube, then the spheres

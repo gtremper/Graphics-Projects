@@ -26,18 +26,6 @@ Intersection::Intersection(vector<Shape*>& objects, Ray& ray) {
 	point = ray.getPoint(min_t);
 }
 
-Intersection::~Intersection(){}
-Shape::Shape(){}
-Shape::~Shape(){}
-double Shape::intersect(Ray& ray) {
-	cout << "This should never be called \"intersect\""<<endl;
-	return 0;
-}
-vec3 Shape::getNormal(){
-	cout << "This should never be called \"getNormal\""<<endl;
-	return vec3(0,0,0);
-}
-
 
 /***  TRIANGLE  ***/
 Triangle::Triangle(vec3 point0, vec3 point1, vec3 point2) {
@@ -55,7 +43,7 @@ double Triangle::intersect(Ray& ray){
 	double det = glm::determinant(M);
 	
 	//cout << "INTERSECT1" << endl;
-	//if (det<EPSILON && det>-EPSILON) return -1.0;
+	if (det<EPSILON && det>-EPSILON) return -1.0;
 	
 	M[0] = ray.origin-p0;
 	float alpha = glm::determinant(M)/det;
@@ -65,7 +53,7 @@ double Triangle::intersect(Ray& ray){
 	M[1] = ray.origin-p0;
 	//cout << "INTERSECT3" << endl;
 	float beta = glm::determinant(M)/det;
-	if (beta<0 || beta>1) return -1.0;
+	if (beta<0 || beta+alpha>1) return -1.0;
 	M[1] = col2;
 	M[2] = ray.origin-p0;
 	return glm::determinant(M)/det;
@@ -75,8 +63,6 @@ vec3 Triangle::getNormal(){
 	return faceNormal;
 }
 
-Triangle::~Triangle(){}
-
 /* SPHERE */
 Sphere::Sphere(vec3 cen, double rad) {
 	center = cen;
@@ -85,13 +71,9 @@ Sphere::Sphere(vec3 cen, double rad) {
 
 
 double Sphere::intersect(Ray& ray) {
-	
-	//Need to at acess to "eye" and "center" from scene.....
-	
-	/*
 	double a = glm::dot(ray.direction, ray.direction);
-	double b = 2.0 * glm::dot(ray.direction,eye-center);
-	double c = glm::dot(eye-center,eye-center) - radius*radius;
+	double b = 2.0 * glm::dot(ray.direction, ray.origin-center);
+	double c = glm::dot(ray.origin-center,ray.origin-center) - radius*radius;
 	
 	double det = b*b - 4.0*a*c;
 	if (det<0.0) return -1.0;
@@ -99,11 +81,12 @@ double Sphere::intersect(Ray& ray) {
 	double t1 = (-b+det)/(2*a);
 	double t2 = (-b-det)/(2*a);
 	
+	//cout << "t1:"<<t1<<"   t2:"<<t2<<endl;
+	
 	if (t1>0.0 && t2>0.0) return min(t1,t2);
 	
 	if (t1>0.0) return t1;
-	if (t2>0.0) return t0;
-	*/
+	if (t2>0.0) return t2;
 	
 	return -1.0;
 }
@@ -112,7 +95,3 @@ vec3 Sphere::getNormal(){
 	//not implemented yet
 	return vec3(0,0,0);
 }
-
-Sphere::~Sphere(){}
-
-
