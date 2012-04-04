@@ -18,6 +18,10 @@ Scene::Scene() {
 	filename = "OUTPUT";
 	maxdepth = 5; 
 	ambient = vec3(0.2,0.2,0.2);
+	diffuse = vec3(0,0,0);
+	specular = vec3(0,0,0);
+	shininess = 0;
+	emission = vec3(0,0,0);
 }
 
 Scene::~Scene() {
@@ -137,24 +141,37 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line >> arg4;
 		line >> arg5;
 		line >> arg6;
-		//NormTriangle t(arg1,arg2,arg3,arg4,arg5,arg6);
+		//NormTriangle* t = new NormTriangle(arg1,arg2,arg3,arg4,arg5,arg6);
 		//objects.push_back(t);
 	} else if(cmd == "translate") {
-		//mat4 t = stack.top()*Transform::rotate()
+		double arg1,arg2,arg3;
+		line >> arg1;
+		line >> arg2;
+		line >> arg3;
+		mv.top() = mv.top() * Transform::translate(arg1, arg2, arg3);
 	} else if(cmd == "rotate") {
-		
+		double arg1,arg2,arg3,arg4;
+		line >> arg1;
+		line >> arg2;
+		line >> arg3;
+		line >> arg4;
+		mv.top() = mv.top() * mat4(Transform::rotate(arg4,vec3(arg1,arg2,arg3)));
 	} else if (cmd=="scale") {
-		
+		double arg1,arg2,arg3;
+		line >> arg1;
+		line >> arg2;
+		line >> arg3;
+		mv.top() = mv.top() * Transform::translate(arg1, arg2, arg3);
 	} else if (cmd == "pushTransform") {
-		
+		mv.push(mv.top());
 	} else if (cmd == "popTransform"){
-		
+		mv.pop();
 	} else if (cmd == "directional") {
-		
+		//implement me
 	} else if (cmd == "point") {
-		
+		//implement me
 	} else if (cmd == "attenuation") {
-		
+		//implement me
 	} else if (cmd == "ambient") {
 		double arg1, arg2, arg3;
 		line>>arg1;
@@ -162,13 +179,27 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg3;
 		ambient = vec3(arg1,arg2,arg3);
 	} else if (cmd == "diffuse") {
-		
+		double arg1, arg2, arg3;
+		line>>arg1;
+		line>>arg2;
+		line>>arg3;
+		diffuse = vec3(arg1,arg2,arg3);
 	} else if (cmd == "specular") {
-		
+		double arg1, arg2, arg3;
+		line>>arg1;
+		line>>arg2;
+		line>>arg3;
+		specular = vec3(arg1,arg2,arg3);
 	} else if (cmd == "shininess") {
-		
+		double arg1;
+		line>>arg1;
+		shininess = arg1;
 	} else if (cmd == "emission") {
-		
+		double arg1, arg2, arg3;
+		line>>arg1;
+		line>>arg2;
+		line>>arg3;
+		emission = vec3(arg1,arg2,arg3);
 	}
 	cout << cmd << endl;//print command name while parsing
 }

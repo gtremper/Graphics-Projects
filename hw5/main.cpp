@@ -17,7 +17,7 @@ using namespace std;
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Intersection hit = Intersection(scene.objects, ray);
 	if (!hit.primative) {
-		return vec3(0,0.0,0.0);
+		return vec3(0,0,0);
 	}
 	return hit.primative->ambient;
 }
@@ -31,7 +31,6 @@ void raytrace(Scene& scene) {
 	
 	if (!bitmap) exit(1);
 	
-	// Draw function. This draws gradient blue to green
 	for (int j=0; j<scene.height; j++){
 		printf("Progress: %2.0f%%\r",(float)j/scene.height);
 		for (int i=0; i<scene.width; i++) {

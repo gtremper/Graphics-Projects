@@ -17,6 +17,10 @@ class Scene {
 		std::vector<Shape*> objects;
 		
 		vec3 ambient;
+		vec3 diffuse;
+		vec3 specular;
+		double shininess;
+		vec3 emission;
 		
 		Scene();
 		~Scene();
