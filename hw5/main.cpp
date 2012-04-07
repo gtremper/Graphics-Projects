@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <stack>
 #include <string>
+#include <time.h>
 
 #include "FreeImage.h"
 #include "Shapes.h"
@@ -56,8 +57,15 @@ int main(int argc, char* argv[]){
 		cerr << "You need 1 scene file as the argument" << endl;
 		exit(1);
 	}
+	time_t start,end;
+	time(&start);
+	
 	Scene scene;
 	scene.parse(argv[1]);
 	raytrace(scene);
+	
+	time(&end);
+	double dif = difftime(end,start);
+	printf("Render time: %.3f seconds\n",dif);
 	return 0;
 }

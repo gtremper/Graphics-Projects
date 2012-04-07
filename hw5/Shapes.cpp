@@ -32,7 +32,7 @@ Triangle::Triangle(vec3 point0, vec3 point1, vec3 point2) {
 	p0 = point0;
 	p1 = point1;
 	p2 = point2;
-	faceNormal = glm::normalize(glm::cross(p1-p0,p2-p0));
+	n0 = glm::normalize(glm::cross(p1-p0,p2-p0));
 }
 
 
@@ -41,57 +41,77 @@ double Triangle::intersect(Ray& ray){
 	vec3 col2 = p2-p0;
 	mat3 M = mat3(col1, col2, -ray.direction);
 	double det = glm::determinant(M);
-	
-	//cout << "INTERSECT1" << endl;
 	if (det<EPSILON && det>-EPSILON) return -1.0;
 	
 	M[0] = ray.origin-p0;
-	float alpha = glm::determinant(M)/det;
-	//cout << "INTERSECT2" << endl;
+	double alpha = glm::determinant(M)/det;
 	if (alpha<0 || alpha>1) return -1.0;
 	M[0] = col1;
 	M[1] = ray.origin-p0;
-	//cout << "INTERSECT3" << endl;
-	float beta = glm::determinant(M)/det;
+
+	double beta = glm::determinant(M)/det;
 	if (beta<0 || beta+alpha>1) return -1.0;
 	M[1] = col2;
 	M[2] = ray.origin-p0;
 	return glm::determinant(M)/det;
 }
 
-vec3 Triangle::getNormal(){
-	return faceNormal;
+vec3 Triangle::getNormal(vec3& hit){
+	return n0;
 }
 
-/* SPHERE */
-Sphere::Sphere(vec3 cen, double rad) {
-	center = cen;
-	radius = rad;
+/***  NORMTRIANGLE  ***/
+NormTriangle::NormTriangle(vec3 point0, vec3 point1, vec3 point2,
+							vec3 norm0, vec3 norm1, vec3 norm2) {
+	p0 = point0;
+	p1 = point1;
+	p2 = point2;
+	n0 = norm0;
+	n1 = norm1;
+	n2 = norm2;
 }
 
+vec3 NormTriangle::getNormal(vec3& hit){
+	mat2 M = mat2(p1[0]-p0[0], p1[1]-p0[1], p2[0]-p0[0], p2[1]-p0[1]);
+	double det = glm::determinant(M);
+	M[0][0] = hit[0]-p0[0];
+	M[0][1] = hit[1]-p0[1];
+	double beta = glm::determinant(M)/det;
+	M[0][0] = p1[0]-p0[0];
+	M[0][1] = p1[1]-p0[1];
+	M[1][0] = hit[0]-p0[0];
+	M[1][1] = hit[1]-p0[1];
+	double gamma = glm::determinant(M)/det;
+	return (1-beta-gamma)*n0 + beta*n1 + gamma*n2;
+}
 
+/***  SPHERE  ***/
 double Sphere::intersect(Ray& ray) {
-	double a = glm::dot(ray.direction, ray.direction);
-	double b = 2.0 * glm::dot(ray.direction, ray.origin-center);
-	double c = glm::dot(ray.origin-center,ray.origin-center) - radius*radius;
+	vec3 direction = glm::normalize(vec3(inv * vec4(ray.direction,0)));
+	vec3 origin =vec3(inv * vec4(ray.origin,1));
 	
-	double det = b*b - 4.0*a*c;
+	// a = 1 because direction is normalized
+	double b = 2.0 * glm::dot(direction, origin);
+	double c = glm::dot(origin,origin) - 1.0;
+	
+	double det = b*b - 4.0*c;
 	if (det<0.0) return -1.0;
+	det = sqrt(det);
 	
-	double t1 = (-b+det)/(2*a);
-	double t2 = (-b-det)/(2*a);
+	double t1 = (-b+det)/2.0;
+	double t2 = (-b-det)/2.0;
 	
-	//cout << "t1:"<<t1<<"   t2:"<<t2<<endl;
+	if (t1<0.0 && t2<0.0) return -1.0;
 	
-	if (t1>0.0 && t2>0.0) return min(t1,t2);
-	
-	if (t1>0.0) return t1;
-	if (t2>0.0) return t2;
-	
-	return -1.0;
+	if (t2>0.0) {
+		vec4 hit = mv * vec4(origin+t2*direction,1);
+		return glm::distance(ray.origin,vec3(hit));
+	}
+	vec4 hit = mv * vec4(origin+t2*direction,1);
+	return glm::distance(ray.origin,vec3(hit));
 }
 
-vec3 Sphere::getNormal(){
+vec3 Sphere::getNormal(vec3& hit){
 	//not implemented yet
 	return vec3(0,0,0);
 }

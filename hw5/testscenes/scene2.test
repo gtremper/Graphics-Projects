@@ -21,6 +21,8 @@ camera -2 -2 2 0 0 0 1 1 2 60
 
 # Now specify the geometry.  First the cube, then the spheres
 
+#rotate 1 1 0 30  
+
 maxverts 8
 
 vertex -1 -1 -1

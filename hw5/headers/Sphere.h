@@ -5,12 +5,11 @@
 
 class Sphere : public Shape {
 	public:
-		Sphere(vec3,double);
 		double intersect(Ray&);
-		vec3 getNormal();
-	private:	
-		vec3 center;
-		double radius;	
+		vec3 getNormal(vec3&);
+	
+		mat4 mv;
+		mat4 inv;	
 };
 
 #endif

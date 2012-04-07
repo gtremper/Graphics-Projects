@@ -44,8 +44,6 @@ void Scene::castEyeRay(int i, int j, Ray& ray){
 	double beta = tan(fovy*pi/360.0) * ((j-half)/half);
 	ray.origin = eye;
 	ray.direction = glm::normalize(alpha*u + beta*v - w);
-	//cout << "EyeRay"<<j<<"x"<<i<<": "<<
-	//	ray.direction[0]<<" "<<ray.direction[1]<<" "<<ray.direction[2]<<endl;
 }
 
 /***********************************************
@@ -54,11 +52,8 @@ void Scene::castEyeRay(int i, int j, Ray& ray){
 
 void Scene::setCoordinateFrame(vec3& lookat, vec3& up){
 	w = glm::normalize(eye - lookat);
-	//cout << "w:("<<w[0]<<", "<<w[1]<<", "<<w[2]<<")"<<endl;
 	u = glm::normalize(glm::cross(up, w));
-	//cout << "u:("<<u[0]<<", "<<u[1]<<", "<<u[2]<<")"<<endl;
 	v = glm::cross(w,u);
-	//cout << "v:("<<v[0]<<", "<<v[1]<<", "<<v[2]<<")"<<endl;
 }
 
 void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts, 
@@ -98,8 +93,19 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line >> arg2;
 		line >> arg3;
 		line >> arg4;
-		Sphere* s = new Sphere(vec3(arg1,arg2,arg3), arg4);
+		
+		mat4 trans = mv.top();
+		trans *= Transform::translate(arg1,arg2,arg3);
+		trans *= Transform::scale(arg4,arg4,arg4);
+		
+		Sphere* s = new Sphere();
+		s->mv = trans;
+		s->inv = glm::inverse(trans);
 		s->ambient = ambient;
+		s->diffuse = diffuse;
+		s->specular = specular;
+		s->shininess = shininess;
+		s->emission = emission;
 		objects.push_back(s);
 	} else if (cmd == "maxverts") {
 		line >> maxverts;
@@ -130,38 +136,42 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if (cmd == "tri") {
 		int a1, a2, a3;
 		line >> a1 >> a2 >> a3;
-		Triangle* t = new Triangle(verts[a1],verts[a2],verts[a3]);
+		mat4 top =  mv.top();
+		vec3 v1 = vec3(top * vec4(verts[a1],1));
+		vec3 v2 = vec3(top * vec4(verts[a2],1) );
+		vec3 v3 = vec3(top * vec4(verts[a3],1) );
+		Triangle* t = new Triangle(v1,v2,v3);
 		t->ambient = ambient;
+		t->diffuse = diffuse;
+		t->specular = specular;
+		t->shininess = shininess;
+		t->emission = emission;
 		objects.push_back(t);
 	} else if(cmd == "trinormal") {
-		double arg1,arg2,arg3,arg4,arg5,arg6;
-		line >> arg1;
-		line >> arg2;
-		line >> arg3;
-		line >> arg4;
-		line >> arg5;
-		line >> arg6;
-		//NormTriangle* t = new NormTriangle(arg1,arg2,arg3,arg4,arg5,arg6);
+		int a1,a2,a3;
+		line >> a1 >> a2 >> a3;
+		//NormTriangle* t = new NormTriangle(normverts[a1],normverts[a2],normverts[a3],
+		//								norms[a1],norms[a2],norms[a3]);
 		//objects.push_back(t);
 	} else if(cmd == "translate") {
 		double arg1,arg2,arg3;
 		line >> arg1;
 		line >> arg2;
 		line >> arg3;
-		mv.top() = mv.top() * Transform::translate(arg1, arg2, arg3);
+		mv.top() *= Transform::translate(arg1, arg2, arg3);
 	} else if(cmd == "rotate") {
 		double arg1,arg2,arg3,arg4;
 		line >> arg1;
 		line >> arg2;
 		line >> arg3;
 		line >> arg4;
-		mv.top() = mv.top() * mat4(Transform::rotate(arg4,vec3(arg1,arg2,arg3)));
+		mv.top() *= Transform::rotate(arg4,vec3(arg1,arg2,arg3));
 	} else if (cmd=="scale") {
 		double arg1,arg2,arg3;
 		line >> arg1;
 		line >> arg2;
 		line >> arg3;
-		mv.top() = mv.top() * Transform::translate(arg1, arg2, arg3);
+		mv.top() *= Transform::scale(arg1, arg2, arg3);
 	} else if (cmd == "pushTransform") {
 		mv.push(mv.top());
 	} else if (cmd == "popTransform"){
@@ -191,9 +201,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg3;
 		specular = vec3(arg1,arg2,arg3);
 	} else if (cmd == "shininess") {
-		double arg1;
-		line>>arg1;
-		shininess = arg1;
+		line>>shininess;
 	} else if (cmd == "emission") {
 		double arg1, arg2, arg3;
 		line>>arg1;
