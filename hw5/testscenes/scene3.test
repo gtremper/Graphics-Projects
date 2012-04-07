@@ -19,6 +19,11 @@ vertex +1 -1 +1
 vertex +1 +1 +1
 vertex -1 +1 +1
 
+output mile3.png
+
+rotate 0 1 1 45
+scale .3 .7 .5
+
 pushTransform
 # The basic camera transform to return to for new parts
 
