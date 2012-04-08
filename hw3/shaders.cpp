@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-#include <GL/glut.h>
+#include <GLUT/glut.h>
 #include <GL/glext.h>
 
 using namespace std; 

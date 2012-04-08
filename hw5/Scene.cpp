@@ -15,7 +15,7 @@ using namespace std;
 
 // sets default values
 Scene::Scene() {
-	filename = "OUTPUT";
+	filename = "OUTPUT.png";
 	maxdepth = 5; 
 	ambient = vec3(0.2,0.2,0.2);
 	diffuse = vec3(0,0,0);
