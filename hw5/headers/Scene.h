@@ -9,8 +9,6 @@ class Scene {
 		int width;
 		int height;
 		int maxdepth;
-		int maxverts;
-		int maxvertnorms;
 		std::string filename;
 		double fovy;
 		vec3 eye;
@@ -21,6 +19,10 @@ class Scene {
 		vec3 specular;
 		double shininess;
 		vec3 emission;
+		
+		double constant;
+		double linear;
+		double quadratic;
 		
 		Scene();
 		~Scene();

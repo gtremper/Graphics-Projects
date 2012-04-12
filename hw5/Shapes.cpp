@@ -1,9 +1,11 @@
 /* Class definitions for Triangles and Spheres */
+#include <iostream>
+#include <vector>
+
 #include "Shapes.h"
 #include "Intersection.h"
-#include <iostream>
-#define EPSILON 0.00000000005
 
+#define EPSILON 0.00000000005
 
 using namespace std;
 
@@ -12,6 +14,7 @@ vec3 Ray::getPoint(double t) {
 	return origin + t*direction;
 }
 
+/***  INTERSECTION  ***/
 Intersection::Intersection(vector<Shape*>& objects, Ray& ray) {
 	double min_t = DBL_MAX;
 	primative = NULL;
@@ -24,6 +27,13 @@ Intersection::Intersection(vector<Shape*>& objects, Ray& ray) {
 		}
 	}
 	point = ray.getPoint(min_t);
+}
+
+bool Intersection::shadowIntersect(vector<Shape*>& objects, Ray& ray) {
+	for(vector<Shape*>::iterator prim=objects.begin(); prim!=objects.end(); prim++) {
+		if((*prim)->intersect(ray) > EPSILON) return true;
+	}
+	return false;
 }
 
 
@@ -90,10 +100,8 @@ double Sphere::intersect(Ray& ray) {
 	vec3 direction = glm::normalize(vec3(inv * vec4(ray.direction,0)));
 	vec3 origin =vec3(inv * vec4(ray.origin,1));
 	
-	// a = 1 because direction is normalized
 	double b = 2.0 * glm::dot(direction, origin);
 	double c = glm::dot(origin,origin) - 1.0;
-	
 	double det = b*b - 4.0*c;
 	if (det<0.0) return -1.0;
 	det = sqrt(det);
@@ -112,6 +120,5 @@ double Sphere::intersect(Ray& ray) {
 }
 
 vec3 Sphere::getNormal(vec3& hit){
-	//not implemented yet
-	return vec3(0,0,0);
+	return glm::normalize(vec3(glm::transpose(inv)*mv*vec4(hit,1.0)));
 }

@@ -19,11 +19,7 @@ vertex +1 -1 +1
 vertex +1 +1 +1
 vertex -1 +1 +1
 
-rotate 0 1 1 45
-scale .3 .7 .5
-rotate 1 0 0 60
-
-
+rotate 0 1 0 23
 pushTransform
 # The basic camera transform to return to for new parts
 
@@ -31,6 +27,7 @@ pushTransform
 # repeat this to create many cubes.  For extra credit, you can implement 
 # instancing to make this simpler.  Alternatively, define a ray-cube 
 # intersection test.
+
 
 ambient .7 .7 1
 

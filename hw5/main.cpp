@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <stack>
 #include <string>
-#include <time.h>
+#include <vector>
 
 #include "FreeImage.h"
 #include "Shapes.h"
@@ -18,9 +18,27 @@ using namespace std;
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Intersection hit = Intersection(scene.objects, ray);
 	if (!hit.primative) {
-		return vec3(0,0,0);
+		return vec3(0,0,0); //background color
 	}
-	return hit.primative->ambient;
+	vec3 normal = hit.primative->getNormal(hit.point);
+	
+	vec3 color = hit.primative->ambient;
+	/*
+	color += hit.primative->emmision;
+	Ray lightRay;
+	vector<Light>::iterator light=scene.pLights.begin();
+	for(; light!=scene.pLights.end(); ++light){
+		lightRay.origin = hit.point;
+		lightRay.direction = *light-source;
+		if (Intersection::shadowIntersect(scene.objects,lightRay)){
+			color += // color shit
+		}
+	}
+	for(light=scene.dLights.begin(); light!=scene.dLights.end(); ++light) {
+		color
+	}
+	*/
+	return color;
 }
 
 void raytrace(Scene& scene) {
@@ -33,7 +51,7 @@ void raytrace(Scene& scene) {
 	if (!bitmap) exit(1);
 	
 	for (int j=0; j<scene.height; j++){
-		printf("Progress: %2.0f%%\r",(float)j/scene.height);
+		printf("Progress: %d\r",j*100/scene.height);
 		for (int i=0; i<scene.width; i++) {
 			scene.castEyeRay(i,j,ray);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
@@ -57,15 +75,10 @@ int main(int argc, char* argv[]){
 		cerr << "You need 1 scene file as the argument" << endl;
 		exit(1);
 	}
-	time_t start,end;
-	time(&start);
 	
 	Scene scene;
 	scene.parse(argv[1]);
 	raytrace(scene);
 	
-	time(&end);
-	double dif = difftime(end,start);
-	printf("Render time: %.3f seconds\n",dif);
 	return 0;
 }

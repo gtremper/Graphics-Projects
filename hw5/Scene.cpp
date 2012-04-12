@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stack>
 #include <string>
+#include <vector>
 #include "float.h"
 
 #include "FreeImage.h"
@@ -108,9 +109,11 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		s->emission = emission;
 		objects.push_back(s);
 	} else if (cmd == "maxverts") {
+		int maxverts;
 		line >> maxverts;
 		verts.reserve(maxverts);
 	} else if (cmd == "maxvertnorms") {
+		int maxvertnorms;
 		line >> maxvertnorms;
 		verts.reserve(maxvertnorms);
 		verts.reserve(maxvertnorms);
@@ -138,8 +141,8 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line >> a1 >> a2 >> a3;
 		mat4 top =  mv.top();
 		vec3 v1 = vec3(top * vec4(verts[a1],1));
-		vec3 v2 = vec3(top * vec4(verts[a2],1) );
-		vec3 v3 = vec3(top * vec4(verts[a3],1) );
+		vec3 v2 = vec3(top * vec4(verts[a2],1));
+		vec3 v3 = vec3(top * vec4(verts[a3],1));
 		Triangle* t = new Triangle(v1,v2,v3);
 		t->ambient = ambient;
 		t->diffuse = diffuse;
