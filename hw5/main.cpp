@@ -23,19 +23,14 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	vec3 normal = hit.primative->getNormal(hit.point);
 	
 	vec3 color = hit.primative->ambient;
+	
 	/*
 	color += hit.primative->emmision;
-	Ray lightRay;
-	vector<Light>::iterator light=scene.pLights.begin();
-	for(; light!=scene.pLights.end(); ++light){
-		lightRay.origin = hit.point;
-		lightRay.direction = *light-source;
-		if (Intersection::shadowIntersect(scene.objects,lightRay)){
+	vector<Light>::iterator light=scene.lights.begin();
+	for(; light!=scene.lights.end(); ++light){
+		if ( light->isVisible(hit.point, scene.objects) ){
 			color += // color shit
 		}
-	}
-	for(light=scene.dLights.begin(); light!=scene.dLights.end(); ++light) {
-		color
 	}
 	*/
 	return color;
@@ -75,10 +70,7 @@ int main(int argc, char* argv[]){
 		cerr << "You need 1 scene file as the argument" << endl;
 		exit(1);
 	}
-	
-	Scene scene;
-	scene.parse(argv[1]);
+	Scene scene(argv[1]);
 	raytrace(scene);
-	
 	return 0;
 }

@@ -14,8 +14,10 @@
 using namespace std;
 
 
+/***  SCENE  ***/
+
 // sets default values
-Scene::Scene() {
+Scene::Scene(char* file) {
 	filename = "OUTPUT.png";
 	maxdepth = 5; 
 	ambient = vec3(0.2,0.2,0.2);
@@ -23,6 +25,7 @@ Scene::Scene() {
 	specular = vec3(0,0,0);
 	shininess = 0;
 	emission = vec3(0,0,0);
+	parse(file);
 }
 
 Scene::~Scene() {

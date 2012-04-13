@@ -24,7 +24,7 @@ class Scene {
 		double linear;
 		double quadratic;
 		
-		Scene();
+		Scene(char*);
 		~Scene();
 		void castEyeRay(int,int,Ray&);
 		void setCoordinateFrame(vec3&,vec3&);

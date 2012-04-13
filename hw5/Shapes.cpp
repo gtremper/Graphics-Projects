@@ -10,6 +10,11 @@
 using namespace std;
 
 /***  RAY  ***/
+Ray::Ray(vec3 o, vec3 d){
+	origin = o;
+	direction = d;
+}
+
 vec3 Ray::getPoint(double t) {
 	return origin + t*direction;
 }
