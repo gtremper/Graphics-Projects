@@ -9,6 +9,8 @@
 
 #include "FreeImage.h"
 #include "Shapes.h"
+#include "Intersection.h"
+#include "Light.h"
 #include "Scene.h"
 
 using namespace std;

@@ -8,7 +8,6 @@ CCOPTS = -c -I./headers/ -I./glm-0.9.3.2
 LDOPTS = -L./lib/mac -lfreeimage
 
 #Final Files and Intermediate .o Files
-SOURCES = main.cpp Scene.cpp Transform.cpp Shapes.cpp Light.cpp
 OBJECTS = main.o Scene.o Transform.o Shapes.o Light.o
 TARGET = raytracer
 

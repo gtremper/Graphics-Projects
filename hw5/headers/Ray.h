@@ -5,7 +5,7 @@
 class Ray {
 public:
 	Ray(){};
-	Ray(vec3 o,vec3 d);
+	Ray(const vec3&,const vec3&);
 	
 	vec3 getPoint(double);
 	vec3 origin;

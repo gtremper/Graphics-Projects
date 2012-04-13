@@ -8,8 +8,9 @@
 
 #include "FreeImage.h"
 #include "Shapes.h"
-#include "Scene.h"
 #include "Intersection.h"
+#include "Light.h"
+#include "Scene.h"
 
 #define BPP 24
 
@@ -20,19 +21,16 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	if (!hit.primative) {
 		return vec3(0,0,0); //background color
 	}
-	vec3 normal = hit.primative->getNormal(hit.point);
 	
 	vec3 color = hit.primative->ambient;
+	color += hit.primative->emission;
 	
-	/*
-	color += hit.primative->emmision;
+	vec3 normal = hit.primative->getNormal(hit.point);
+	
 	vector<Light>::iterator light=scene.lights.begin();
 	for(; light!=scene.lights.end(); ++light){
-		if ( light->isVisible(hit.point, scene.objects) ){
-			color += // color shit
-		}
+		color += light->shade(hit,scene.objects,normal);
 	}
-	*/
 	return color;
 }
 
@@ -63,7 +61,6 @@ void raytrace(Scene& scene) {
 	
 	FreeImage_DeInitialise();
 }
-
 
 int main(int argc, char* argv[]){
 	if(argc != 2) {

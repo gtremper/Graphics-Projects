@@ -10,7 +10,7 @@
 using namespace std;
 
 /***  RAY  ***/
-Ray::Ray(vec3 o, vec3 d){
+Ray::Ray(const vec3& o,const vec3& d){
 	origin = o;
 	direction = d;
 }
@@ -32,15 +32,8 @@ Intersection::Intersection(vector<Shape*>& objects, Ray& ray) {
 		}
 	}
 	point = ray.getPoint(min_t);
+	sourceDirection = -ray.direction;
 }
-
-bool Intersection::shadowIntersect(vector<Shape*>& objects, Ray& ray) {
-	for(vector<Shape*>::iterator prim=objects.begin(); prim!=objects.end(); prim++) {
-		if((*prim)->intersect(ray) > EPSILON) return true;
-	}
-	return false;
-}
-
 
 /***  TRIANGLE  ***/
 Triangle::Triangle(vec3 point0, vec3 point1, vec3 point2) {
