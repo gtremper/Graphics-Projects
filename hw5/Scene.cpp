@@ -35,6 +35,10 @@ Scene::~Scene() {
 	for(it=objects.begin(); it!=objects.end(); it++){
 		delete *it;
 	}
+	vector<Light*>::iterator l;
+	for(l=lights.begin(); l!=lights.end(); l++){
+		delete *l;
+	}
 }
 
 
@@ -71,25 +75,18 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	if (cmd[0]=='#' || cmd=="") { //comment or blank line
 		return;
 	} else if (cmd == "size") {
-		line >> width;
-		line >> height;
+		line >> width >> height;
 	} else if (cmd == "maxdepth") {
 		line >> maxdepth;
 	} else if (cmd == "output") {
 		line >> filename;
 	} else if (cmd == "camera") {
 		double arg1, arg2, arg3;
-		line >> arg1;
-		line >> arg2;
-		line >> arg3;
+		line >> arg1 >> arg2 >> arg3;
 		eye = vec3(arg1,arg2,arg3);
-		line >> arg1;
-		line >> arg2;
-		line >> arg3;
+		line >> arg1 >> arg2 >> arg3;
 		vec3 lookat = vec3(arg1,arg2,arg3);
-		line >> arg1;
-		line >> arg2;
-		line >> arg3;
+		line >> arg1 >> arg2 >> arg3;
 		vec3 up = vec3(arg1,arg2,arg3);
 		setCoordinateFrame(lookat,up);
 		line >> fovy;
@@ -99,11 +96,9 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line >> arg2;
 		line >> arg3;
 		line >> arg4;
-		
 		mat4 trans = mv.top();
 		trans *= Transform::translate(arg1,arg2,arg3);
 		trans *= Transform::scale(arg4,arg4,arg4);
-		
 		Sphere* s = new Sphere();
 		s->mv = trans;
 		s->inv = glm::inverse(trans);
@@ -185,16 +180,20 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if (cmd == "popTransform"){
 		mv.pop();
 	} else if (cmd == "directional") {
-		//implement me
+		double x,y,z,r,g,b;
+		line >> x >> y >> z >> r >> g >> b;
+		DirectionalLight* light = new DirectionalLight(vec3(r,b,g),vec3(x,y,z));
+		lights.push_back(light);
 	} else if (cmd == "point") {
-		//implement me
+		double x,y,z,r,g,b;
+		line >> x >> y >> z >> r >> g >> b;
+		PointLight* light = new PointLight(vec3(r,b,g),vec3(x,y,z),constant,linear,quadratic);
+		lights.push_back(light);
 	} else if (cmd == "attenuation") {
-		//implement me
+		line >> constant >> linear >> quadratic;
 	} else if (cmd == "ambient") {
 		double arg1, arg2, arg3;
-		line>>arg1;
-		line>>arg2;
-		line>>arg3;
+		line >> arg1 >> arg2 >> arg3;
 		ambient = vec3(arg1,arg2,arg3);
 	} else if (cmd == "diffuse") {
 		double arg1, arg2, arg3;
@@ -217,7 +216,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg3;
 		emission = vec3(arg1,arg2,arg3);
 	}
-	cout << cmd << endl;//print command name while parsing
+	cout << cmd << endl;
 }
 
 void Scene::parse(char* filename) {

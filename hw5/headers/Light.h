@@ -17,6 +17,7 @@ public:
 };
 
 class PointLight : public Light {
+public:
 	PointLight(const vec3& color,const vec3& p, double,double,double);
 	vec3 shade(const Intersection& hit, const std::vector<Shape*>& objects,const vec3&);	
 	bool isVisible(const vec3& point, const std::vector<Shape*>& objects);

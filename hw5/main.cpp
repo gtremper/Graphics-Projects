@@ -27,9 +27,11 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	
 	vec3 normal = hit.primative->getNormal(hit.point);
 	
-	vector<Light>::iterator light=scene.lights.begin();
+	//cout << "normal: "<<normal[0]<<", "<<normal[1]<<", "<<normal[2]<<endl;
+	
+	vector<Light*>::iterator light=scene.lights.begin();
 	for(; light!=scene.lights.end(); ++light){
-		color += light->shade(hit,scene.objects,normal);
+		color += (*light)->shade(hit,scene.objects,normal);
 	}
 	return color;
 }
@@ -48,9 +50,9 @@ void raytrace(Scene& scene) {
 		for (int i=0; i<scene.width; i++) {
 			scene.castEyeRay(i,j,ray);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
-			rgb.rgbRed = color[0]*255.0;
-			rgb.rgbGreen = color[1]*255.0;
-			rgb.rgbBlue = color[2]*255.0;
+			rgb.rgbRed = min(color[0],1.0)*255.0;
+			rgb.rgbGreen = min(color[1],1.0)*255.0;
+			rgb.rgbBlue = min(color[2],1.0)*255.0;
 			FreeImage_SetPixelColor(bitmap,i,j,&rgb);
 		}
 	}

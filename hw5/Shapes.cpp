@@ -5,7 +5,7 @@
 #include "Shapes.h"
 #include "Intersection.h"
 
-#define EPSILON 0.00000000005
+#define EPSILON 0.0000005
 
 using namespace std;
 
@@ -74,9 +74,9 @@ NormTriangle::NormTriangle(vec3 point0, vec3 point1, vec3 point2,
 	p0 = point0;
 	p1 = point1;
 	p2 = point2;
-	n0 = norm0;
-	n1 = norm1;
-	n2 = norm2;
+	n0 = glm::normalize(norm0);
+	n1 = glm::normalize(norm1);
+	n2 = glm::normalize(norm2);
 }
 
 vec3 NormTriangle::getNormal(vec3& hit){
@@ -118,5 +118,5 @@ double Sphere::intersect(Ray& ray) {
 }
 
 vec3 Sphere::getNormal(vec3& hit){
-	return glm::normalize(vec3(glm::transpose(inv)*mv*vec4(hit,1.0)));
+	return glm::normalize(vec3(glm::transpose(inv)*inv*vec4(hit,1.0)));
 }

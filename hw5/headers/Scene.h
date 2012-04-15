@@ -20,7 +20,7 @@ class Scene {
 		double shininess;
 		vec3 emission;
 		
-		std::vector<Light> lights;
+		std::vector<Light*> lights;
 		double constant;
 		double linear;
 		double quadratic;
