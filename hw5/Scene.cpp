@@ -185,11 +185,13 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if (cmd == "directional") {
 		double x,y,z,r,g,b;
 		line >> x >> y >> z >> r >> g >> b;
+		cout << cmd <<" "<<x<<" "<<y<<" "<<z<<" "<<r<<" "<<g<<" "<<b<< endl;
 		DirectionalLight* light = new DirectionalLight(vec3(r,b,g),vec3(x,y,z));
 		lights.push_back(light);
 	} else if (cmd == "point") {
 		double x,y,z,r,g,b;
 		line >> x >> y >> z >> r >> g >> b;
+		cout << cmd <<" "<<x<<" "<<y<<" "<<z<<" "<<r<<" "<<g<<" "<<b<< endl;
 		PointLight* light = new PointLight(vec3(r,b,g),vec3(x,y,z),constant,linear,quadratic);
 		lights.push_back(light);
 	} else if (cmd == "attenuation") {
@@ -219,7 +221,6 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg3;
 		emission = vec3(arg1,arg2,arg3);
 	}
-	cout << cmd << endl;
 }
 
 void Scene::parse(char* filename) {
