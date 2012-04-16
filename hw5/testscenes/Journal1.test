@@ -3,8 +3,7 @@ camera 0 0 0 0 0 -3 0 1 0 36.87
 
 output test.png
 
-directional -0.57735027 0.57735027 0.57735027 1.0 1.0 1.0
-directional -0.57735027  -0.57735027 0.57735027  0.  0.  1.
+directional 0 0 -1 1.0 1.0 1.0
 
 ambient 0.1  0.1  0.1
 diffuse 1.0 0.0 1.0

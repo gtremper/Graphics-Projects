@@ -27,6 +27,9 @@ Scene::Scene(char* file) {
 	specular = vec3(0,0,0);
 	shininess = 0;
 	emission = vec3(0,0,0);
+	constant = 1;
+	linear = 0;
+	quadratic = 0;
 	parse(file);
 }
 

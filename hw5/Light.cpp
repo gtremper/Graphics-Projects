@@ -45,7 +45,7 @@ bool DirectionalLight::isVisible(const vec3& point, const vector<Shape*>& object
 /***  Point Light  ***/
 PointLight::PointLight(const vec3& colour,const vec3& poi, double con, double lin, double quad) {
 	color = colour;
-	point = glm::normalize(poi);
+	point = poi;
 	constant = con;
 	linear = lin;
 	quadratic = quad;
@@ -69,10 +69,10 @@ vec3 PointLight::shade(const Intersection& hit, const vector<Shape*>& objects, c
 
 bool PointLight::isVisible(const vec3& p, const vector<Shape*>& objects) {
 	vec3 direction = glm::normalize(point-p);
-	Ray ray(point,direction);
+	Ray ray(p,direction);
 	vector<Shape*>::const_iterator prim=objects.begin();
 	for(;prim!=objects.end(); ++prim){
-		if ((*prim)->intersect(ray)) return false;
+		if ((*prim)->intersect(ray) >= EPSILON) return false;
 	}
 	return true;
 }
