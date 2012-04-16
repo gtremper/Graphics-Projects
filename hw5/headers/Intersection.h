@@ -7,6 +7,7 @@ public:
 	Intersection(std::vector<Shape*>&, Ray&);
 	Shape* primative;
 	vec3 point;
+	vec3 sourceDirection;
 };
 
 #endif

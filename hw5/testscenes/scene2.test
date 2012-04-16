@@ -22,7 +22,9 @@ scale 1 1 0.3
 
 # Now specify the geometry.  First the cube, then the spheres
 
-#rotate 1 1 0 30  
+output mile2.png
+scale 2 1 1
+translate 2 2 -2  
 
 maxverts 8
 

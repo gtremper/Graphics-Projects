@@ -9,8 +9,6 @@ class Scene {
 		int width;
 		int height;
 		int maxdepth;
-		int maxverts;
-		int maxvertnorms;
 		std::string filename;
 		double fovy;
 		vec3 eye;
@@ -22,7 +20,12 @@ class Scene {
 		double shininess;
 		vec3 emission;
 		
-		Scene();
+		std::vector<Light*> lights;
+		double constant;
+		double linear;
+		double quadratic;
+		
+		Scene(char*);
 		~Scene();
 		void castEyeRay(int,int,Ray&);
 		void setCoordinateFrame(vec3&,vec3&);

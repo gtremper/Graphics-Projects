@@ -3,9 +3,16 @@
 # I know it's not the most exciting of scenes...
 
 size 640 480 
+output scene4-ambient.png
 
 camera 0 -4 4 0 -1 0 0 1 1 45
 
+point 1 1 3 1 1 1
+
+emission 0 0 0
+diffuse 0 0 0
+shininess 20
+specular 0 0 0
 
 
 maxverts 8
@@ -19,10 +26,6 @@ vertex +1 -1 +1
 vertex +1 +1 +1
 vertex -1 +1 +1
 
-rotate 1 0 0 15
-rotate 0 1 0 45
-translate 1 -1 0
-
 pushTransform
 # The basic camera transform to return to for new parts
 
@@ -30,7 +33,6 @@ pushTransform
 # repeat this to create many cubes.  For extra credit, you can implement 
 # instancing to make this simpler.  Alternatively, define a ray-cube 
 # intersection test.
-
 
 ambient .7 .7 1
 

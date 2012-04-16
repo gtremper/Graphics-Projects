@@ -1,17 +1,25 @@
 /* Class definitions for Triangles and Spheres */
+#include <iostream>
+#include <vector>
+
 #include "Shapes.h"
 #include "Intersection.h"
-#include <iostream>
-#define EPSILON 0.00000000005
 
+#define EPSILON 0.0000005
 
 using namespace std;
 
 /***  RAY  ***/
+Ray::Ray(const vec3& o,const vec3& d){
+	origin = o;
+	direction = d;
+}
+
 vec3 Ray::getPoint(double t) {
 	return origin + t*direction;
 }
 
+/***  INTERSECTION  ***/
 Intersection::Intersection(vector<Shape*>& objects, Ray& ray) {
 	double min_t = DBL_MAX;
 	primative = NULL;
@@ -24,8 +32,8 @@ Intersection::Intersection(vector<Shape*>& objects, Ray& ray) {
 		}
 	}
 	point = ray.getPoint(min_t);
+	sourceDirection = -ray.direction;
 }
-
 
 /***  TRIANGLE  ***/
 Triangle::Triangle(vec3 point0, vec3 point1, vec3 point2) {
@@ -66,12 +74,13 @@ NormTriangle::NormTriangle(vec3 point0, vec3 point1, vec3 point2,
 	p0 = point0;
 	p1 = point1;
 	p2 = point2;
-	n0 = norm0;
-	n1 = norm1;
-	n2 = norm2;
+	n0 = glm::normalize(norm0);
+	n1 = glm::normalize(norm1);
+	n2 = glm::normalize(norm2);
 }
 
 vec3 NormTriangle::getNormal(vec3& hit){
+	/*
 	mat2 M = mat2(p1[0]-p0[0], p1[1]-p0[1], p2[0]-p0[0], p2[1]-p0[1]);
 	double det = glm::determinant(M);
 	M[0][0] = hit[0]-p0[0];
@@ -82,7 +91,8 @@ vec3 NormTriangle::getNormal(vec3& hit){
 	M[1][0] = hit[0]-p0[0];
 	M[1][1] = hit[1]-p0[1];
 	double gamma = glm::determinant(M)/det;
-	return (1-beta-gamma)*n0 + beta*n1 + gamma*n2;
+	return glm::normalize((1-beta-gamma)*n0 + beta*n1 + gamma*n2);
+	*/
 }
 
 /***  SPHERE  ***/
@@ -90,10 +100,8 @@ double Sphere::intersect(Ray& ray) {
 	vec3 direction = glm::normalize(vec3(inv * vec4(ray.direction,0)));
 	vec3 origin =vec3(inv * vec4(ray.origin,1));
 	
-	// a = 1 because direction is normalized
 	double b = 2.0 * glm::dot(direction, origin);
 	double c = glm::dot(origin,origin) - 1.0;
-	
 	double det = b*b - 4.0*c;
 	if (det<0.0) return -1.0;
 	det = sqrt(det);
@@ -106,12 +114,12 @@ double Sphere::intersect(Ray& ray) {
 	if (t2>0.0) {
 		vec4 hit = mv * vec4(origin+t2*direction,1);
 		return glm::distance(ray.origin,vec3(hit));
+	} else { //t1 is closer
+		vec4 hit = mv * vec4(origin+t1*direction,1);
+		return glm::distance(ray.origin,vec3(hit));
 	}
-	vec4 hit = mv * vec4(origin+t2*direction,1);
-	return glm::distance(ray.origin,vec3(hit));
 }
 
 vec3 Sphere::getNormal(vec3& hit){
-	//not implemented yet
-	return vec3(0,0,0);
+	return glm::normalize(vec3(glm::transpose(inv)*inv*vec4(hit,1.0)));
 }

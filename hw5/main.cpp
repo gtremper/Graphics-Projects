@@ -4,12 +4,13 @@
 #include <cstdio>
 #include <stack>
 #include <string>
-#include <time.h>
+#include <vector>
 
 #include "FreeImage.h"
 #include "Shapes.h"
-#include "Scene.h"
 #include "Intersection.h"
+#include "Light.h"
+#include "Scene.h"
 
 #define BPP 24
 
@@ -18,9 +19,21 @@ using namespace std;
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Intersection hit = Intersection(scene.objects, ray);
 	if (!hit.primative) {
-		return vec3(0,0,0);
+		return vec3(0,0,0); //background color
 	}
-	return hit.primative->ambient;
+	
+	vec3 color = hit.primative->ambient;
+	color += hit.primative->emission;
+	
+	vec3 normal = hit.primative->getNormal(hit.point);
+	
+	//cout << "normal: "<<normal[0]<<", "<<normal[1]<<", "<<normal[2]<<endl;
+	
+	vector<Light*>::iterator light=scene.lights.begin();
+	for(; light!=scene.lights.end(); ++light){
+		color += (*light)->shade(hit,scene.objects,normal);
+	}
+	return color;
 }
 
 void raytrace(Scene& scene) {
@@ -33,13 +46,13 @@ void raytrace(Scene& scene) {
 	if (!bitmap) exit(1);
 	
 	for (int j=0; j<scene.height; j++){
-		printf("Progress: %2.0f%%\r",(float)j/scene.height);
+		printf("Progress: %d\r%%",j*100/scene.height);
 		for (int i=0; i<scene.width; i++) {
 			scene.castEyeRay(i,j,ray);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
-			rgb.rgbRed = color[0]*255.0;
-			rgb.rgbGreen = color[1]*255.0;
-			rgb.rgbBlue = color[2]*255.0;
+			rgb.rgbRed = min(color[0],1.0)*255.0;
+			rgb.rgbGreen = min(color[1],1.0)*255.0;
+			rgb.rgbBlue = min(color[2],1.0)*255.0;
 			FreeImage_SetPixelColor(bitmap,i,j,&rgb);
 		}
 	}
@@ -51,21 +64,12 @@ void raytrace(Scene& scene) {
 	FreeImage_DeInitialise();
 }
 
-
 int main(int argc, char* argv[]){
 	if(argc != 2) {
 		cerr << "You need 1 scene file as the argument" << endl;
 		exit(1);
 	}
-	time_t start,end;
-	time(&start);
-	
-	Scene scene;
-	scene.parse(argv[1]);
+	Scene scene(argv[1]);
 	raytrace(scene);
-	
-	time(&end);
-	double dif = difftime(end,start);
-	printf("Render time: %.3f seconds\n",dif);
 	return 0;
 }
