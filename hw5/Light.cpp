@@ -22,8 +22,8 @@ vec3 DirectionalLight::shade(const Intersection& hit, const vector<Shape*>& obje
 	if(!isVisible(hit.point,objects)) {
 		return vec3(0.0,0.0,0.0);
 	}
-	vec3 shade = max(0.0,glm::dot(normal,-direction)) * hit.primative->diffuse;
-	vec3 half = glm::normalize(hit.sourceDirection-direction);
+	vec3 shade = max(0.0,glm::dot(normal,direction)) * hit.primative->diffuse;
+	vec3 half = glm::normalize(hit.sourceDirection+direction);
 	double phong = pow( max(0.0,glm::dot(half,normal)) , hit.primative->shininess);
 	shade += phong * hit.primative->specular;
 	shade *= color;
@@ -32,7 +32,7 @@ vec3 DirectionalLight::shade(const Intersection& hit, const vector<Shape*>& obje
 }
 
 bool DirectionalLight::isVisible(const vec3& point, const vector<Shape*>& objects) {
-	Ray ray(point,-direction);
+	Ray ray(point,direction);
 	vector<Shape*>::const_iterator prim=objects.begin();
 	for(;prim!=objects.end(); ++prim){
 		if ((*prim)->intersect(ray) >= EPSILON){
