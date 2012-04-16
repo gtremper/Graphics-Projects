@@ -80,7 +80,6 @@ NormTriangle::NormTriangle(vec3 point0, vec3 point1, vec3 point2,
 }
 
 vec3 NormTriangle::getNormal(vec3& hit){
-	/*
 	mat2 M = mat2(p1[0]-p0[0], p1[1]-p0[1], p2[0]-p0[0], p2[1]-p0[1]);
 	double det = glm::determinant(M);
 	M[0][0] = hit[0]-p0[0];
@@ -92,7 +91,6 @@ vec3 NormTriangle::getNormal(vec3& hit){
 	M[1][1] = hit[1]-p0[1];
 	double gamma = glm::determinant(M)/det;
 	return glm::normalize((1-beta-gamma)*n0 + beta*n1 + gamma*n2);
-	*/
 }
 
 /***  SPHERE  ***/
