@@ -19,7 +19,9 @@ vertex +1 -1 +1
 vertex +1 +1 +1
 vertex -1 +1 +1
 
-rotate 1 0 0 60
+rotate 1 0 0 15
+rotate 0 1 0 45
+translate 1 -1 0
 
 pushTransform
 # The basic camera transform to return to for new parts
