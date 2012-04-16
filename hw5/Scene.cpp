@@ -185,8 +185,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if (cmd == "directional") {
 		double x,y,z,r,g,b;
 		line >> x >> y >> z >> r >> g >> b;
-		cout << cmd <<" "<<x<<" "<<y<<" "<<z<<" "<<r<<" "<<g<<" "<<b<< endl;
-		DirectionalLight* light = new DirectionalLight(vec3(r,b,g),vec3(x,y,z));
+		DirectionalLight* light = new DirectionalLight(vec3(r,g,b),vec3(x,y,z));
 		lights.push_back(light);
 	} else if (cmd == "point") {
 		double x,y,z,r,g,b;
