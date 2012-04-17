@@ -4,8 +4,8 @@
 CC = g++ -g -Wall -O2 -fmessage-length=0
 
 #Libraries
-CCOPTS = -c -I./headers/ -I./glm-0.9.3.2
-LDOPTS = -L./lib/mac -lfreeimage
+CCOPTS = -c -I./headers/ -I./glm-0.9.3.2 -fopenmp
+LDOPTS = -L./lib/mac -lfreeimage -fopenmp
 
 #Final Files and Intermediate .o Files
 OBJECTS = main.o Scene.o Transform.o Shapes.o Light.o
