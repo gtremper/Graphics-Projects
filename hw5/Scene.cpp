@@ -50,13 +50,14 @@ Scene::~Scene() {
 **	A little jenky but whatever, its faster.    **
 *************************************************/ 
  
-void Scene::castEyeRay(int i, int j, Ray& ray){
-	double half = width/2.0;
-	double alpha = tan(fovy*pi*width/(height*360.0)) * ((i-half)/half);
-	half = height/2.0;
-	double beta = tan(fovy*pi/360.0) * ((j-half)/half);
-	ray.origin = eye;
-	ray.direction = glm::normalize(alpha*u + beta*v - w);
+Ray Scene::castEyeRay(int i, int j){
+	double alpha = (2.0*i-width+1)/width;
+	alpha *=tan(fovx/2.0);
+	double beta = (2.0*j-height+1)/height;
+	beta *= tan(fovy/2.0);
+	
+	Ray ray(eye,glm::normalize(alpha*u + beta*v - w));
+	return ray;
 }
 
 /***********************************************
@@ -93,6 +94,9 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		vec3 up = vec3(arg1,arg2,arg3);
 		setCoordinateFrame(lookat,up);
 		line >> fovy;
+		fovy*=pi/180.0;
+		double d = height/(2.0 * tan(fovy*0.5));
+		fovx = 2 * atan(width/(2.0*d));
 	} else if (cmd == "sphere") {
 		double arg1, arg2, arg3, arg4;
 		line >> arg1;
@@ -219,6 +223,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg3;
 		emission = vec3(arg1,arg2,arg3);
 	}
+	//cout << cmd << endl;
 }
 
 void Scene::parse(char* filename) {

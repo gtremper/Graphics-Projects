@@ -41,14 +41,13 @@ void raytrace(Scene& scene) {
 	
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	RGBQUAD rgb;
-	Ray ray;
 	
 	if (!bitmap) exit(1);
 	
 	for (int j=0; j<scene.height; j++){
-		printf("Progress: %d%%\r",j*100/scene.height);
+		clog << "Progress: "<< (j*100)/scene.height <<"%"<<"\r";
 		for (int i=0; i<scene.width; i++) {
-			scene.castEyeRay(i,j,ray);
+			Ray ray = scene.castEyeRay(i,j);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
 			rgb.rgbRed = min(color[0],1.0)*255.0;
 			rgb.rgbGreen = min(color[1],1.0)*255.0;
