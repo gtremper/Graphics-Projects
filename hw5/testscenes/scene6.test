@@ -40,7 +40,6 @@ diffuse 0 0 1
 
 attenuation 1 0.1 0.05
 
-pushTransform
 
 #red
 pushTransform
@@ -48,8 +47,10 @@ translate 0 0 -3
 rotate 0 1 0 60
 scale 10 10 1
 diffuse 1 0 0
+
 tri 0 1 2
 tri 0 2 3
+
 popTransform
 
 #green
@@ -188,4 +189,3 @@ tri 10 9 11
 #trinormal 6 5 7
 popTransform
 
-popTransform

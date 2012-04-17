@@ -43,12 +43,6 @@ Scene::~Scene() {
 		delete *l;
 	}
 }
-
-
-/************************************************* 
-** The shot ray is stored in the argument "ray" **
-**	A little jenky but whatever, its faster.    **
-*************************************************/ 
  
 Ray Scene::castEyeRay(int i, int j){
 	double alpha = (2.0*i-width+1)/width;
@@ -88,15 +82,17 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		double arg1, arg2, arg3;
 		line >> arg1 >> arg2 >> arg3;
 		eye = vec3(arg1,arg2,arg3);
+		
 		line >> arg1 >> arg2 >> arg3;
 		vec3 lookat = vec3(arg1,arg2,arg3);
+		
 		line >> arg1 >> arg2 >> arg3;
 		vec3 up = vec3(arg1,arg2,arg3);
 		setCoordinateFrame(lookat,up);
 		line >> fovy;
 		fovy*=pi/180.0;
 		double d = height/(2.0 * tan(fovy*0.5));
-		fovx = 2 * atan(width/(2.0*d));
+		fovx = 2. * atan(width/(2.0*d));
 	} else if (cmd == "sphere") {
 		double arg1, arg2, arg3, arg4;
 		line >> arg1;

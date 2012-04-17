@@ -7,7 +7,7 @@
 #include "Intersection.h"
 #include "Light.h"
 
-#define EPSILON 0.005
+#define EPSILON 0.0001
 
 using namespace std;
 
@@ -19,7 +19,7 @@ DirectionalLight::DirectionalLight(const vec3& c,const vec3& dir) {
 }
 
 vec3 DirectionalLight::shade(const Intersection& hit, const vector<Shape*>& objects, const vec3& normal){
-	if(!isVisible(hit.point,objects)) {
+	if(!isVisible(hit.point+EPSILON*normal,objects)) {
 		return vec3(0.0,0.0,0.0);
 	}
 	vec3 shade = max(0.0,glm::dot(normal,direction)) * hit.primative->diffuse;
@@ -35,7 +35,7 @@ bool DirectionalLight::isVisible(const vec3& point, const vector<Shape*>& object
 	Ray ray(point,direction);
 	vector<Shape*>::const_iterator prim=objects.begin();
 	for(;prim!=objects.end(); ++prim){
-		if ((*prim)->intersect(ray) >= EPSILON){
+		if ((*prim)->intersect(ray) >= 0.0){
 			return false;
 		}
 	}
@@ -52,7 +52,7 @@ PointLight::PointLight(const vec3& colour,const vec3& poi, double con, double li
 }
 
 vec3 PointLight::shade(const Intersection& hit, const vector<Shape*>& objects, const vec3& normal){
-	if( !isVisible(hit.point,objects) ){
+	if( !isVisible(hit.point+EPSILON*normal,objects) ){
 		return vec3(0.0,0.0,0.0);
 	}
 	vec3 direction = glm::normalize(point-hit.point);
@@ -71,8 +71,10 @@ bool PointLight::isVisible(const vec3& p, const vector<Shape*>& objects) {
 	vec3 direction = glm::normalize(point-p);
 	Ray ray(p,direction);
 	vector<Shape*>::const_iterator prim=objects.begin();
+	double dist = glm::distance(point,p);
 	for(;prim!=objects.end(); ++prim){
-		if ((*prim)->intersect(ray) >= EPSILON) return false;
+		double t = (*prim)->intersect(ray);
+		if (t >= 0.0 && t<dist ) return false;
 	}
 	return true;
 }
