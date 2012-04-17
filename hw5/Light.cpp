@@ -63,7 +63,7 @@ vec3 PointLight::shade(const Intersection& hit, const vector<Shape*>& objects, c
 	shade += phong * hit.primative->specular;
 	shade *= color;
 	double dist = glm::distance(point,hit.point);
-	shade /= constant + linear*dist + quadratic*dist*dist;
+	shade *= 1.0/(constant + linear*dist + quadratic*dist*dist);
 	return shade;
 }
 

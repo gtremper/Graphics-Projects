@@ -156,9 +156,21 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if(cmd == "trinormal") {
 		int a1,a2,a3;
 		line >> a1 >> a2 >> a3;
-		//NormTriangle* t = new NormTriangle(normverts[a1],normverts[a2],normverts[a3],
-		//								norms[a1],norms[a2],norms[a3]);
-		//objects.push_back(t);
+		mat4 top =  mv.top();
+		vec3 v1 = vec3(top * vec4(normverts[a1],1));
+		vec3 v2 = vec3(top * vec4(normverts[a2],1));
+		vec3 v3 = vec3(top * vec4(normverts[a3],1));
+		top = glm::transpose(glm::inverse(top));
+		vec3 n1 = vec3(top * vec4(norms[a1],0));
+		vec3 n2 = vec3(top * vec4(norms[a2],0));
+		vec3 n3 = vec3(top * vec4(norms[a3],0));
+		NormTriangle* t = new NormTriangle(v1,v2,v3,n1,n2,n3);
+		t->ambient = ambient;
+		t->diffuse = diffuse;
+		t->specular = specular;
+		t->shininess = shininess;
+		t->emission = emission;
+		objects.push_back(t);
 	} else if(cmd == "translate") {
 		double arg1,arg2,arg3;
 		line >> arg1;
@@ -185,11 +197,13 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if (cmd == "directional") {
 		double x,y,z,r,g,b;
 		line >> x >> y >> z >> r >> g >> b;
-		DirectionalLight* light = new DirectionalLight(vec3(r,g,b),vec3(x,y,z));
+		vec3 dir = vec3(mv.top()*vec4(x,y,z,0.0));
+		DirectionalLight* light = new DirectionalLight(vec3(r,g,b),dir);
 		lights.push_back(light);
 	} else if (cmd == "point") {
 		double x,y,z,r,g,b;
 		line >> x >> y >> z >> r >> g >> b;
+		vec3 point = vec3(mv.top()*vec4(x,y,z,1.0));
 		PointLight* light = new PointLight(vec3(r,g,b),vec3(x,y,z),constant,linear,quadratic);
 		lights.push_back(light);
 	} else if (cmd == "attenuation") {

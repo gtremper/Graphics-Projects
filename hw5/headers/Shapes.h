@@ -40,7 +40,7 @@ class Triangle : public Shape {
 		vec3 n0;
 };
 
-class NormTriangle : private Triangle {
+class NormTriangle : public Triangle {
 public:
 	NormTriangle(vec3,vec3,vec3,vec3,vec3,vec3);
 	vec3 getNormal(vec3&);
