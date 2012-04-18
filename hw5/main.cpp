@@ -15,13 +15,11 @@
 
 #define BPP 24
 
-const int NUMTHREADS = 4;
-
 using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Intersection hit = Intersection(scene.objects, ray);
-	if (!hit.primative) {
+	if (!hit.primative || depth==0) {
 		return vec3(0,0,0); //background color
 	}
 	
@@ -47,9 +45,8 @@ void raytrace(Scene& scene) {
 	#pragma omp parallel for
 	for (int j=0; j<scene.height; j++){
 		int tid = omp_get_thread_num();
-		if(tid == 0)
-		{
-		   clog << "Progress: "<< (j*100*NUMTHREADS)/scene.height <<"%"<<"\r";
+		if(tid == 0) {
+		   clog << "Progress: "<< (j*100*omp_get_num_threads())/scene.height <<"%"<<"\r";
 		}
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
