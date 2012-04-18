@@ -14,6 +14,7 @@
 #include "Scene.h"
 
 #define BPP 24
+#define EPSILON 0.0000005
 
 using namespace std;
 
@@ -32,6 +33,10 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	for(; light!=scene.lights.end(); ++light){
 		color += (*light)->shade(hit,scene.objects,normal);
 	}
+	
+	Ray reflectedRay = Ray( hit.point + EPSILON * normal, ray.direction + (2.0 * normal * -glm::dot(normal, ray.direction)) );
+	
+	color += hit.primative->specular * findColor(scene, reflectedRay, --depth);
 	return color;
 }
 
