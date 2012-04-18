@@ -9,7 +9,7 @@ maxdepth 5
 
 maxverts 12
 #planar face
-vertex -1 +1 0
+vertex -1 1 0
 vertex -1 -1 0
 vertex +1 -1 0
 vertex +1 +1 0
@@ -32,15 +32,16 @@ shininess 1
 emission 0 0 0
 diffuse 0 0 0
 
+attenuation 1 0.1 0.05
+
 point 0 0.44 -1.5 0.8 0.8 0.8
 directional 0 1 -1 0.2 0.2 0.2
 
 diffuse 0 0 1
-sphere 0 0.8 -1.5 0.1
+#sphere 0 0.8 -1.5 0.1
 
-attenuation 1 0.1 0.05
 
-pushTransform
+
 
 #red
 pushTransform
@@ -48,8 +49,10 @@ translate 0 0 -3
 rotate 0 1 0 60
 scale 10 10 1
 diffuse 1 0 0
+
 tri 0 1 2
 tri 0 2 3
+
 popTransform
 
 #green
@@ -188,4 +191,3 @@ tri 10 9 11
 #trinormal 6 5 7
 popTransform
 
-popTransform

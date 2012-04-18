@@ -43,20 +43,15 @@ Scene::~Scene() {
 		delete *l;
 	}
 }
-
-
-/************************************************* 
-** The shot ray is stored in the argument "ray" **
-**	A little jenky but whatever, its faster.    **
-*************************************************/ 
  
-void Scene::castEyeRay(int i, int j, Ray& ray){
-	double half = width/2.0;
-	double alpha = tan(fovy*pi*width/(height*360.0)) * ((i-half)/half);
-	half = height/2.0;
-	double beta = tan(fovy*pi/360.0) * ((j-half)/half);
-	ray.origin = eye;
-	ray.direction = glm::normalize(alpha*u + beta*v - w);
+Ray Scene::castEyeRay(int i, int j){
+	double alpha = (2.0*i-width+1)/width;
+	alpha *=tan(fovx/2.0);
+	double beta = (2.0*j-height+1)/height;
+	beta *= tan(fovy/2.0);
+	
+	Ray ray(eye,glm::normalize(alpha*u + beta*v - w));
+	return ray;
 }
 
 /***********************************************
@@ -87,12 +82,17 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		double arg1, arg2, arg3;
 		line >> arg1 >> arg2 >> arg3;
 		eye = vec3(arg1,arg2,arg3);
+		
 		line >> arg1 >> arg2 >> arg3;
 		vec3 lookat = vec3(arg1,arg2,arg3);
+		
 		line >> arg1 >> arg2 >> arg3;
 		vec3 up = vec3(arg1,arg2,arg3);
 		setCoordinateFrame(lookat,up);
 		line >> fovy;
+		fovy*=pi/180.0;
+		double d = height/(2.0 * tan(fovy*0.5));
+		fovx = 2. * atan(width/(2.0*d));
 	} else if (cmd == "sphere") {
 		double arg1, arg2, arg3, arg4;
 		line >> arg1;
@@ -156,9 +156,21 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if(cmd == "trinormal") {
 		int a1,a2,a3;
 		line >> a1 >> a2 >> a3;
-		//NormTriangle* t = new NormTriangle(normverts[a1],normverts[a2],normverts[a3],
-		//								norms[a1],norms[a2],norms[a3]);
-		//objects.push_back(t);
+		mat4 top =  mv.top();
+		vec3 v1 = vec3(top * vec4(normverts[a1],1));
+		vec3 v2 = vec3(top * vec4(normverts[a2],1));
+		vec3 v3 = vec3(top * vec4(normverts[a3],1));
+		top = glm::transpose(glm::inverse(top));
+		vec3 n1 = vec3(top * vec4(norms[a1],0));
+		vec3 n2 = vec3(top * vec4(norms[a2],0));
+		vec3 n3 = vec3(top * vec4(norms[a3],0));
+		NormTriangle* t = new NormTriangle(v1,v2,v3,n1,n2,n3);
+		t->ambient = ambient;
+		t->diffuse = diffuse;
+		t->specular = specular;
+		t->shininess = shininess;
+		t->emission = emission;
+		objects.push_back(t);
 	} else if(cmd == "translate") {
 		double arg1,arg2,arg3;
 		line >> arg1;
@@ -185,11 +197,13 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 	} else if (cmd == "directional") {
 		double x,y,z,r,g,b;
 		line >> x >> y >> z >> r >> g >> b;
-		DirectionalLight* light = new DirectionalLight(vec3(r,g,b),vec3(x,y,z));
+		vec3 dir = vec3(mv.top()*vec4(x,y,z,0.0));
+		DirectionalLight* light = new DirectionalLight(vec3(r,g,b),dir);
 		lights.push_back(light);
 	} else if (cmd == "point") {
 		double x,y,z,r,g,b;
 		line >> x >> y >> z >> r >> g >> b;
+		vec3 point = vec3(mv.top()*vec4(x,y,z,1.0));
 		PointLight* light = new PointLight(vec3(r,g,b),vec3(x,y,z),constant,linear,quadratic);
 		lights.push_back(light);
 	} else if (cmd == "attenuation") {
@@ -219,6 +233,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg3;
 		emission = vec3(arg1,arg2,arg3);
 	}
+	//cout << cmd << endl;
 }
 
 void Scene::parse(char* filename) {

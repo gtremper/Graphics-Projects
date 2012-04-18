@@ -5,6 +5,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include "omp.h"
 
 #include "FreeImage.h"
 #include "Shapes.h"
@@ -14,6 +15,8 @@
 
 #define BPP 24
 #define EPSILON 0.0000005
+
+const int NUMTHREADS = 4;
 
 using namespace std;
 
@@ -27,8 +30,6 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	color += hit.primative->emission;
 	
 	vec3 normal = hit.primative->getNormal(hit.point);
-	
-	//cout << "normal: "<<normal[0]<<", "<<normal[1]<<", "<<normal[2]<<endl;
 	
 	vector<Light*>::iterator light=scene.lights.begin();
 	for(; light!=scene.lights.end(); ++light){
@@ -45,18 +46,19 @@ void raytrace(Scene& scene) {
 	FreeImage_Initialise();
 	
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
-	RGBQUAD rgb;
-	Ray ray;
 	
 	if (!bitmap) exit(1);
 	
+	#pragma omp parallel for
 	for (int j=0; j<scene.height; j++){
-		float temp = j*100/scene.height;
-//		if(temp % 25 == 0) {
-			printf("Progress: %.0f%%\r",temp);
-//		}
+		int tid = omp_get_thread_num();
+		if(tid == 0)
+		{
+		   clog << "Progress: "<< (j*100*NUMTHREADS)/scene.height <<"%"<<"\r";
+		}
+		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
-			scene.castEyeRay(i,j,ray);
+			Ray ray = scene.castEyeRay(i,j);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
 			rgb.rgbRed = min(color[0],1.0)*255.0;
 			rgb.rgbGreen = min(color[1],1.0)*255.0;

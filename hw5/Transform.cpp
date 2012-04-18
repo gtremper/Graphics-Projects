@@ -10,11 +10,12 @@ mat4 Transform::rotate(double degrees, const vec3& axis) {
 	double y = a[1];
 	double z = a[2];
 	mat3 rotation(x*x, x*y, x*z, x*y, y*y, y*z, x*z, y*z, z*z);
-	rotation = (1-cos(degrees*pi/180.0))*rotation;
+	rotation *= (1-cos(degrees*pi/180.0));
 	mat3 cross(0.0, -z, y, z, 0.0, -x, -y, x, 0.0);
-	cross = sin(degrees*pi/180.0)*cross;
+	cross *= sin(degrees*pi/180.0);
 	mat3 result = parallel + rotation + cross;
-	return mat4(glm::transpose(result));
+	mat4 ret = mat4(glm::transpose(result));
+	return ret;
 }
 
 mat4 Transform::scale(double sx, double sy, double sz) {

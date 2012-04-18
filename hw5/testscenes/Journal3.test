@@ -5,6 +5,8 @@ camera 0 0 0 0 0 -3 0 1 0 36.87
 directional -0.57735027 0.57735027 0.57735027 1 1 1
 directional 0.57735027  -0.57735027  -0.57735027 1 1 1
 
+pushTransform
+rotate 0 1 0 0
 
 pushTransform
 ambient 0.1  0.1  0.1
