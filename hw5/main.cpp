@@ -13,12 +13,13 @@
 #include "Scene.h"
 
 #define BPP 24
+#define EPSILON 0.0000005
 
 using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Intersection hit = Intersection(scene.objects, ray);
-	if (!hit.primative) {
+	if (!hit.primative || depth == 0) {
 		return vec3(0,0,0); //background color
 	}
 	
@@ -33,6 +34,10 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	for(; light!=scene.lights.end(); ++light){
 		color += (*light)->shade(hit,scene.objects,normal);
 	}
+	
+	Ray reflectedRay = Ray( hit.point + EPSILON * normal, ray.direction + (2.0 * normal * -glm::dot(normal, ray.direction)) );
+	
+	color += hit.primative->specular * findColor(scene, reflectedRay, --depth);
 	return color;
 }
 
@@ -46,7 +51,10 @@ void raytrace(Scene& scene) {
 	if (!bitmap) exit(1);
 	
 	for (int j=0; j<scene.height; j++){
-		printf("Progress: %d%%\r",j*100/scene.height);
+		float temp = j*100/scene.height;
+//		if(temp % 25 == 0) {
+			printf("Progress: %.0f%%\r",temp);
+//		}
 		for (int i=0; i<scene.width; i++) {
 			scene.castEyeRay(i,j,ray);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
