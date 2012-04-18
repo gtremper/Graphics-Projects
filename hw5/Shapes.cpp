@@ -28,7 +28,6 @@ Intersection::Intersection(vector<Shape*>& objects, Ray& ray) {
 		if (t>0 && t<min_t){
 			primative = *prim;
 			min_t = t;
-			//cout << "Intersected!" << endl;
 		}
 	}
 	point = ray.getPoint(min_t);

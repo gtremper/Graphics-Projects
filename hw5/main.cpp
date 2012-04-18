@@ -34,9 +34,10 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 		color += (*light)->shade(hit,scene.objects,normal);
 	}
 	
-	Ray reflectedRay = Ray( hit.point + EPSILON * normal, ray.direction + (2.0 * normal * -glm::dot(normal, ray.direction)) );
+	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction-(2.*normal*glm::dot(normal, ray.direction)));
 	
-	color += hit.primative->specular * findColor(scene, reflectedRay, --depth);
+	color += hit.primative->specular*findColor(scene, reflectedRay, --depth);
+	
 	return color;
 }
 

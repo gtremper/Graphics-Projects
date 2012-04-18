@@ -16,10 +16,13 @@ camera 0 0 4 0 0 0 0 1 0 30
 # you may want to use dummy (constant) shading, ignoring these lines
 
 ambient .1 .1 .1
-directional 0 0 1 .5 .5 .5 
+#directional 0 0 1 .5 .5 .5 
 point 4 0 4 .5 .5 .5
-diffuse 1 0 0 
-specular 0 0 0
+ambient 0.01 0.01 0.01
+specular 0.6 0.6 0.6
+diffuse 0.4 0.4 0.4
+shininess 40
+emission 0 0 0
 
 # Now specify the geometry 
 # Again, for initial testing, maybe you want to implement a dummy 
@@ -28,15 +31,21 @@ specular 0 0 0
 # parts of the assignment.
 
 maxverts 4 
+maxvertnorms 4
 
 vertex -1 -1 0 
 vertex +1 -1 0
 vertex +1 +1 0
 vertex -1 +1 0
 
-ambient 1 0 0
-tri 0 1 2
-tri 0 2 3
+vertexnormal -1 -1 0 0 0 1
+vertexnormal +1 -1 0 0 0 1
+vertexnormal +1 +1 0 0 0 -1
+vertexnormal -1 +1 0 0 0 1
+
+
+trinormal 0 1 2
+trinormal 0 2 3
 
 #sphere 0 0 0 1
 
