@@ -18,11 +18,10 @@ camera -2 -2 2 0 0 0 1 1 2 60
 #camera +2 +2 2 0 0 0 -1 -1 2 60
 #camera -2 -2 -2 0 0 0 -1 -1 2 60
 
-scale 1 1 0.3
 
 # Now specify the geometry.  First the cube, then the spheres
 
-output mile2.png
+output scene2.png
 scale 2 1 1
 translate 2 2 -2  
 

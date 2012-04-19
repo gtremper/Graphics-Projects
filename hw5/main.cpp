@@ -20,7 +20,7 @@ using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Intersection hit = Intersection(scene.objects, ray);
-	if (!hit.primative || depth==0) {
+	if (!hit.primative) {
 		return vec3(0,0,0); //background color
 	}
 	
@@ -36,8 +36,10 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction-(2.*normal*glm::dot(normal, ray.direction)));
 	
-	color += hit.primative->specular*findColor(scene, reflectedRay, --depth);
 	
+	if (depth != 1){
+		color += (hit.primative->specular*findColor(scene, reflectedRay, --depth));
+	}
 	return color;
 }
 
