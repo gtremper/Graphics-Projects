@@ -5,10 +5,20 @@
 #include "Transform.h"
 #include "Ray.h"
 
+class AABB {
+public:
+	AABB(double,double,double,double,double,double);
+	double bounds[6];
+	double intersect(Ray&);
+	vec3 center;
+};
+
 class Shape {
 	public:
 		virtual double intersect(Ray&)=0;
 		virtual vec3 getNormal(vec3&)=0;
+		
+		//AABB aabb;
 		
 		/* material properties */
 		vec3 ambient;

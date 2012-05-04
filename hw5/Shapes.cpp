@@ -120,3 +120,23 @@ double Sphere::intersect(Ray& ray) {
 vec3 Sphere::getNormal(vec3& hit){
 	return glm::normalize(vec3(glm::transpose(inv)*inv*vec4(hit,1.0)));
 }
+
+/***  AABB  ***/
+AABB::AABB(double minx, double maxx, double miny, double maxy, double minz, double maxz) {
+	bounds[0] = minx;
+	bounds[1] = maxx;
+	bounds[2] = miny;
+	bounds[3] = maxy;
+	bounds[4] = minz;
+	bounds[5] = maxz;
+}
+
+double AABB::intersect(Ray& ray){
+	return 0.0;
+}
+
+
+
+
+
+
