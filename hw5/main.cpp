@@ -14,7 +14,7 @@
 #include "Scene.h"
 
 #define BPP 24
-#define EPSILON 0.0000005
+#define EPSILON 0.0000001
 
 using namespace std;
 
@@ -58,8 +58,10 @@ void raytrace(Scene& scene) {
 		}
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
+			
 			Ray ray = scene.castEyeRay(i,j);
 			vec3 color = findColor(scene,ray,scene.maxdepth);
+			
 			rgb.rgbRed = min(color[0],1.0)*255.0;
 			rgb.rgbGreen = min(color[1],1.0)*255.0;
 			rgb.rgbBlue = min(color[2],1.0)*255.0;

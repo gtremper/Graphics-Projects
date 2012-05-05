@@ -14,6 +14,7 @@ class Scene {
 		double fovx;
 		vec3 eye;
 		std::vector<Shape*> objects;
+		AABB sceneAABB;
 		
 		vec3 ambient;
 		vec3 diffuse;
@@ -33,6 +34,7 @@ class Scene {
 		void parseLine(std::string,std::stack<mat4>&,
 			std::vector<vec3>&,std::vector<vec3>&,std::vector<vec3>&);
 		void parse(char*);
+		void updateAABB(vec3&);
 };
 
 

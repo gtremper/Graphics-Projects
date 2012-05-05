@@ -30,6 +30,7 @@ Scene::Scene(char* file) {
 	constant = 1;
 	linear = 0;
 	quadratic = 0;
+	sceneAABB = AABB(DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN);
 	parse(file);
 }
 
@@ -45,9 +46,9 @@ Scene::~Scene() {
 }
  
 Ray Scene::castEyeRay(int i, int j){
-	double alpha = (2.0*i-width+1)/width;
+	double alpha = (2.0*i-width)/width;
 	alpha *=tan(fovx/2.0);
-	double beta = (2.0*j-height+1)/height;
+	double beta = (2.0*j-height)/height;
 	beta *= tan(fovy/2.0);
 	
 	Ray ray(eye,glm::normalize(alpha*u + beta*v - w));
@@ -62,6 +63,12 @@ void Scene::setCoordinateFrame(vec3& lookat, vec3& up){
 	w = glm::normalize(eye - lookat);
 	u = glm::normalize(glm::cross(up, w));
 	v = glm::cross(w,u);
+}
+
+void Scene::updateAABB(vec3& point){
+	if(point[0]){
+		
+	}
 }
 
 void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts, 

@@ -5,7 +5,7 @@
 #include "Shapes.h"
 #include "Intersection.h"
 
-#define EPSILON 0.0000005
+#define EPSILON 0.00000001
 
 using namespace std;
 
@@ -129,10 +129,44 @@ AABB::AABB(double minx, double maxx, double miny, double maxy, double minz, doub
 	bounds[3] = maxy;
 	bounds[4] = minz;
 	bounds[5] = maxz;
+	center[0] = (minx + maxx)/2.0;
+	center[1] = (miny + maxy)/2.0;
+	center[2] = (minz + maxz)/2.0;
 }
 
-double AABB::intersect(Ray& ray){
-	return 0.0;
+bool intersect1D(double start, double dir, double axisMin, double axisMax, double& enter, double& ex){
+	// Parallel
+	if(dir<EPSILON && dir>-EPSILON){
+		return (start>=axisMin && start<=axisMax);
+	}
+	
+	//intersection parameters
+	double t0 = (axisMin-start)/dir;
+	double t1 = (axisMax-start)/dir;
+	
+	if(t0>t1){
+		double temp = t0;
+		t1 = t0;
+		t0 = temp;
+	}
+	
+	if(t0>enter) enter = t0;
+	if(t1<ex) ex = t1;
+
+	if(ex<enter || ex<0.0) return false;
+	
+	return true;
+}
+
+bool AABB::intersect(Ray& ray){
+	double ex = DBL_MIN;
+	double enter = DBL_MAX;
+	
+	if (!intersect1D(ray.origin[0],ray.direction[0],bounds[0],bounds[1],enter,ex)) return -1.0;
+	if (!intersect1D(ray.origin[1],ray.direction[1],bounds[2],bounds[3],enter,ex)) return -1.0;
+	if (!intersect1D(ray.origin[2],ray.direction[2],bounds[4],bounds[5],enter,ex)) return -1.0;
+	
+	return true;
 }
 
 

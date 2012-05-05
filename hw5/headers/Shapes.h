@@ -7,9 +7,10 @@
 
 class AABB {
 public:
+	AABB(){};
 	AABB(double,double,double,double,double,double);
 	double bounds[6];
-	double intersect(Ray&);
+	bool intersect(Ray&);
 	vec3 center;
 };
 
@@ -18,7 +19,7 @@ class Shape {
 		virtual double intersect(Ray&)=0;
 		virtual vec3 getNormal(vec3&)=0;
 		
-		//AABB aabb;
+		AABB aabb;
 		
 		/* material properties */
 		vec3 ambient;
