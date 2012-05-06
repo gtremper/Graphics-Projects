@@ -29,7 +29,7 @@ class Scene {
 		
 		Scene(char*);
 		~Scene();
-		Ray castEyeRay(int,int);
+		Ray castEyeRay(double,double);
 		void setCoordinateFrame(vec3&,vec3&);
 		void parseLine(std::string,std::stack<mat4>&,
 			std::vector<vec3>&,std::vector<vec3>&,std::vector<vec3>&);

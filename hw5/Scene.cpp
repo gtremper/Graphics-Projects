@@ -45,7 +45,7 @@ Scene::~Scene() {
 	}
 }
  
-Ray Scene::castEyeRay(int i, int j){
+Ray Scene::castEyeRay(double i, double j){
 	double alpha = (2.0*i-width)/width;
 	alpha *=tan(fovx/2.0);
 	double beta = (2.0*j-height)/height;
