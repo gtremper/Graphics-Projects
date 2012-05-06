@@ -32,7 +32,8 @@ Scene::Scene(char* file) {
 	quadratic = 0;
 	sceneAABB = AABB(DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN);
 	parse(file);
-	//KDTree = new TreeNode(objects,0,sceneAABB);
+	cout << "ORIGNIAL SIZE: "<<objects.size()<<endl;
+	KDTree = new TreeNode(objects,0,sceneAABB);
 }
 
 Scene::~Scene() {

@@ -157,17 +157,17 @@ bool intersect1D(double start, double dir, double axisMin, double axisMax, doubl
 		t0 = temp;
 	}
 	
-	if(t0>enter) enter = t0;
-	if(t1<ex) ex = t1;
-
-	if(ex<enter || ex<0.0) return false;
+	if(t0>ex || t1<enter) return false;
+	
+	t0 = max(t0,enter);
+	t1 = min(t1,ex);
 	
 	return true;
 }
 
 bool AABB::intersect(Ray& ray){
-	double ex = DBL_MAX;
-	double enter = DBL_MIN;
+	double ex = 999999999999;
+	double enter = -999999999;
 	
 	if (!intersect1D(ray.origin[0],ray.direction[0],bounds[0],bounds[1],enter,ex)) return false;
 	if (!intersect1D(ray.origin[1],ray.direction[1],bounds[2],bounds[3],enter,ex)) return false;

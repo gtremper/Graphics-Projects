@@ -62,48 +62,15 @@ void raytrace(Scene& scene) {
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
-			for(double a=i+.125; a<i+1; a+=.25) {
+			for(double a=i; a<i+1; a+=.25) {
 				double randomNum1 = ((double)rand()/(double)RAND_MAX) * 0.25;
-				for(double b=j+.125; b<j+1; b+=.25) {
+				for(double b=j; b<j+1; b+=.25) {
 					double randomNum2 = ((double)rand()/(double)RAND_MAX) * 0.25;
 					Ray ray = scene.castEyeRay(a + randomNum1,b + randomNum2);
 					color += findColor(scene, ray, scene.maxdepth);
 				}
 			}
-			
-			// Ray ray1 = scene.castEyeRay(i+.125,j+.125);
-			// Ray ray2 = scene.castEyeRay(i+.125,j+.375);
-			// Ray ray3 = scene.castEyeRay(i+.125,j+.625);
-			// Ray ray4 = scene.castEyeRay(i+.125,j+.875);
-			// Ray ray5 = scene.castEyeRay(i+.375,j+.125);
-			// Ray ray6 = scene.castEyeRay(i+.375,j+.375);
-			// Ray ray7 = scene.castEyeRay(i+.375,j+.625);
-			// Ray ray8 = scene.castEyeRay(i+.375,j+.875);
-			// Ray ray9 = scene.castEyeRay(i+.625,j+.125);
-			// Ray ray10 = scene.castEyeRay(i+.625,j+.375);
-			// Ray ray11 = scene.castEyeRay(i+.625,j+.625);
-			// Ray ray12 = scene.castEyeRay(i+.625,j+.875);
-			// Ray ray13 = scene.castEyeRay(i+.875,j+.125);
-			// Ray ray14 = scene.castEyeRay(i+.875,j+.375);
-			// Ray ray15 = scene.castEyeRay(i+.875,j+.625);
-			// Ray ray16 = scene.castEyeRay(i+.875,j+.875);
-			// 
-			// vec3 color = findColor(scene,ray1,scene.maxdepth);
-			// color += findColor(scene,ray2,scene.maxdepth);
-			// color += findColor(scene,ray3,scene.maxdepth);
-			// color += findColor(scene,ray4,scene.maxdepth);
-			// color += findColor(scene,ray5,scene.maxdepth);
-			// color += findColor(scene,ray6,scene.maxdepth);
-			// color += findColor(scene,ray7,scene.maxdepth);
-			// color += findColor(scene,ray8,scene.maxdepth);
-			// color += findColor(scene,ray9,scene.maxdepth);
-			// color += findColor(scene,ray10,scene.maxdepth);
-			// color += findColor(scene,ray11,scene.maxdepth);
-			// color += findColor(scene,ray12,scene.maxdepth);
-			// color += findColor(scene,ray13,scene.maxdepth);
-			// color += findColor(scene,ray14,scene.maxdepth);
-			// color += findColor(scene,ray15,scene.maxdepth);
-			// color += findColor(scene,ray16,scene.maxdepth);
+
 			color /= 16;
 			
 			rgb.rgbRed = min(color[0],1.0)*255.0;
