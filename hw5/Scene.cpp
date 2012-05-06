@@ -32,6 +32,7 @@ Scene::Scene(char* file) {
 	quadratic = 0;
 	sceneAABB = AABB(DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN);
 	parse(file);
+	//KDTree = new TreeNode(objects,0,sceneAABB);
 }
 
 Scene::~Scene() {
@@ -66,9 +67,12 @@ void Scene::setCoordinateFrame(vec3& lookat, vec3& up){
 }
 
 void Scene::updateAABB(vec3& point){
-	if(point[0]){
-		
-	}
+	sceneAABB.bounds[0] = min(sceneAABB.bounds[0],point[0]);
+	sceneAABB.bounds[1] = max(sceneAABB.bounds[1],point[0]);
+	sceneAABB.bounds[2] = min(sceneAABB.bounds[2],point[1]);
+	sceneAABB.bounds[3] = max(sceneAABB.bounds[3],point[1]);
+	sceneAABB.bounds[4] = min(sceneAABB.bounds[4],point[2]);
+	sceneAABB.bounds[5] = max(sceneAABB.bounds[5],point[2]);
 }
 
 void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts, 
@@ -154,6 +158,9 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		vec3 v2 = vec3(top * vec4(verts[a2],1));
 		vec3 v3 = vec3(top * vec4(verts[a3],1));
 		Triangle* t = new Triangle(v1,v2,v3);
+		updateAABB(v1);
+		updateAABB(v2);
+		updateAABB(v3);
 		t->ambient = ambient;
 		t->diffuse = diffuse;
 		t->specular = specular;
@@ -244,7 +251,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 }
 
 void Scene::parse(char* filename) {
-	ifstream  file(filename, ifstream::in);
+	ifstream file(filename, ifstream::in);
 	string line;
 	if (file.is_open()) {
 		stack<mat4> modelview;

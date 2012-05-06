@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define TREELIMIT 5
+#define TREELIMIT 8
 
 /***  TREENODE  ***/
 struct ShapeSorter {
@@ -20,17 +20,19 @@ struct ShapeSorter {
 	int axis;
 };
 
-TreeNode::TreeNode(vector<Shape*>& prims, int axis, AABB bigBox){
+TreeNode::TreeNode(vector<Shape*>& prims, int ax, AABB bigBox){
+	cout<<"axis: "<< ax <<endl;
 	this->aabb = bigBox;
+	this->axis = ax;
+	cout << "SIZE: " <<prims.size()<<endl;
 	if(prims.size()<=TREELIMIT){
 		left = NULL;
 		right = NULL;
 		primatives = prims;
 	}else{
-		//primatives = NULL;
 		ShapeSorter s(axis);
 		sort(prims.begin(), prims.end(),s);
-		double split = prims[prims.size()/2]->aabb.center[axis];
+		this->split = prims[prims.size()/2]->aabb.center[axis];
 		
 		vector<Shape*> leftPrims;
 		vector<Shape*>::iterator it=prims.begin();
@@ -67,7 +69,30 @@ TreeNode::~TreeNode(){
 }
 
 Intersection TreeNode::intersect(Ray& ray){
-	return Intersection(primatives,ray);
+	if(!left){
+		return Intersection(primatives,ray);
+	}
+	
+	if(ray.origin[axis]<split){
+		if(left->aabb.intersect(ray)){
+			Intersection hit = left->intersect(ray);
+			if(hit.primative) return hit;
+		}
+		if(right->aabb.intersect(ray)){
+			Intersection hit = right->intersect(ray);
+			if(hit.primative) return hit;
+		}
+	} else {
+		if(right->aabb.intersect(ray)){
+			Intersection hit = right->intersect(ray);
+			if(hit.primative) return hit;
+		}
+		if(left->aabb.intersect(ray)){
+			Intersection hit = left->intersect(ray);
+			if(hit.primative) return hit;
+		}
+	}
+	return Intersection();
 }
 
 

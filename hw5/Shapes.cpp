@@ -40,6 +40,13 @@ Triangle::Triangle(vec3 point0, vec3 point1, vec3 point2) {
 	p1 = point1;
 	p2 = point2;
 	n0 = glm::normalize(glm::cross(p1-p0,p2-p0));
+	double minx = min(min(p0[0],p1[0]),p2[0]);
+	double maxx = max(max(p0[0],p1[0]),p2[0]);
+	double miny = min(min(p0[1],p1[1]),p2[1]);
+	double maxy = max(max(p0[1],p1[1]),p2[1]);
+	double minz = min(min(p0[2],p1[2]),p2[2]);
+	double maxz = max(max(p0[2],p1[2]),p2[2]);
+	aabb = AABB(minx,maxx,miny,maxy,minz,maxz);
 }
 
 
@@ -159,12 +166,12 @@ bool intersect1D(double start, double dir, double axisMin, double axisMax, doubl
 }
 
 bool AABB::intersect(Ray& ray){
-	double ex = DBL_MIN;
-	double enter = DBL_MAX;
+	double ex = DBL_MAX;
+	double enter = DBL_MIN;
 	
-	if (!intersect1D(ray.origin[0],ray.direction[0],bounds[0],bounds[1],enter,ex)) return -1.0;
-	if (!intersect1D(ray.origin[1],ray.direction[1],bounds[2],bounds[3],enter,ex)) return -1.0;
-	if (!intersect1D(ray.origin[2],ray.direction[2],bounds[4],bounds[5],enter,ex)) return -1.0;
+	if (!intersect1D(ray.origin[0],ray.direction[0],bounds[0],bounds[1],enter,ex)) return false;
+	if (!intersect1D(ray.origin[1],ray.direction[1],bounds[2],bounds[3],enter,ex)) return false;
+	if (!intersect1D(ray.origin[2],ray.direction[2],bounds[4],bounds[5],enter,ex)) return false;
 	
 	return true;
 }

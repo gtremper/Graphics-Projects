@@ -69,29 +69,29 @@ tri 4 6 7
 # Make spheres
 ambient 1 1 1
 
-sphere 1 0 0 0.15
+#sphere 1 0 0 0.15
 
-sphere -.5 1 -.5 0.15
-sphere +.5 1 +.5 0.15
+#sphere -.5 1 -.5 0.15
+#sphere +.5 1 +.5 0.15
 
-sphere 0 0 1 0.15
-sphere -.5 -.5 1 0.15
-sphere +.5 +.5 1 0.15
+#sphere 0 0 1 0.15
+#sphere -.5 -.5 1 0.15
+#sphere +.5 +.5 1 0.15
 
-sphere -1 -.5 -.5 0.15
-sphere -1 -.5 +.5 0.15
-sphere -1 +.5 +.5 0.15
-sphere -1 +.5 -.5 0.15
+#sphere -1 -.5 -.5 0.15
+#sphere -1 -.5 +.5 0.15
+#sphere -1 +.5 +.5 0.15
+#sphere -1 +.5 -.5 0.15
 
-sphere -.5 -1 -.5 0.15
-sphere -.5 -1 +.5 0.15
-sphere +.5 -1 +.5 0.15
-sphere +.5 -1 -.5 0.15
-sphere  0 -1 0 0.15
+#sphere -.5 -1 -.5 0.15
+#sphere -.5 -1 +.5 0.15
+#sphere +.5 -1 +.5 0.15
+#sphere +.5 -1 -.5 0.15
+#sphere  0 -1 0 0.15
 
-sphere -.5 -.5 -1 0.15
-sphere -.5   0 -1 0.15
-sphere -.5 +.5 -1 0.15
-sphere +.5 -.5 -1 0.15
-sphere +.5   0 -1 0.15
-sphere +.5 +.5 -1 0.15 
+#sphere -.5 -.5 -1 0.15
+#sphere -.5   0 -1 0.15
+#sphere -.5 +.5 -1 0.15
+#sphere +.5 -.5 -1 0.15
+#sphere +.5   0 -1 0.15
+#sphere +.5 +.5 -1 0.15 

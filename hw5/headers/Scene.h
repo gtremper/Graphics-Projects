@@ -1,5 +1,7 @@
-#ifndef SCENE_H
+#ifndef SCENE_H  
 #define SCENE_H
+
+#include "KDTree.h"
 
 class Scene {
 	public:
@@ -15,6 +17,7 @@ class Scene {
 		vec3 eye;
 		std::vector<Shape*> objects;
 		AABB sceneAABB;
+		TreeNode* KDTree;
 		
 		vec3 ambient;
 		vec3 diffuse;

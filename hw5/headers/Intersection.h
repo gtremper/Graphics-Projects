@@ -4,6 +4,7 @@
 
 class Intersection {
 public:
+	Intersection(){primative=NULL;};
 	Intersection(std::vector<Shape*>&, Ray&);
 	Shape* primative;
 	vec3 point;

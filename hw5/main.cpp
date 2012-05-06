@@ -19,6 +19,8 @@
 using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
+	//Intersection hit = scene.KDTree->intersect(ray);
+	
 	Intersection hit = Intersection(scene.objects, ray);
 	if (!hit.primative) {
 		return vec3(0,0,0); //background color
