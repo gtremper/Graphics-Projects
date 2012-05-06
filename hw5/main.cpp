@@ -23,25 +23,30 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	//Intersection hit = scene.KDTree->intersect(ray);
 	
 	Intersection hit = Intersection(scene.objects, ray);
-	if (!hit.primative) {
+	if(!hit.primative) {
 		return vec3(0,0,0); //background color
 	}
 	
 	vec3 color = hit.primative->ambient;
 	color += hit.primative->emission;
-	
 	vec3 normal = hit.primative->getNormal(hit.point);
+	double c1 = -glm::dot(normal, ray.direction);
 	
 	vector<Light*>::iterator light=scene.lights.begin();
 	for(; light!=scene.lights.end(); ++light){
 		color += (*light)->shade(hit,scene.objects,normal);
 	}
 	
-	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction-(2.*normal*glm::dot(normal, ray.direction)));
+	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction+(2.*normal*c1));
 	
-	
-	if (depth != 1){
-		color += (hit.primative->specular*findColor(scene, reflectedRay, --depth));
+	if(depth != 1) {
+		color += (hit.primative->specular * findColor(scene, reflectedRay, --depth));
+		if(hit.primative->refractivity) {
+			double n = 1.000293/hit.primative->refractivity; // first number is the refractive index of air
+			double c2 = sqrt(1 - n*n * (1 - c1*c1));
+			Ray refractedRay = Ray(hit.point+EPSILON*normal, (n*ray.direction) + (n*c1-c2)*normal);
+			color += (hit.primative->refractivity * findColor(scene, refractedRay, --depth));
+		}
 	}
 	return color;
 }
@@ -64,8 +69,8 @@ void raytrace(Scene& scene) {
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
 			for(double a=i; a<i+1; a+=subdivisions) {
-				double randomNum1 = ((double)rand()/(double)RAND_MAX) * subdivisions;
 				for(double b=j; b<j+1; b+=subdivisions) {
+					double randomNum1 = ((double)rand()/(double)RAND_MAX) * subdivisions;
 					double randomNum2 = ((double)rand()/(double)RAND_MAX) * subdivisions;
 					Ray ray = scene.castEyeRay(a + randomNum1,b + randomNum2);
 					color += findColor(scene, ray, scene.maxdepth);
@@ -105,7 +110,7 @@ void raytrace(Scene& scene) {
 			// color += findColor(scene,ray14,scene.maxdepth);
 			// color += findColor(scene,ray15,scene.maxdepth);
 			// color += findColor(scene,ray16,scene.maxdepth);
-			color /= 16;
+			color /= ((1/subdivisions) * (1/subdivisions));
 			
 			rgb.rgbRed = min(color[0],1.0)*255.0;
 			rgb.rgbGreen = min(color[1],1.0)*255.0;

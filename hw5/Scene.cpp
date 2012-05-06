@@ -27,6 +27,8 @@ Scene::Scene(char* file) {
 	specular = vec3(0,0,0);
 	shininess = 0;
 	emission = vec3(0,0,0);
+	refractionIndex = 1;
+	refractivity = 0;
 	constant = 1;
 	linear = 0;
 	quadratic = 0;
@@ -246,6 +248,10 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg2;
 		line>>arg3;
 		emission = vec3(arg1,arg2,arg3);
+	} else if (cmd == "indexofrefraction") {
+		line>>refractionIndex;
+	} else if (cmd == "refractivity") {
+		line>>refractivity;
 	}
 	//cout << cmd << endl;
 }
