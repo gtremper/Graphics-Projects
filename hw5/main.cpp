@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include "omp.h"
+#include <time.h>
 
 #include "FreeImage.h"
 #include "Shapes.h"
@@ -60,8 +61,10 @@ void raytrace(Scene& scene) {
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
 			for(double a=i+.125; a<i+1; a+=.25) {
+				double randomNum1 = ((double)rand()/(double)RAND_MAX) * 0.25;
 				for(double b=j+.125; b<j+1; b+=.25) {
-					Ray ray = scene.castEyeRay(a,b);
+					double randomNum2 = ((double)rand()/(double)RAND_MAX) * 0.25;
+					Ray ray = scene.castEyeRay(a + randomNum1,b + randomNum2);
 					color += findColor(scene, ray, scene.maxdepth);
 				}
 			}
@@ -121,6 +124,7 @@ int main(int argc, char* argv[]){
 		exit(1);
 	}
 	Scene scene(argv[1]);
+	srand(time(0));
 	raytrace(scene);
 	return 0;
 }
