@@ -52,6 +52,7 @@ void raytrace(Scene& scene) {
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	
 	if (!bitmap) exit(1);
+	double subdivisions = .25;
 	
 	#pragma omp parallel for
 	for (int j=0; j<scene.height; j++){
@@ -62,10 +63,10 @@ void raytrace(Scene& scene) {
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
-			for(double a=i+.125; a<i+1; a+=.25) {
-				double randomNum1 = ((double)rand()/(double)RAND_MAX) * 0.25;
-				for(double b=j+.125; b<j+1; b+=.25) {
-					double randomNum2 = ((double)rand()/(double)RAND_MAX) * 0.25;
+			for(double a=i; a<i+1; a+=subdivisions) {
+				double randomNum1 = ((double)rand()/(double)RAND_MAX) * subdivisions;
+				for(double b=j; b<j+1; b+=subdivisions) {
+					double randomNum2 = ((double)rand()/(double)RAND_MAX) * subdivisions;
 					Ray ray = scene.castEyeRay(a + randomNum1,b + randomNum2);
 					color += findColor(scene, ray, scene.maxdepth);
 				}
