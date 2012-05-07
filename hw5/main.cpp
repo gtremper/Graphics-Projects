@@ -35,7 +35,7 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	
 	vector<Light*>::iterator light=scene.lights.begin();
 	for(; light!=scene.lights.end(); ++light){
-		color += (*light)->shade(hit,scene.objects,normal);
+		color += (*light)->shade(hit,*scene.KDTree,normal);
 	}
 	
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction+(2.*normal*c1));
