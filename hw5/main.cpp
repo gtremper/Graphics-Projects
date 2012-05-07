@@ -20,7 +20,6 @@
 using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
-
 	//Intersection hit = scene.KDTree->intersect(ray);
 	
 	Intersection hit = Intersection(scene.objects, ray);
@@ -35,7 +34,7 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	
 	vector<Light*>::iterator light=scene.lights.begin();
 	for(; light!=scene.lights.end(); ++light){
-		color += (*light)->shade(hit,*scene.KDTree,normal);
+		color += (*light)->shade(hit,scene.objects,normal);
 	}
 	
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction+(2.*normal*c1));
@@ -50,7 +49,6 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 		}
 	}
 	return color;
-	
 }
 
 void raytrace(Scene& scene) {
@@ -59,7 +57,6 @@ void raytrace(Scene& scene) {
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	
 	if (!bitmap) exit(1);
-
 	double subdivisions = 4;
 	double subdivide = 1/subdivisions;
 	
@@ -72,11 +69,11 @@ void raytrace(Scene& scene) {
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
-			for(double a=0; a<subdivisions; a+=1) {
-				for(double b=0; b<subdivisions; b+=1) {
+			for(double a=i; a<i+1; a+=subdivide) {
+				for(double b=j; b<j+1; b+=subdivide) {
 					double randomNum1 = ((double)rand()/(double)RAND_MAX) * subdivide;
 					double randomNum2 = ((double)rand()/(double)RAND_MAX) * subdivide;
-					Ray ray = scene.castEyeRay((i+a*subdivide)+randomNum1,(j+b*subdivide)+randomNum2);
+					Ray ray = scene.castEyeRay(a + randomNum1,b + randomNum2);
 					color += findColor(scene, ray, scene.maxdepth);
 				}
 			}
