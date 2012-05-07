@@ -32,16 +32,6 @@ vec3 DirectionalLight::shade(const Intersection& hit, TreeNode& tree, const vec3
 }
 
 bool DirectionalLight::isVisible(const vec3& point, TreeNode& tree) {
-	/*
-	Ray ray(point,direction);
-	vector<Shape*>::const_iterator prim=objects.begin();
-	for(;prim!=objects.end(); ++prim){
-		if ((*prim)->intersect(ray) >= 0.0){
-			return false;
-		}
-	}
-	return true;
-	*/
 	Ray ray(point,direction);
 	Intersection hit = tree.intersect(ray);
 	return hit.primative;
@@ -56,43 +46,51 @@ PointLight::PointLight(const vec3& colour,const vec3& poi, double con, double li
 	quadratic = quad;
 }
 
-vec3 PointLight::shade(const Intersection& hit, TreeNode& tree, const vec3& normal){
-	if( !isVisible(hit.point+EPSILON*normal,tree) ){
-		return vec3(0.0,0.0,0.0);
+vec3 PointLight::shade(const Intersection& hit, TreeNode& tree, const vec3& normal) {
+	double totalshots = 20;
+	int numberOfHits = 0;
+	for(int i =0; i<totalshots; i++){
+		if( isVisible(hit.point+EPSILON*normal,tree) ) {
+			numberOfHits++;
+		}
 	}
+	if (numberOfHits == 0) return vec3(0,0,0);
+
 	vec3 direction = glm::normalize(point-hit.point);
 	vec3 shade = max(0.0,glm::dot(normal,direction)) * hit.primative->diffuse;
-	
+
 	vec3 half = glm::normalize(hit.sourceDirection+direction);
 	double phong = pow( max(0.0,glm::dot(half,normal)) , hit.primative->shininess);
 	shade += phong * hit.primative->specular;
 	shade *= color;
 	double dist = glm::distance(point,hit.point);
 	shade *= 1.0/(constant + linear*dist + quadratic*dist*dist);
-	return shade;
+	
+	return (numberOfHits/totalshots)*shade;
 }
 
 bool PointLight::isVisible(const vec3& p, TreeNode& tree) {
-	/*
-	vec3 direction = glm::normalize(point-p);
+	vec3 randPoint;
+	double radius = 0.0;
+	double randomNum1 = ((double)rand()/(double)RAND_MAX);
+	double randomNum2 = ((double)rand()/(double)RAND_MAX);
+	double q = 2. * M_PI * randomNum1;
+	double f = acos(2. * randomNum2 - 1);
+	randPoint[0] = radius*cos(q)*sin(f);
+	randPoint[1] = radius*sin(q)*sin(f);
+	randPoint[2] = radius*cos(f);
+	
+	randPoint+=point;
+	
+	vec3 direction = glm::normalize(randPoint-p);
 	Ray ray(p,direction);
-	vector<Shape*>::const_iterator prim=objects.begin();
-	double dist = glm::distance(point,p);
-	for(;prim!=objects.end(); ++prim){
-		double t = (*prim)->intersect(ray);
-		if (t >= 0.0 && t<dist ) return false;
-	}
-	return true;
-	*/
-	vec3 direction = glm::normalize(point-p);
-	Ray ray(p,direction);
-	double dist = glm::distance(point,p);
+	double dist = glm::distance(randPoint,p);
 	Intersection hit = tree.intersect(ray);
 	if(hit.primative){
-		if(glm::distance(p,hit.point) > dist){
-			return true;
+		if(glm::distance(p,hit.point) < dist){
+			return false;
 		}
 	}
-	return false;
+	return true;
 }
 
