@@ -27,7 +27,7 @@ class Shape {
 		vec3 specular;
 		double shininess;
 		vec3 emission;
-		double refractionIndex;
+		double indexofrefraction;
 		double refractivity;
 };
 

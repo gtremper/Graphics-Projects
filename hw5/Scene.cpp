@@ -27,7 +27,7 @@ Scene::Scene(char* file) {
 	specular = vec3(0,0,0);
 	shininess = 0;
 	emission = vec3(0,0,0);
-	refractionIndex = 1;
+	indexofrefraction = 1;
 	refractivity = 0;
 	constant = 1;
 	linear = 0;
@@ -123,6 +123,8 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		s->specular = specular;
 		s->shininess = shininess;
 		s->emission = emission;
+		s->indexofrefraction = indexofrefraction;
+		s->refractivity = refractivity;
 		objects.push_back(s);
 	} else if (cmd == "maxverts") {
 		int maxverts;
@@ -168,6 +170,8 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		t->specular = specular;
 		t->shininess = shininess;
 		t->emission = emission;
+		t->indexofrefraction = indexofrefraction;
+		t->refractivity = refractivity;
 		objects.push_back(t);
 	} else if(cmd == "trinormal") {
 		int a1,a2,a3;
@@ -186,6 +190,8 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		t->specular = specular;
 		t->shininess = shininess;
 		t->emission = emission;
+		t->indexofrefraction = indexofrefraction;
+		t->refractivity = refractivity;
 		objects.push_back(t);
 	} else if(cmd == "translate") {
 		double arg1,arg2,arg3;
@@ -249,7 +255,7 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line>>arg3;
 		emission = vec3(arg1,arg2,arg3);
 	} else if (cmd == "indexofrefraction") {
-		line>>refractionIndex;
+		line>>indexofrefraction;
 	} else if (cmd == "refractivity") {
 		line>>refractivity;
 	}

@@ -5,7 +5,7 @@
 #include <stack>
 #include <string>
 #include <vector>
-#include "omp.h"
+// #include "omp.h"
 #include <time.h>
 
 #include "FreeImage.h"
@@ -40,12 +40,15 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction+(2.*normal*c1));
 	
 	if(depth != 1) {
-		color += (hit.primative->specular * findColor(scene, reflectedRay, --depth));
+		color += (hit.primative->specular * findColor(scene, reflectedRay, depth-1));
 		if(hit.primative->refractivity) {
-			double n = 1.000293/hit.primative->refractivity; // first number is the refractive index of air
+			double n = 1.000293/hit.primative->indexofrefraction; // first number is the refractive index of air
 			double c2 = sqrt(1 - n*n * (1 - c1*c1));
-			Ray refractedRay = Ray(hit.point+EPSILON*normal, (n*ray.direction) + (n*c1-c2)*normal);
-			color += (hit.primative->refractivity * findColor(scene, refractedRay, --depth));
+			Ray refractedRay = Ray(hit.point+EPSILON*ray.direction, (n*ray.direction) + (n*c1-c2)*normal);
+			color += (hit.primative->refractivity * findColor(scene, refractedRay, depth-1));
+			// cout << "refractivity: " << hit.primative->refractivity << endl;
+			// Ray refractedRay = Ray(hit.point+EPSILON*ray.direction,ray.direction);
+			// color += 0.5*findColor(scene,refractedRay,--depth);
 		}
 	}
 	return color;
@@ -59,12 +62,12 @@ void raytrace(Scene& scene) {
 	if (!bitmap) exit(1);
 	double subdivisions = .25;
 	
-	#pragma omp parallel for
+	// #pragma omp parallel for
 	for (int j=0; j<scene.height; j++){
-		int tid = omp_get_thread_num();
-		if(tid == 0) {
-		   clog << "Progress: "<< (j*100*omp_get_num_threads())/scene.height <<"%"<<"\r";
-		}
+		// int tid = omp_get_thread_num();
+		// if(tid == 0) {
+		//    clog << "Progress: "<< (j*100*omp_get_num_threads())/scene.height <<"%"<<"\r";
+		// }
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
