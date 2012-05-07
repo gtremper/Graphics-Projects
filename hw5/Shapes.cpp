@@ -74,6 +74,19 @@ vec3 Triangle::getNormal(vec3& hit){
 	return n0;
 }
 
+vec3 Triangle::getTexture(vec3& hit){
+	mat2 M = mat2(p1[0]-p0[0], p1[1]-p0[1], p2[0]-p0[0], p2[1]-p0[1]);
+	double det = glm::determinant(M);
+	M[0][0] = hit[0]-p0[0];
+	M[0][1] = hit[1]-p0[1];
+	double alpha = glm::determinant(M)/det;//p0 to p1
+	M[0][0] = p1[0]-p0[0];
+	M[0][1] = p1[1]-p0[1];
+	M[1][0] = hit[0]-p0[0];
+	M[1][1] = hit[1]-p0[1];
+	double beta = glm::determinant(M)/det;//p0 to p2
+}
+
 /***  NORMTRIANGLE  ***/
 NormTriangle::NormTriangle(vec3 point0, vec3 point1, vec3 point2,
 							vec3 norm0, vec3 norm1, vec3 norm2) {

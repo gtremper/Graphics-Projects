@@ -57,7 +57,7 @@ void raytrace(Scene& scene) {
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	
 	if (!bitmap) exit(1);
-	int subdivisions = 4;
+	double subdivisions = 4;
 	double subdivide = 1/subdivisions;
 	
 	#pragma omp parallel for

@@ -18,8 +18,10 @@ class Shape {
 	public:
 		virtual double intersect(Ray&)=0;
 		virtual vec3 getNormal(vec3&)=0;
+		virtual vec3 getTexture(vec3&){};
 		
 		AABB aabb;
+		bool hasTexture;
 		
 		/* material properties */
 		vec3 ambient;
@@ -46,6 +48,7 @@ class Triangle : public Shape {
 		Triangle(vec3,vec3,vec3);
 		double intersect(Ray&);
 		virtual vec3 getNormal(vec3&);
+		vec3 getTexture(vec3&);
 	
 		vec3 p0;
 		vec3 p1;
