@@ -100,6 +100,26 @@ vec3 NormTriangle::getNormal(vec3& hit){
 }
 
 /***  SPHERE  ***/
+Sphere::Sphere(mat4 trans){
+	mv = trans;
+	inv = glm::inverse(mv);
+	
+	/*Bounding Box*/
+	mat4 S = mat4(1.0);
+	S[3][3] = -1;
+	mat4 R = mv*S*glm::transpose(mv);
+	double minx = (R[0][3]+sqrt(R[0][3]*R[0][3] -R[3][3]*R[0][0]))/R[3][3];
+	double maxx = (R[0][3]-sqrt(R[0][3]*R[0][3] -R[3][3]*R[0][0]))/R[3][3];
+	double miny = (R[1][3]+sqrt(R[1][3]*R[1][3] -R[3][3]*R[1][1]))/R[3][3];
+	double maxy = (R[1][3]-sqrt(R[1][3]*R[1][3] -R[3][3]*R[1][1]))/R[3][3];
+	double minz = (R[2][3]+sqrt(R[2][3]*R[2][3] -R[3][3]*R[2][2]))/R[3][3];
+	double maxz = (R[2][3]-sqrt(R[2][3]*R[2][3] -R[3][3]*R[2][2]))/R[3][3];
+	aabb = AABB(minx,maxx,miny,maxy,minz,maxz);
+	cout<<"SphereAABB: "<<minx<<" "<<maxx<<" "<<miny<<" "<<maxy<<" "<<minz<<" "<<maxz<<endl;
+}
+
+
+
 double Sphere::intersect(Ray& ray) {
 	vec3 direction = glm::normalize(vec3(inv * vec4(ray.direction,0)));
 	vec3 origin =vec3(inv * vec4(ray.origin,1));
@@ -141,7 +161,7 @@ AABB::AABB(double minx, double maxx, double miny, double maxy, double minz, doub
 	center[2] = (minz + maxz)/2.0;
 }
 
-bool intersect1D(double start, double dir, double axisMin, double axisMax, double& enter, double& ex){
+bool intersect1D(double start, double dir, double axisMin, double axisMax, double& near, double& far){
 	// Parallel
 	if(dir<EPSILON && dir>-EPSILON){
 		return (start>=axisMin && start<=axisMax);
@@ -152,26 +172,31 @@ bool intersect1D(double start, double dir, double axisMin, double axisMax, doubl
 	double t1 = (axisMax-start)/dir;
 	
 	if(t0>t1){
-		double temp = t0;
+		double temp = t1;
 		t1 = t0;
 		t0 = temp;
 	}
 	
-	if(t0>ex || t1<enter) return false;
+	near = max(t0,near);
+	far = min(t1,far);
 	
-	t0 = max(t0,enter);
-	t1 = min(t1,ex);
+	if(near>far || near<0.0) return false;
 	
 	return true;
 }
 
 bool AABB::intersect(Ray& ray){
-	double ex = 999999999999;
-	double enter = -999999999;
+	if(ray.origin[0]>bounds[0] && ray.origin[0]<bounds[1] &&ray.origin[1]>bounds[2] &&
+	ray.origin[1]<bounds[3] &&ray.origin[2]>bounds[4] &&ray.origin[2]<bounds[5]){
+		return true;	
+	}
 	
-	if (!intersect1D(ray.origin[0],ray.direction[0],bounds[0],bounds[1],enter,ex)) return false;
-	if (!intersect1D(ray.origin[1],ray.direction[1],bounds[2],bounds[3],enter,ex)) return false;
-	if (!intersect1D(ray.origin[2],ray.direction[2],bounds[4],bounds[5],enter,ex)) return false;
+	double far = DBL_MAX;
+	double near = DBL_MIN;
+	
+	if (!intersect1D(ray.origin[0],ray.direction[0],bounds[0],bounds[1],near,far)) return false;
+	if (!intersect1D(ray.origin[1],ray.direction[1],bounds[2],bounds[3],near,far)) return false;
+	if (!intersect1D(ray.origin[2],ray.direction[2],bounds[4],bounds[5],near,far)) return false;
 	
 	return true;
 }

@@ -32,8 +32,13 @@ Scene::Scene(char* file) {
 	quadratic = 0;
 	sceneAABB = AABB(DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN);
 	parse(file);
-	cout << "ORIGNIAL SIZE: "<<objects.size()<<endl;
+	
+	cout<<"AABB: "<<sceneAABB.bounds[0]<<" "<<sceneAABB.bounds[1]<<" "<<sceneAABB.bounds[2]<<" "<<sceneAABB.bounds[3]<<" "<<sceneAABB.bounds[4]<<" "<<sceneAABB.bounds[5]<<endl;
+	
+	clog << "Constructing KDTree... "<<endl;
+	cout << "Original size: "<<objects.size()<<endl;
 	KDTree = new TreeNode(objects,0,sceneAABB);
+	clog << "done"<<endl;
 }
 
 Scene::~Scene() {
@@ -114,14 +119,18 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		mat4 trans = mv.top();
 		trans *= Transform::translate(arg1,arg2,arg3);
 		trans *= Transform::scale(arg4,arg4,arg4);
-		Sphere* s = new Sphere();
-		s->mv = trans;
-		s->inv = glm::inverse(trans);
+		Sphere* s = new Sphere(trans);
+		sceneAABB.bounds[0] = min(s->aabb.bounds[0],sceneAABB.bounds[0]);
+		sceneAABB.bounds[1] = max(s->aabb.bounds[1],sceneAABB.bounds[1]);
+		sceneAABB.bounds[2] = min(s->aabb.bounds[2],sceneAABB.bounds[2]);
+		sceneAABB.bounds[3] = max(s->aabb.bounds[3],sceneAABB.bounds[3]);
+		sceneAABB.bounds[4] = min(s->aabb.bounds[4],sceneAABB.bounds[4]);
+		sceneAABB.bounds[5] = max(s->aabb.bounds[5],sceneAABB.bounds[5]);
 		s->ambient = ambient;
 		s->diffuse = diffuse;
 		s->specular = specular;
 		s->shininess = shininess;
-		s->emission = emission;
+		s->emission = emission;	
 		objects.push_back(s);
 	} else if (cmd == "maxverts") {
 		int maxverts;

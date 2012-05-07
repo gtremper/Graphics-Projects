@@ -1,5 +1,8 @@
 /* Class definitions for KDTree acceleration structure */
 
+#ifndef KDTREE_H
+#define KDTREE_H
+
 class TreeNode {
 public:
 	TreeNode(std::vector<Shape*>&,int,AABB&);
@@ -12,4 +15,6 @@ public:
 	int axis;
 	double split;
 };
+
+#endif
 

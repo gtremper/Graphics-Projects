@@ -31,6 +31,7 @@ class Shape {
 
 class Sphere : public Shape {
 	public:
+		Sphere(mat4);
 		double intersect(Ray&);
 		vec3 getNormal(vec3&);
 	

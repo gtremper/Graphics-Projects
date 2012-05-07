@@ -7,7 +7,7 @@
 #include "Intersection.h"
 #include "Light.h"
 
-#define EPSILON 0.0001
+#define EPSILON 0.00000001
 
 using namespace std;
 
@@ -18,8 +18,8 @@ DirectionalLight::DirectionalLight(const vec3& c,const vec3& dir) {
 	direction = glm::normalize(dir);
 }
 
-vec3 DirectionalLight::shade(const Intersection& hit, const vector<Shape*>& objects, const vec3& normal){
-	if(!isVisible(hit.point+EPSILON*normal,objects)) {
+vec3 DirectionalLight::shade(const Intersection& hit, TreeNode& tree, const vec3& normal){
+	if(!isVisible(hit.point+EPSILON*normal,tree)) {
 		return vec3(0.0,0.0,0.0);
 	}
 	vec3 shade = max(0.0,glm::dot(normal,direction)) * hit.primative->diffuse;
@@ -31,7 +31,8 @@ vec3 DirectionalLight::shade(const Intersection& hit, const vector<Shape*>& obje
 	return shade;
 }
 
-bool DirectionalLight::isVisible(const vec3& point, const vector<Shape*>& objects) {
+bool DirectionalLight::isVisible(const vec3& point, TreeNode& tree) {
+	/*
 	Ray ray(point,direction);
 	vector<Shape*>::const_iterator prim=objects.begin();
 	for(;prim!=objects.end(); ++prim){
@@ -40,6 +41,10 @@ bool DirectionalLight::isVisible(const vec3& point, const vector<Shape*>& object
 		}
 	}
 	return true;
+	*/
+	Ray ray(point,direction);
+	Intersection hit = tree.intersect(ray);
+	return hit.primative;
 }
 
 /***  Point Light  ***/
@@ -51,8 +56,8 @@ PointLight::PointLight(const vec3& colour,const vec3& poi, double con, double li
 	quadratic = quad;
 }
 
-vec3 PointLight::shade(const Intersection& hit, const vector<Shape*>& objects, const vec3& normal){
-	if( !isVisible(hit.point+EPSILON*normal,objects) ){
+vec3 PointLight::shade(const Intersection& hit, TreeNode& tree, const vec3& normal){
+	if( !isVisible(hit.point+EPSILON*normal,tree) ){
 		return vec3(0.0,0.0,0.0);
 	}
 	vec3 direction = glm::normalize(point-hit.point);
@@ -67,7 +72,8 @@ vec3 PointLight::shade(const Intersection& hit, const vector<Shape*>& objects, c
 	return shade;
 }
 
-bool PointLight::isVisible(const vec3& p, const vector<Shape*>& objects) {
+bool PointLight::isVisible(const vec3& p, TreeNode& tree) {
+	/*
 	vec3 direction = glm::normalize(point-p);
 	Ray ray(p,direction);
 	vector<Shape*>::const_iterator prim=objects.begin();
@@ -77,5 +83,16 @@ bool PointLight::isVisible(const vec3& p, const vector<Shape*>& objects) {
 		if (t >= 0.0 && t<dist ) return false;
 	}
 	return true;
+	*/
+	vec3 direction = glm::normalize(point-p);
+	Ray ray(p,direction);
+	double dist = glm::distance(point,p);
+	Intersection hit = tree.intersect(ray);
+	if(hit.primative){
+		if(glm::distance(p,hit.point) > dist){
+			return true;
+		}
+	}
+	return false;
 }
 

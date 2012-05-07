@@ -20,6 +20,7 @@
 using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
+
 	//Intersection hit = scene.KDTree->intersect(ray);
 	
 	Intersection hit = Intersection(scene.objects, ray);
@@ -34,7 +35,7 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	
 	vector<Light*>::iterator light=scene.lights.begin();
 	for(; light!=scene.lights.end(); ++light){
-		color += (*light)->shade(hit,scene.objects,normal);
+		color += (*light)->shade(hit,*scene.KDTree,normal);
 	}
 	
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction-(2.*normal*glm::dot(normal, ray.direction)));
@@ -44,6 +45,7 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 		color += (hit.primative->specular*findColor(scene, reflectedRay, --depth));
 	}
 	return color;
+	
 }
 
 void raytrace(Scene& scene) {
@@ -52,6 +54,7 @@ void raytrace(Scene& scene) {
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	
 	if (!bitmap) exit(1);
+	double subdivisions = 0.5;
 	
 	#pragma omp parallel for
 	for (int j=0; j<scene.height; j++){
@@ -62,16 +65,16 @@ void raytrace(Scene& scene) {
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
-			for(double a=i; a<i+1; a+=.25) {
-				double randomNum1 = ((double)rand()/(double)RAND_MAX) * 0.25;
-				for(double b=j; b<j+1; b+=.25) {
-					double randomNum2 = ((double)rand()/(double)RAND_MAX) * 0.25;
+			for(double a=i; a<i+1; a+=subdivisions) {
+				for(double b=j; b<j+1; b+=subdivisions) {
+					double randomNum1 = ((double)rand()/(double)RAND_MAX) * subdivisions;
+					double randomNum2 = ((double)rand()/(double)RAND_MAX) * subdivisions;
 					Ray ray = scene.castEyeRay(a + randomNum1,b + randomNum2);
 					color += findColor(scene, ray, scene.maxdepth);
 				}
 			}
 
-			color /= 16;
+			color /= 4;
 			
 			rgb.rgbRed = min(color[0],1.0)*255.0;
 			rgb.rgbGreen = min(color[1],1.0)*255.0;
