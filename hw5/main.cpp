@@ -60,7 +60,7 @@ void raytrace(Scene& scene) {
 	
 	if (!bitmap) exit(1);
 
-	double subdivisions = 4;
+	double subdivisions = 2;
 	double subdivide = 1/subdivisions;
 	
 	#pragma omp parallel for

@@ -129,7 +129,6 @@ Sphere::Sphere(mat4 trans){
 	double minz = (R[2][3]+sqrt(R[2][3]*R[2][3] -R[3][3]*R[2][2]))/R[3][3];
 	double maxz = (R[2][3]-sqrt(R[2][3]*R[2][3] -R[3][3]*R[2][2]))/R[3][3];
 	aabb = AABB(minx,maxx,miny,maxy,minz,maxz);
-	cout<<"SphereAABB: "<<minx<<" "<<maxx<<" "<<miny<<" "<<maxy<<" "<<minz<<" "<<maxz<<endl;
 }
 
 

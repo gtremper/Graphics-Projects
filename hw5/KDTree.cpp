@@ -33,21 +33,21 @@ TreeNode::TreeNode(vector<Shape*>& prims, int ax, AABB& bigBox){
 	vector<Shape*> leftPrims;
 	vector<Shape*>::iterator it=prims.begin();
 	for(;it!=prims.end(); ++it){
-		if((*it)->aabb.bounds[2*axis]<(split+EPSILON)){
+		if((*it)->aabb.bounds[2*axis]<(split)){
 			leftPrims.push_back(*it);
 		}
 	}
 	
 	vector<Shape*> rightPrims;
 	for(it=prims.begin(); it!=prims.end(); ++it){
-		if((*it)->aabb.bounds[2*axis+1]>(split-EPSILON)){
+		if((*it)->aabb.bounds[2*axis+1]>(split)){
 			rightPrims.push_back(*it);
 		}
 	}
 	
 	cout << "LEFTSIZE: " <<leftPrims.size()<<endl;
 	cout << "RIGHTSIZE: " <<rightPrims.size()<<endl;
-	
+	//if(prims.size()<=TREELIMIT){
 	if(leftPrims.size()==prims.size() || rightPrims.size()==prims.size() || prims.size()<=TREELIMIT){
 		left = NULL;
 		right = NULL;
@@ -56,10 +56,10 @@ TreeNode::TreeNode(vector<Shape*>& prims, int ax, AABB& bigBox){
 		cout << "Size: "<<prims.size()<<endl;
 	}else{
 		AABB leftAABB = AABB(aabb.bounds[0],aabb.bounds[1],aabb.bounds[2],aabb.bounds[3],aabb.bounds[4],aabb.bounds[5]);
-		leftAABB.bounds[2*axis+1] = split+EPSILON;
+		leftAABB.bounds[2*axis+1] = split;
 		
 		AABB rightAABB = AABB(aabb.bounds[0],aabb.bounds[1],aabb.bounds[2],aabb.bounds[3],aabb.bounds[4],aabb.bounds[5]);
-		rightAABB.bounds[2*axis] = split-EPSILON;
+		rightAABB.bounds[2*axis] = split;
 		
 		int newAxis = (axis+1)%3;
 		left = new TreeNode(leftPrims, newAxis, leftAABB);
@@ -80,7 +80,7 @@ Intersection TreeNode::intersect(Ray& ray){
 		//cout << "HIT BOX"<<endl;
 		return Intersection(primatives,ray);
 	}
-	if(ray.origin[axis]<(split+EPSILON)){
+	if(ray.origin[axis]<(split)){
 		if(left->aabb.intersect(ray)){
 			//cout <<"1st left"<<endl;
 			Intersection hit = left->intersect(ray);
