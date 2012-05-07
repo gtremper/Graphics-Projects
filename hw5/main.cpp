@@ -5,7 +5,7 @@
 #include <stack>
 #include <string>
 #include <vector>
-// #include "omp.h"
+#include "omp.h"
 #include <time.h>
 
 #include "FreeImage.h"
@@ -46,9 +46,6 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 			double c2 = sqrt(1 - n*n * (1 - c1*c1));
 			Ray refractedRay = Ray(hit.point+EPSILON*ray.direction, (n*ray.direction) + (n*c1-c2)*normal);
 			color += (hit.primative->refractivity * findColor(scene, refractedRay, depth-1));
-			// cout << "refractivity: " << hit.primative->refractivity << endl;
-			// Ray refractedRay = Ray(hit.point+EPSILON*ray.direction,ray.direction);
-			// color += 0.5*findColor(scene,refractedRay,--depth);
 		}
 	}
 	return color;
@@ -60,60 +57,27 @@ void raytrace(Scene& scene) {
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	
 	if (!bitmap) exit(1);
-	double subdivisions = .25;
+	int subdivisions = 4;
+	double subdivide = 1/subdivisions;
 	
-	// #pragma omp parallel for
+	#pragma omp parallel for
 	for (int j=0; j<scene.height; j++){
-		// int tid = omp_get_thread_num();
-		// if(tid == 0) {
-		//    clog << "Progress: "<< (j*100*omp_get_num_threads())/scene.height <<"%"<<"\r";
-		// }
+		int tid = omp_get_thread_num();
+		if(tid == 0) {
+		   clog << "Progress: "<< (j*100*omp_get_num_threads())/scene.height <<"%"<<"\r";
+		}
 		RGBQUAD rgb;
 		for (int i=0; i<scene.width; i++) {
 			vec3 color;
-			for(double a=i; a<i+1; a+=subdivisions) {
-				for(double b=j; b<j+1; b+=subdivisions) {
-					double randomNum1 = ((double)rand()/(double)RAND_MAX) * subdivisions;
-					double randomNum2 = ((double)rand()/(double)RAND_MAX) * subdivisions;
+			for(double a=i; a<i+1; a+=subdivide) {
+				for(double b=j; b<j+1; b+=subdivide) {
+					double randomNum1 = ((double)rand()/(double)RAND_MAX) * subdivide;
+					double randomNum2 = ((double)rand()/(double)RAND_MAX) * subdivide;
 					Ray ray = scene.castEyeRay(a + randomNum1,b + randomNum2);
 					color += findColor(scene, ray, scene.maxdepth);
 				}
 			}
-			
-			// Ray ray1 = scene.castEyeRay(i+.125,j+.125);
-			// Ray ray2 = scene.castEyeRay(i+.125,j+.375);
-			// Ray ray3 = scene.castEyeRay(i+.125,j+.625);
-			// Ray ray4 = scene.castEyeRay(i+.125,j+.875);
-			// Ray ray5 = scene.castEyeRay(i+.375,j+.125);
-			// Ray ray6 = scene.castEyeRay(i+.375,j+.375);
-			// Ray ray7 = scene.castEyeRay(i+.375,j+.625);
-			// Ray ray8 = scene.castEyeRay(i+.375,j+.875);
-			// Ray ray9 = scene.castEyeRay(i+.625,j+.125);
-			// Ray ray10 = scene.castEyeRay(i+.625,j+.375);
-			// Ray ray11 = scene.castEyeRay(i+.625,j+.625);
-			// Ray ray12 = scene.castEyeRay(i+.625,j+.875);
-			// Ray ray13 = scene.castEyeRay(i+.875,j+.125);
-			// Ray ray14 = scene.castEyeRay(i+.875,j+.375);
-			// Ray ray15 = scene.castEyeRay(i+.875,j+.625);
-			// Ray ray16 = scene.castEyeRay(i+.875,j+.875);
-			// 
-			// vec3 color = findColor(scene,ray1,scene.maxdepth);
-			// color += findColor(scene,ray2,scene.maxdepth);
-			// color += findColor(scene,ray3,scene.maxdepth);
-			// color += findColor(scene,ray4,scene.maxdepth);
-			// color += findColor(scene,ray5,scene.maxdepth);
-			// color += findColor(scene,ray6,scene.maxdepth);
-			// color += findColor(scene,ray7,scene.maxdepth);
-			// color += findColor(scene,ray8,scene.maxdepth);
-			// color += findColor(scene,ray9,scene.maxdepth);
-			// color += findColor(scene,ray10,scene.maxdepth);
-			// color += findColor(scene,ray11,scene.maxdepth);
-			// color += findColor(scene,ray12,scene.maxdepth);
-			// color += findColor(scene,ray13,scene.maxdepth);
-			// color += findColor(scene,ray14,scene.maxdepth);
-			// color += findColor(scene,ray15,scene.maxdepth);
-			// color += findColor(scene,ray16,scene.maxdepth);
-			color /= ((1/subdivisions) * (1/subdivisions));
+			color /= (subdivisions * subdivisions);
 			
 			rgb.rgbRed = min(color[0],1.0)*255.0;
 			rgb.rgbGreen = min(color[1],1.0)*255.0;
