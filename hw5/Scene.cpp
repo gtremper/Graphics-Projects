@@ -35,11 +35,10 @@ Scene::Scene(char* file) {
 	sceneAABB = AABB(DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN);
 	parse(file);
 	
-	cout<<"AABB: "<<sceneAABB.bounds[0]<<" "<<sceneAABB.bounds[1]<<" "<<sceneAABB.bounds[2]<<" "<<sceneAABB.bounds[3]<<" "<<sceneAABB.bounds[4]<<" "<<sceneAABB.bounds[5]<<endl;
+	//cout<<"AABB: "<<sceneAABB.bounds[0]<<" "<<sceneAABB.bounds[1]<<" "<<sceneAABB.bounds[2]<<" "<<sceneAABB.bounds[3]<<" "<<sceneAABB.bounds[4]<<" "<<sceneAABB.bounds[5]<<endl;
 	
-	clog << "Constructing KDTree... "<<endl;
-	cout << "Original size: "<<objects.size()<<endl;
-	KDTree = new TreeNode(objects,0,sceneAABB);
+	clog << "Constructing KDTree... ";
+	KDTree = new TreeNode(objects,0,sceneAABB,false);
 	clog << "done"<<endl;
 }
 
