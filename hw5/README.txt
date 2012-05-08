@@ -17,5 +17,3 @@ The added commands for the scene files are:
 	-lightradius (for the size of the area light)
 
 To render a scene, simply call "raytracer" with the scene file as the argument.
-
-The bug we still have is with the KD-tree. In the tree traversal, some objects do not get added to a subdivision making that object, or parts of that object, disappear. It only happens occasionally though. We know that it is a floating point precision error because it only occurs on edge cases when the object lies on both sides of the subdivision. We know that the object is in the tree because it appears when rendering from different angles, or splitting down different axes.
