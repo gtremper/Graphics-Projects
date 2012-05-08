@@ -1,4 +1,4 @@
-size 500 500
+size 300 300
 camera 0 0 -5 0 0 0 0 1 0 36.87
 
 
@@ -6,32 +6,35 @@ camera 0 0 -5 0 0 0 0 1 0 36.87
 
 point 0 5 -1 1.0 1.0 1.0
 
-ambient 0.1  0.1  0.1
-diffuse 1.0 0.0 1.0
-specular 1.0 1.0 1.0
-shininess 50
-translate 0 0 -1
-#sphere 0 0 0 1
 
-
+refractivity 1
+indexofrefraction 1.2
 
 ambient 0.1  0.1  0.1
 diffuse 1.0 0.0 1.0
 specular 1.0 1.0 1.0
 shininess 50
-sphere 0 0 -20 3.0
+sphere 0 0 0 1
+
+
+
+ambient 0.1  0.1  0.1
+diffuse 1.0 0.0 1.0
+specular 1.0 1.0 1.0
+shininess 50
+#sphere 0 0 -20 3.0
 
 ambient 0.1  0.1  0.1
 diffuse 1.0 1.0 0.0
 specular 1.0 1.0 1.0
 shininess 50
-sphere -2.0 2.0 -15.0 1.0
+#sphere -2.0 2.0 -15.0 1.0
 	
 ambient 0.1  0.1  0.1
 diffuse 0 1.0 1.0
 specular 1.0 1.0 1.0
 shininess 50
-sphere -2.0 -2.0 -15.0 1.0
+#sphere -2.0 -2.0 -15.0 1.0
 	
 ambient 0.1  0.1  0.1
 diffuse 0 1.0 1.0
@@ -42,5 +45,5 @@ vertex 5 5 -17
 vertex 1 4 -20
 vertex 6 -1 -20
 	    
-tri 0 1 2
+#tri 0 1 2
 

@@ -177,7 +177,7 @@ AABB::AABB(double minx, double maxx, double miny, double maxy, double minz, doub
 bool intersect1D(double start, double dir, double axisMin, double axisMax, double& near, double& far){
 	// Parallel
 	if(dir<EPSILON && dir>-EPSILON){
-		return (start>=axisMin && start<=axisMax);
+		return (start>axisMin-EPSILON && start<axisMax+EPSILON);
 	}
 	
 	//intersection parameters
@@ -193,7 +193,7 @@ bool intersect1D(double start, double dir, double axisMin, double axisMax, doubl
 	near = max(t0,near);
 	far = min(t1,far);
 	
-	if(near>far || near<0.0) return false;
+	if(near>far) return false;
 	
 	return true;
 }

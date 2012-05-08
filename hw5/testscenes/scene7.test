@@ -8,9 +8,9 @@ diffuse 0 0 0
 ambient 0 0 0
 shininess 1
 specular 0 0 0
-indexofrefraction 1
+indexofrefraction 1.1
 refractivity 1
-#sphere 0 5 10 1
+#sphere 0 5 13.5 1
 refractivity 0
 
 

@@ -24,6 +24,8 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Intersection hit = scene.KDTree->intersect(ray);
 
 	//Intersection hit = Intersection(scene.objects, ray);
+	
+	
 	if(!hit.primative) {
 		return vec3(0,0,0); //background color
 	}
@@ -41,12 +43,18 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction+(2.*normal*c1));
 	
 	if(depth != 1) {
-		color += (hit.primative->specular * findColor(scene, reflectedRay, depth-1));
+		color += hit.primative->specular * findColor(scene, reflectedRay, depth-1);
 		if(hit.primative->refractivity) {
-			double n = 1.000293/hit.primative->indexofrefraction; // first number is the refractive index of air
+			
+			double n = 1.0/hit.primative->indexofrefraction; // first number is the refractive index of air
 			double c2 = sqrt(1 - n*n * (1 - c1*c1));
-			Ray refractedRay = Ray(hit.point+EPSILON*ray.direction, (n*ray.direction) + (n*c1-c2)*normal);
-			color += (hit.primative->refractivity * findColor(scene, refractedRay, depth-1));
+			Ray refractedRay = Ray(hit.point, -glm::normalize((n*ray.direction) + (n*c1-c2)*normal));
+			if(c1>0.0){
+				refractedRay.origin -= EPSILON*normal;
+			} else {
+				refractedRay.origin += EPSILON*normal;
+			}
+			color += hit.primative->refractivity * findColor(scene, refractedRay, depth-1);
 		}
 	}
 	return color;
@@ -58,7 +66,7 @@ void raytrace(Scene& scene) {
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	
 	if (!bitmap) exit(1);
-	double subdivisions = 1;
+	double subdivisions = 2;
 	double subdivide = 1/subdivisions;
 	
 	#pragma omp parallel for
