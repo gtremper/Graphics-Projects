@@ -29,8 +29,8 @@ public:
 	double constant;
 	double linear;
 	double quadratic;
-	double radius;
-	int shadowRays;
+	double lightradius;
+	int shadowrays;
 };
 
 #endif

@@ -241,6 +241,8 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		line >> x >> y >> z >> r >> g >> b;
 		vec3 point = vec3(mv.top()*vec4(x,y,z,1.0));
 		PointLight* light = new PointLight(vec3(r,g,b),vec3(x,y,z),constant,linear,quadratic);
+		light->shadowrays = shadowrays;
+		light->lightradius = lightradius;
 		lights.push_back(light);
 	} else if (cmd == "attenuation") {
 		line >> constant >> linear >> quadratic;
@@ -250,28 +252,28 @@ void Scene::parseLine(string l, stack<mat4>& mv, vector<vec3>& verts,
 		ambient = vec3(arg1,arg2,arg3);
 	} else if (cmd == "diffuse") {
 		double arg1, arg2, arg3;
-		line>>arg1;
-		line>>arg2;
-		line>>arg3;
+		line >> arg1 >> arg2 >> arg3;
 		diffuse = vec3(arg1,arg2,arg3);
 	} else if (cmd == "specular") {
 		double arg1, arg2, arg3;
-		line>>arg1;
-		line>>arg2;
-		line>>arg3;
+		line >> arg1 >> arg2 >> arg3;
 		specular = vec3(arg1,arg2,arg3);
 	} else if (cmd == "shininess") {
-		line>>shininess;
+		line >> shininess;
 	} else if (cmd == "emission") {
 		double arg1, arg2, arg3;
-		line>>arg1;
-		line>>arg2;
-		line>>arg3;
+		line >> arg1 >> arg2 >> arg3;
 		emission = vec3(arg1,arg2,arg3);
 	} else if (cmd == "indexofrefraction") {
-		line>>indexofrefraction;
+		line >> indexofrefraction;
 	} else if (cmd == "refractivity") {
-		line>>refractivity;
+		line >> refractivity;
+	} else if (cmd == "antialias") {
+		line >> antialias;
+	} else if (cmd == "shadowrays") {
+		line >> shadowrays;
+	} else if (cmd == "lightradius") {
+		line >> lightradius;
 	}
 	//cout << cmd << endl;
 }
