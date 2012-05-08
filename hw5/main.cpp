@@ -21,13 +21,7 @@ using namespace std;
 
 vec3 findColor(Scene& scene, Ray& ray, int depth) {
 
-	// Intersection hit = scene.KDTree->intersect(ray);
-	
-	if (depth ==3){
-		cout << "derasdfasdf"<<endl;
-	}
-	
-	Intersection hit = Intersection(scene.objects, ray);
+	Intersection hit = scene.KDTree->intersect(ray);
 	
 	if(!hit.primative) {
 		return vec3(0,0,0); //background color
@@ -46,13 +40,13 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction+(2.*normal*c1));
 	
 	if(depth != 1) {
-		//color += hit.primative->specular * findColor(scene, reflectedRay, depth-1);
+		color += hit.primative->specular * findColor(scene, reflectedRay, depth-1);
 		if(hit.primative->refractivity) {
 			double n;
 			if(c1 > 0.0) {
-				n = 1.0/hit.primative->indexofrefraction; // 1.0 is the refractive index of a vacuum
+				n = 1.003/hit.primative->indexofrefraction; // 1.009 is the refractive index of a vacuum
 			} else {
-				n = hit.primative->indexofrefraction;
+				n = hit.primative->indexofrefraction/1.003;
 			}
 			
 			double c2 = sqrt(1 - n*n * (1 - c1*c1));
@@ -60,6 +54,7 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 			if(c1>0.0){
 				refractedRay.origin -= EPSILON*normal;
 			} else {
+				refractedRay.direction = -refractedRay.direction;
 				refractedRay.origin += EPSILON*normal;
 			}
 			color += hit.primative->refractivity * findColor(scene, refractedRay, depth-1);
@@ -84,7 +79,7 @@ void raytrace(Scene& scene) {
 		   clog << "Progress: "<< (j*100*omp_get_num_threads())/scene.height <<"%"<<"\r";
 		}
 		RGBQUAD rgb;
-		for (int i=0; i<scene.width; i++) {
+		for (int i=0; i<scene.width; i++) {			
 			vec3 color;
 			for(double a=0; a<subdivisions; a+=1) {
 				for(double b=0; b<subdivisions; b+=1) {

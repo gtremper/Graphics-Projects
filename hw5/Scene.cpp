@@ -38,11 +38,8 @@ Scene::Scene(char* file) {
 	quadratic = 0;
 	sceneAABB = AABB(DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN,DBL_MAX,DBL_MIN);
 	parse(file);
-	
-	//cout<<"AABB: "<<sceneAABB.bounds[0]<<" "<<sceneAABB.bounds[1]<<" "<<sceneAABB.bounds[2]<<" "<<sceneAABB.bounds[3]<<" "<<sceneAABB.bounds[4]<<" "<<sceneAABB.bounds[5]<<endl;
-	
 	clog << "Constructing KDTree... ";
-	KDTree = new TreeNode(objects,2,sceneAABB,false);
+	KDTree = new TreeNode(objects,0,sceneAABB,false);
 	clog << "done"<<endl;
 }
 

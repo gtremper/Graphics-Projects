@@ -4,13 +4,17 @@ size 640 480
 camera 0 5 15 0 5 -1 0 1 0 45
 output scene7.png
 
-diffuse 0 0 0
-ambient 0 0 0
-shininess 1
-specular 0 0 0
-indexofrefraction 1.1
-refractivity 1
-#sphere 0 5 13.5 1
+antialias 2
+lightradius 0
+shadowrays 1
+
+diffuse 0 0 .2
+ambient 0.01 0.01 0.01
+shininess 100
+specular 1 1 1
+indexofrefraction 1.4
+refractivity .8
+#sphere -2 6 7 1
 refractivity 0
 
 

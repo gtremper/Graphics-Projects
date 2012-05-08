@@ -1,6 +1,7 @@
 size 500 500
-camera 0 0 -15 0 0 0 0 1 0 36.87
+camera 0 0 5 0 0 0 0 1 0 36.87
 
+antialias 1
 
 
 
@@ -8,13 +9,13 @@ point 0 4 -15 1.0 1.0 1.0
 
 
 refractivity 1
-indexofrefraction 1.2
+indexofrefraction 1.5
 
 ambient 0.1  0.1  0.1
 #diffuse 1.0 0.0 1.0
 #specular 1.0 1.0 1.0
 shininess 50
-sphere 0 0 -3 1
+sphere 0 0 0 1
 
 refractivity 0
 
@@ -24,6 +25,7 @@ diffuse 0 1.0 1.0
 specular 1.0 1.0 1.0
 shininess 50
 	
+translate 1.5 0 0
 vertex -1 -2 -3
 vertex 3 -2 -3
 vertex 0 2 -3

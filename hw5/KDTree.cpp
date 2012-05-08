@@ -22,7 +22,6 @@ struct ShapeSorter {
 };
 
 TreeNode::TreeNode(vector<Shape*>& prims, int ax, AABB& bigBox, bool prevSize){
-	//cout<<"axis: "<< ax <<endl;
 	this->aabb = bigBox;
 	this->axis = ax;
 	
@@ -45,17 +44,12 @@ TreeNode::TreeNode(vector<Shape*>& prims, int ax, AABB& bigBox, bool prevSize){
 		}
 	}
 	
-	//cout << "LEFTSIZE: " <<leftPrims.size()<<endl;
-	//cout << "RIGHTSIZE: " <<rightPrims.size()<<endl;
-	
 	bool same = leftPrims.size()==prims.size() || rightPrims.size()==prims.size();
 	
 	if( prevSize&&same || prims.size()<=TREELIMIT){
 		left = NULL;
 		right = NULL;
 		primatives = prims;
-		//cout << "LEAFNODE: "<<aabb.bounds[0]<<" "<<aabb.bounds[1]<<" "<<aabb.bounds[2]<<" "<<aabb.bounds[3]<<" "<<aabb.bounds[4]<<" "<<aabb.bounds[5]<<endl;
-		//cout << "Size: "<<prims.size()<<endl;
 	}else{
 		AABB leftAABB = AABB(aabb);
 		leftAABB.bounds[2*axis+1] = split;
@@ -81,73 +75,22 @@ Intersection TreeNode::intersect(Ray& ray){
 	if(!left){
 		return Intersection(primatives,ray);
 	}
-	/*
-	if(ray.origin[axis]>split-EPSILON && ray.origin[axis]<split+EPSILON){
-		Intersection hit1 = left->intersect(ray);
-		Intersection hit2 = right->intersect(ray);
-		if(!hit1.primative) return hit2;
-		if(!hit2.primative) return hit1;
-		if(glm::distance(hit1.point,ray.origin)<glm::distance(hit2.point,ray.origin)){
-			return hit1;
-		}
-		return hit2;
-	}
-	*/
 	
-	if(ray.origin[axis]<split){	
-		
-		if(left->aabb.intersect(ray)){
-			Intersection hit = left->intersect(ray);
-			if(hit.primative) return hit;
-		}
-		if(right->aabb.intersect(ray)){
-			Intersection hit = right->intersect(ray);
-			if(hit.primative) return hit;
-		}
-	} else {
-		if(right->aabb.intersect(ray)){
-			Intersection hit = right->intersect(ray);
-			if(hit.primative) return hit;
-		}
-		if(left->aabb.intersect(ray)){
-			Intersection hit = left->intersect(ray);
-			if(hit.primative) return hit;
-		}
-	}
-	return Intersection();
-}
-
-/*
-double leftHit = left->aabb.intersect(ray);
-double rightHit = right->aabb.intersect(ray);
-
-if(leftHit<0.0 && rightHit<0.0) return Intersection();
-
-if(leftHit>rightHit){
-	Intersection hit = left->intersect(ray);
-	if(hit.primative) return hit;
-	if(rightHit>0.0) return right->intersect(ray);
-	return Intersection();
-}else{
-	Intersection hit = right->intersect(ray);
-	if(hit.primative) return hit;
-	if(leftHit>0.0) return left->intersect(ray);
-	return Intersection();
-}
-*/
-
-
-
-/*
-if(ray.origin[axis]>(split-EPSILON)){
+	bool hitLeft = left->aabb.intersect(ray);
+	bool hitRight = right->aabb.intersect(ray);
+	
+	if(!hitLeft && !hitRight) return Intersection();
+	
+	if(!hitLeft) return right->intersect(ray);
+	if(!hitRight) return left->intersect(ray);
 	
 	Intersection hit1 = left->intersect(ray);
 	Intersection hit2 = right->intersect(ray);
 	if(!hit1.primative) return hit2;
 	if(!hit2.primative) return hit1;
 	if(glm::distance(hit1.point,ray.origin)<glm::distance(hit2.point,ray.origin)){
-		//return hit1;
+		return hit1;
 	}
-	//return hit2;
+	return hit2;
+	
 }
-*/

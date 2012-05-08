@@ -5,8 +5,8 @@ output scene6.png
 
 maxdepth 5
 
-shadowrays 1
-lightradius 0
+shadowrays 20
+lightradius .1
 antialias 2
 
 maxverts 12
