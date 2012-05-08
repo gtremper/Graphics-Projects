@@ -23,7 +23,7 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 
 	Intersection hit = scene.KDTree->intersect(ray);
 
-	//Intersection hit = Intersection(scene.objects, ray);
+	// Intersection hit = Intersection(scene.objects, ray);
 	
 	
 	if(!hit.primative) {
@@ -66,7 +66,7 @@ void raytrace(Scene& scene) {
 	FIBITMAP* bitmap = FreeImage_Allocate(scene.width, scene.height, BPP);
 	
 	if (!bitmap) exit(1);
-	double subdivisions = 3;
+	double subdivisions = scene.antialias;
 	double subdivide = 1/subdivisions;
 	
 	#pragma omp parallel for
