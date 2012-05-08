@@ -18,6 +18,10 @@
 size 640 480
 output myScene.png
 
+antialias 2
+shadowrays 1
+lightradius 0
+
 camera 0 0 1 0 0 -1 0 1 0 45
 maxdepth 5
 

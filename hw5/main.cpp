@@ -23,6 +23,10 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 
 	//Intersection hit = scene.KDTree->intersect(ray);
 	
+	if (depth ==3){
+		cout << "derasdfasdf"<<endl;
+	}
+	
 	Intersection hit = Intersection(scene.objects, ray);
 	
 	if(!hit.primative) {
@@ -42,12 +46,12 @@ vec3 findColor(Scene& scene, Ray& ray, int depth) {
 	Ray reflectedRay = Ray(hit.point+EPSILON*normal, ray.direction+(2.*normal*c1));
 	
 	if(depth != 1) {
-		color += hit.primative->specular * findColor(scene, reflectedRay, depth-1);
+		//color += hit.primative->specular * findColor(scene, reflectedRay, depth-1);
 		if(hit.primative->refractivity) {
 			
 			double n = 1.0/hit.primative->indexofrefraction; // first number is the refractive index of air
 			double c2 = sqrt(1 - n*n * (1 - c1*c1));
-			Ray refractedRay = Ray(hit.point, -glm::normalize((n*ray.direction) + (n*c1-c2)*normal));
+			Ray refractedRay = Ray(hit.point, glm::normalize((n*ray.direction) + (n*c1-c2)*normal));
 			if(c1>0.0){
 				refractedRay.origin -= EPSILON*normal;
 			} else {

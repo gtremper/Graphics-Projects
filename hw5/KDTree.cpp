@@ -81,8 +81,21 @@ Intersection TreeNode::intersect(Ray& ray){
 	if(!left){
 		return Intersection(primatives,ray);
 	}
+	/*
+	if(ray.origin[axis]>split-EPSILON && ray.origin[axis]<split+EPSILON){
+		Intersection hit1 = left->intersect(ray);
+		Intersection hit2 = right->intersect(ray);
+		if(!hit1.primative) return hit2;
+		if(!hit2.primative) return hit1;
+		if(glm::distance(hit1.point,ray.origin)<glm::distance(hit2.point,ray.origin)){
+			return hit1;
+		}
+		return hit2;
+	}
+	*/
 	
 	if(ray.origin[axis]<split){	
+		
 		if(left->aabb.intersect(ray)){
 			Intersection hit = left->intersect(ray);
 			if(hit.primative) return hit;
