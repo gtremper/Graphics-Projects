@@ -24,6 +24,9 @@ lightradius 0
 
 camera 0 0 1 0 0 -1 0 1 0 45
 maxdepth 5
+antialias 4
+shadowrays 20
+lightradius 0.15
 
 ambient 0 0 0
 specular 0 0 0

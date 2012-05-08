@@ -9,8 +9,6 @@ shadowrays 1
 lightradius 0
 antialias 2
 
-
-
 maxverts 12
 #planar face
 vertex -1 1 0
