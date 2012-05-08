@@ -41,6 +41,8 @@ diffuse 0 0 1
 
 pushTransform
 
+#rotate 0 1 0 0.01
+
 #red
 pushTransform
 translate 0 0 -3

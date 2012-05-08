@@ -34,7 +34,7 @@ vec3 DirectionalLight::shade(const Intersection& hit, TreeNode& tree, const vec3
 bool DirectionalLight::isVisible(const vec3& point, TreeNode& tree) {
 	Ray ray(point,direction);
 	Intersection hit = tree.intersect(ray);
-	return hit.primative;
+	return !hit.primative;
 }
 
 /***  Point Light  ***/
@@ -47,7 +47,7 @@ PointLight::PointLight(const vec3& colour,const vec3& poi, double con, double li
 }
 
 vec3 PointLight::shade(const Intersection& hit, TreeNode& tree, const vec3& normal) {
-	double totalshots = 20;
+	double totalshots = 1;
 	int numberOfHits = 0;
 	for(int i =0; i<totalshots; i++){
 		if( isVisible(hit.point+EPSILON*normal,tree) ) {
@@ -71,7 +71,7 @@ vec3 PointLight::shade(const Intersection& hit, TreeNode& tree, const vec3& norm
 
 bool PointLight::isVisible(const vec3& p, TreeNode& tree) {
 	vec3 randPoint;
-	double radius = 0.1;
+	double radius = 0.0;
 	double randomNum1 = ((double)rand()/(double)RAND_MAX);
 	double randomNum2 = ((double)rand()/(double)RAND_MAX);
 	double q = 2. * M_PI * randomNum1;

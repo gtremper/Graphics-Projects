@@ -79,12 +79,10 @@ TreeNode::~TreeNode(){
 
 Intersection TreeNode::intersect(Ray& ray){
 	if(!left){
-		//cout << "HIT BOX"<<endl;
 		return Intersection(primatives,ray);
 	}
 	if(ray.origin[axis]<(split+EPSILON)){
 		if(left->aabb.intersect(ray)){
-			//cout <<"1st left"<<endl;
 			Intersection hit = left->intersect(ray);
 			if(hit.primative) return hit;
 		}
@@ -94,18 +92,26 @@ Intersection TreeNode::intersect(Ray& ray){
 		}
 	} else {
 		if(right->aabb.intersect(ray)){
-			//cout <<"2nd right"<<endl;
 			Intersection hit = right->intersect(ray);
 			if(hit.primative) return hit;
 		}
 		if(left->aabb.intersect(ray)){
-			//cout << "2nd left"<<endl;
 			Intersection hit = left->intersect(ray);
 			if(hit.primative) return hit;
 		}
 	}
 	return Intersection();
 }
-
-
-
+/*
+if(ray.origin[axis]>(split-EPSILON)){
+	
+	Intersection hit1 = left->intersect(ray);
+	Intersection hit2 = right->intersect(ray);
+	if(!hit1.primative) return hit2;
+	if(!hit2.primative) return hit1;
+	if(glm::distance(hit1.point,ray.origin)<glm::distance(hit2.point,ray.origin)){
+		//return hit1;
+	}
+	//return hit2;
+}
+*/

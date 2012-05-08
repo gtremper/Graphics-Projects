@@ -1,8 +1,18 @@
 #Stanford Dragon
 
 size 640 480
-camera 0 15 15 0 5 -1 0 1 0 45
+camera 0 5 15 0 5 -1 0 1 0 45
 output scene7.png
+
+diffuse 0 0 0
+ambient 0 0 0
+shininess 1
+specular 0 0 0
+indexofrefraction 1
+refractivity 1
+#sphere 0 5 10 1
+refractivity 0
+
 
 diffuse 0.4 0.1 0.1
 ambient 0.0 0.0 0.0

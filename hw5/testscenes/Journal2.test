@@ -8,7 +8,7 @@ maxdepth 10
 
 pushTransform
 
-rotate 0 1 0 10
+rotate 0 1 0 0
 
 pushTransform
 ambient 0.1  0.1  0.1
