@@ -29,6 +29,10 @@ Scene::Scene(char* file) {
 	emission = vec3(0,0,0);
 	indexofrefraction = 1;
 	refractivity = 0;
+	antialias = 2;
+	shadowrays = 1;
+	lightradius = 0;
+	
 	constant = 1;
 	linear = 0;
 	quadratic = 0;

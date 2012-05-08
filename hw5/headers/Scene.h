@@ -27,6 +27,10 @@ class Scene {
 		double indexofrefraction;
 		double refractivity;
 		
+		int antialias;
+		int shadowrays;
+		double lightradius;
+		
 		std::vector<Light*> lights;
 		double constant;
 		double linear;
