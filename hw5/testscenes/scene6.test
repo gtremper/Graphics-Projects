@@ -4,8 +4,9 @@ camera 0 0 1 0 0 -1 0 1 0 45
 output scene6.png
 
 maxdepth 5
-
-
+antialias 4
+shadowrays 20
+lightradius 0.15
 
 maxverts 12
 #planar face
