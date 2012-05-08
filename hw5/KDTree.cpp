@@ -81,10 +81,8 @@ Intersection TreeNode::intersect(Ray& ray){
 	if(!left){
 		return Intersection(primatives,ray);
 	}
-	if(ray.origin[axis]<(split+EPSILON)){
-		
-	//	if(ray.origin[axis]>(split-EPSILON))
-		
+	
+	if(ray.origin[axis]<split){	
 		if(left->aabb.intersect(ray)){
 			Intersection hit = left->intersect(ray);
 			if(hit.primative) return hit;
@@ -105,6 +103,28 @@ Intersection TreeNode::intersect(Ray& ray){
 	}
 	return Intersection();
 }
+
+/*
+double leftHit = left->aabb.intersect(ray);
+double rightHit = right->aabb.intersect(ray);
+
+if(leftHit<0.0 && rightHit<0.0) return Intersection();
+
+if(leftHit>rightHit){
+	Intersection hit = left->intersect(ray);
+	if(hit.primative) return hit;
+	if(rightHit>0.0) return right->intersect(ray);
+	return Intersection();
+}else{
+	Intersection hit = right->intersect(ray);
+	if(hit.primative) return hit;
+	if(leftHit>0.0) return left->intersect(ray);
+	return Intersection();
+}
+*/
+
+
+
 /*
 if(ray.origin[axis]>(split-EPSILON)){
 	
