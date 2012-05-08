@@ -5,7 +5,7 @@
 #include "Shapes.h"
 #include "Intersection.h"
 
-#define EPSILON 0.00000001
+#define EPSILON 0.000001
 
 using namespace std;
 

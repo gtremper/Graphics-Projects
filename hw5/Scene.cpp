@@ -42,7 +42,7 @@ Scene::Scene(char* file) {
 	//cout<<"AABB: "<<sceneAABB.bounds[0]<<" "<<sceneAABB.bounds[1]<<" "<<sceneAABB.bounds[2]<<" "<<sceneAABB.bounds[3]<<" "<<sceneAABB.bounds[4]<<" "<<sceneAABB.bounds[5]<<endl;
 	
 	clog << "Constructing KDTree... ";
-	KDTree = new TreeNode(objects,0,sceneAABB,false);
+	KDTree = new TreeNode(objects,2,sceneAABB,false);
 	clog << "done"<<endl;
 }
 
