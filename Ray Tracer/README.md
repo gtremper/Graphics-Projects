@@ -22,5 +22,5 @@ The added commands for the scene files are:
 
 ## Creators
 
-Graham Tremper: cs184-bj: http://inst.cs.berkeley.edu/~cs184-bj/
-Wesley Prager:  cs184-dy: http://inst.cs.berkeley.edu/~cs184-dy/
+* Graham Tremper: cs184-bj: http://inst.cs.berkeley.edu/~cs184-bj/
+* Wesley Prager:  cs184-dy: http://inst.cs.berkeley.edu/~cs184-dy/
