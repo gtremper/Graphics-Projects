@@ -1,3 +1,5 @@
+# Hedge Maze Scene
+
 To run the scene after compiling, run "./transforms HedgeMaze.txt models.txt" from the command line.
 
 The movement is similar to a first person game where moving the mouse controls where to look, and the "WASD" keys control movement. You can move the mouse without moving the eye by clicking first and then dragging. By pressing the "f" key, you can switch to fly mode where you can leave the ground and get a bird's eye view of the scene. In this mode, you can move vertically in addition to along the horizontal plane. The orientation we are using is such that the two entrances to the maze are at the top left corner (facing up), and bottom right corner (facing right).
